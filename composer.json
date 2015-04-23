@@ -1,5 +1,5 @@
 {
-  "name": "subgoe/find",
+  "name": "slub/find",
   "description": "A frontend for Solr indexes",
   "version": "1.0.1",
   "type": "typo3-cms-extension",
@@ -10,6 +10,11 @@
     {
       "name" : "Sven-S. Porst, Ingo Pfennigstorf",
       "email" : "porst@sub.uni-goettingen.de",
+      "role" : "Developer"
+    },
+    {
+      "name" : "Christof Rodejohann",
+      "email" : "chrtistof.rodejohann@slub-dresden.de",
       "role" : "Developer"
     }
   ],
