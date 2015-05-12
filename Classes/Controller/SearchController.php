@@ -56,6 +56,12 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	 */
 	protected $configuration = array();
 
+	/**
+	 * @var \TYPO3\CMS\Extbase\SignalSlot\Dispatcher
+	 * @inject
+	 */
+	protected $signalSlotDispatcher;
+
 
 	/**
 	 * Initialisation and setup.
@@ -93,6 +99,8 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 
 			// Run the query.
 			try {
+				$this->signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . 'BeforeSelect', array(&$query, $this->requestArguments));
+
 				$resultSet = $this->solr->select($query);
 			}
 			catch (\Solarium\Exception\HttpException $exception) {
@@ -100,6 +108,8 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 				$this->logError($message, \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR, array('requestArguments' => $this->requestArguments, 'exception' => $this->exceptionToArray($exception)), FALSE);
 				$this->view->assign('error', array('solr' => $exception));
 			}
+
+			$this->signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . 'BeforeRender', array(&$resultSet));
 
 			$this->view->assignMultiple(array(
 				'results' => $resultSet,
@@ -232,8 +242,11 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 				}
 			}
 
+			$this->signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . 'BeforeRender', array(&$assignments));
+
 			$this->view->assignMultiple($assignments);
 			$this->addStandardAssignments();
+
 		}
 		else {
 			// id argument missing or empty
@@ -384,26 +397,39 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		return $queryComponents;
 	}
 
-
 	/**
 	 * Creates a blank query, sets up TypoScript filters and adds it to the view.
 	 *
+	 * @param array $arguments request arguments
 	 * @return \Solarium\QueryType\Select\Query\Query
 	 */
-	private function createQuery () {
+	private function createQuery ($arguments = array()) {
 		$query = $this->solr->createSelect();
 		$this->addTypoScriptFilters($query);
 
-        if(count($this->settings['shards'])) {
-            $distributedSearch = $query->getDistributedSearch();
-            foreach($this->settings['shards'] as $name => $shard) {
-                $distributedSearch->addShard($name, $shard);
-            }
-        }
+		$this->createQueryComponents($query);
 
 		$this->configuration['solarium'] = $query;
 
-		return $query;
+		return $this->configuration['solarium'];
+	}
+
+
+	/**
+	 * Check configuration for shards and when found create Distributed Search
+	 *
+	 * @param \Solarium\QueryType\Select\Query\Query $query
+	 */
+	private function createQueryComponents(&$query) {
+
+		// Shards
+
+		if(count($this->settings['shards'])) {
+			$distributedSearch = $query->getDistributedSearch();
+			foreach($this->settings['shards'] as $name => $shard) {
+				$distributedSearch->addShard($name, $shard);
+			}
+		}
 	}
 
 
@@ -651,6 +677,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 						}
 					}
 					else {
+
 						$queryForFacet = $facetSet->createFacetField($facetID);
 						$queryForFacet->setField($facet['field'] ? $facet['field'] : $facetID)
 										->setMinCount($facet['fetchMinimum'])
