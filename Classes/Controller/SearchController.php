@@ -180,6 +180,9 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 				$query->setRows($nextIndex - $previousIndex + 1);
 
 				try {
+
+					$this->signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . 'BeforePagingSelect', array(&$query, $arguments['underlyingQuery']));
+
 					$selectResults = $this->solr->select($query);
 					if (count($selectResults) > 0) {
 						$assignments['results'] = $selectResults;
