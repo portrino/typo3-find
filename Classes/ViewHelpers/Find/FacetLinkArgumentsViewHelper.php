@@ -54,6 +54,8 @@ class FacetLinkArgumentsViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\Abst
 		$this->registerArgument('facetTerm', 'string', 'Term of the facet item to create the link for', FALSE, '');
 		$this->registerArgument('activeFacets', 'array', 'Array of active facets', FALSE, Array());
 		$this->registerArgument('mode', 'string', 'One of »add« or »remove« depending on whether the result is used with »arguments« or with »argumentsToBeExcludedFromQueryString«', FALSE, 'add');
+		$this->registerArgument('not', 'boolean', 'Invert facet to not.', FALSE, '');
+		$this->registerArgument('modifier', 'string', 'Choose a modifier.', FALSE, '');
 	}
 
 	
@@ -84,6 +86,11 @@ class FacetLinkArgumentsViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\Abst
 			$result['facet'] = array(
 				 $this->arguments['facetID'] => array($this->arguments['facetTerm'] => 1)
 			);
+
+			if ($this->arguments['modifier']) {
+				$result['facet'][$this->arguments['facetID']][$this->arguments['facetTerm']] = $this->arguments['modifier'];
+			}
+
 		}
 
 		return $result;
