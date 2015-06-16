@@ -482,7 +482,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		$activeFacetsForTemplate = array();
 		foreach ($activeFacets as $facetID => $facets) {
 			foreach ($facets as $facetTerm => $facetInfo) {
-				$facetQuery = $this->getFacetQuery($this->getFacetConfig($facetID), $facetTerm);
+				$facetQuery = $this->getFacetQuery($this->getFacetConfig($facetID), $facetTerm, $facetInfo['status']);
 				if ($facetInfo['config']['queryStyle'] === 'and') {
 					// TODO: Do we really use this part of the condition? Can it be removed?
 					// Alternative query style: adding a conjunction to the main query.
@@ -524,9 +524,10 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	 *
 	 * @param array $facetConfig
 	 * @param string $queryTerm
+	 * @param string $queryModifier
 	 * @return string query string
 	 */
-	private function getFacetQuery ($facetConfig, $queryTerm) {
+	private function getFacetQuery ($facetConfig, $queryTerm, $queryModifier) {
 		$queryString = NULL;
 
 		if ($facetConfig) {
@@ -562,6 +563,10 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		else {
 			$message = 'find: A non-configured facet was selected. Ignoring it.';
 			$this->logError($message, \TYPO3\CMS\Core\Messaging\FlashMessage::WARNING, array('requestArguments' => $this->requestArguments));
+		}
+
+		if($queryModifier && is_array($this->settings['modifier']) && $this->settings['modifier'][$queryModifier]) {
+			$queryString = sprintf($this->settings['modifier'][$queryModifier], $queryString);
 		}
 
 		return $queryString;
@@ -614,7 +619,6 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 				$this->setActiveFacetSelectionForID($activeFacets, $facetID, $facetSelection);
 			}
 		}
-
 		return $activeFacets;
 	}
 
@@ -635,7 +639,8 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 				'id' => $facetID,
 				'config' => $facetConfig,
 				'term' => $facetTerm,
-				'query' => $this->getFacetQuery($facetConfig, $facetTerm)
+				'status' => $facetStatus,
+				'query' => $this->getFacetQuery($facetConfig, $facetTerm, $facetStatus)
 			);
 			$facetQueries[$facetTerm] = $facetInfo;
 		}
