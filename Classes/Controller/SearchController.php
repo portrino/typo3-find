@@ -31,6 +31,8 @@ namespace Subugoe\Find\Controller;
 
 
 
+use Solarium\QueryType\Select\Query\FilterQuery;
+
 require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('find') . 'vendor/autoload.php');
 
 /**
@@ -393,9 +395,12 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		}
 
 		// Ask for all results if there is no query.
+
 		if (count($queryComponents) === 0) {
 			$queryComponents[] = $this->settings['defaultQuery'];
 		}
+
+
 
 		return $queryComponents;
 	}
@@ -452,6 +457,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 			$queryParameters = $arguments['q'];
 		}
 		$queryComponents = $this->queryComponentsForQueryParameters($query, $queryParameters);
+
 		$queryString = implode(' ' . $query::QUERY_OPERATOR_AND . ' ', $queryComponents);
 		$query->setQuery($queryString);
 
@@ -481,7 +487,11 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		$activeFacets = $this->getActiveFacets($arguments);
 		$activeFacetsForTemplate = array();
 		foreach ($activeFacets as $facetID => $facets) {
+
+			$combineFacets = array();
+
 			foreach ($facets as $facetTerm => $facetInfo) {
+
 				$facetQuery = $this->getFacetQuery($this->getFacetConfig($facetID), $facetTerm, $facetInfo['status']);
 				if ($facetInfo['config']['queryStyle'] === 'and') {
 					// TODO: Do we really use this part of the condition? Can it be removed?
@@ -506,11 +516,53 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 						$queryInfo['tag'] =  $this->tagForFacet($facetID);
 					}
 
-					$query->createFilterQuery($queryInfo)
+					if($facetInfo['status'] !== '1') {
+
+						$query->createFilterQuery($queryInfo)
 							->setQuery($facetQuery);
+
+					} else {
+
+
+						if(!is_array($combineFacets[$facetInfo['id']])) {
+							$combineFacets[$facetInfo['id']] = array('query' => $facetQuery, 'info' => $facetInfo);
+
+							$query->createFilterQuery($queryInfo)
+								->setQuery($facetQuery);
+
+						} else {
+							$combineFacets[$facetInfo['id']]['query'] .= ' OR ' . $facetQuery;
+
+							$filterQueries = $query->getFilterQueries();
+
+							$removed = false;
+
+							/** @var FilterQuery $filterQuery */
+							foreach($filterQueries as $filterQuery) {
+
+								if(in_array('facet-'.$facetInfo['id'], $filterQuery->getTags())) {
+
+									$query->removeFilterQuery($filterQuery);
+
+									$removed = true;
+
+								}
+
+							}
+
+							if($removed) {
+								$query->createFilterQuery($queryInfo)
+									->setQuery($combineFacets[$facetInfo['id']]['query']);
+							}
+
+						}
+
+					}
+
 				}
 				$activeFacetsForTemplate[$facetID][$facetTerm] = $facetInfo;
 			}
+
 		}
 
 		$this->configuration['activeFacets'] = $activeFacetsForTemplate;
@@ -703,7 +755,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 				}
 			}
 		}
-		
+
 		$this->configuration['facets'] = $facetConfiguration;
 	}
 
