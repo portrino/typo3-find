@@ -97,28 +97,36 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 			$this->forward('detail');
 		}
 		else {
-			$query = $this->createQueryForArguments($this->requestArguments);
 
-			// Run the query.
-			try {
-				$this->signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . 'BeforeSelect', array(&$query, $this->requestArguments));
+			if(count($this->requestArguments['q']) > 0) {
 
-				$resultSet = $this->solr->select($query);
+				$query = $this->createQueryForArguments($this->requestArguments);
+
+				// Run the query.
+				try {
+
+					$this->signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . 'BeforeSelect', array(&$query, $this->requestArguments));
+
+					$resultSet = $this->solr->select($query);
+				} catch (\Solarium\Exception\HttpException $exception) {
+					$message = 'find: Solr Exception (Timeout?)';
+					$this->logError($message, \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR, array('requestArguments' => $this->requestArguments, 'exception' => $this->exceptionToArray($exception)), FALSE);
+					$this->view->assign('error', array('solr' => $exception));
+				}
+
+				$this->signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . 'BeforeRender', array(&$resultSet));
+
+				$this->view->assignMultiple(array(
+					'results' => $resultSet,
+					'noSearch', '0'
+				));
+
+				$this->configuration['counterStart'] = $this->counterStart();
+				$this->configuration['counterEnd'] = $this->counterEnd();
+
+			} else {
+				$this->view->assign('noSearch', '1');
 			}
-			catch (\Solarium\Exception\HttpException $exception) {
-				$message = 'find: Solr Exception (Timeout?)';
-				$this->logError($message, \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR, array('requestArguments' => $this->requestArguments, 'exception' => $this->exceptionToArray($exception)), FALSE);
-				$this->view->assign('error', array('solr' => $exception));
-			}
-
-			$this->signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . 'BeforeRender', array(&$resultSet));
-
-			$this->view->assignMultiple(array(
-				'results' => $resultSet,
-			));
-			
-			$this->configuration['counterStart'] = $this->counterStart();
-			$this->configuration['counterEnd'] = $this->counterEnd();
 
 			$this->addQueryInformationAsJavaScript($this->requestArguments['q']);
 			$this->addStandardAssignments();
@@ -537,9 +545,9 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 
 							$removed = false;
 
-							/** @var FilterQuery $filterQuery */
 							foreach($filterQueries as $filterQuery) {
 
+								/**	@var FilterQuery */
 								if(in_array('facet-'.$facetInfo['id'], $filterQuery->getTags())) {
 
 									$query->removeFilterQuery($filterQuery);
