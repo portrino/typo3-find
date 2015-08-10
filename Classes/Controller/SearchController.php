@@ -326,6 +326,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	 * search strings from it, using the »queryFields« configuration from TypoScript.
 	 * These search strings need to be ANDed together for the complete query.
 	 *
+	 * @param \Solarium\QueryType\Select\Query\Query $query
 	 * @param array $queryParameters
 	 * @return array
 	 */
@@ -396,6 +397,11 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 
 				ksort($queryTerms);
 				$queryPart = '_query_:' . $query->getHelper()->escapePhrase(vsprintf($queryFormat, $queryTerms));
+
+				if($fieldInfo['advancedEscape']) {
+					$queryPart = '_query_:"' . vsprintf($queryFormat, array_map($query->getHelper()->escapePhrase, $queryTerms)).'"';
+				}
+
 				if ($queryPart) {
 					$queryComponents[$fieldID] = $queryPart;
 				}
