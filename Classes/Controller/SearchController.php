@@ -215,13 +215,13 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 						else {
 							$message = 'find: »detail« action query with underlying query could not retrieve record id »' . $id . '«.';
 							$this->logError($message, \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR, array('arguments' => $arguments));
-							$this->forward('index');
+							$this->view->assign('error', array('solr' => $message));
 						}
 					}
 					else {
 						$message = 'find: »detail« action query with underlying query returned no results.';
 						$this->logError($message, \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR, array('arguments' => $arguments));
-						$this->forward('index');
+						$this->view->assign('error', array('solr' => $message));
 					}
 				}
 				catch (\Solarium\Exception\HttpException $exception) {
@@ -245,7 +245,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 					else {
 						$message = 'find: »detail« action query for id »' . $id . '« returned no results.';
 						$this->logError($message, \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR, array('arguments' => $arguments));
-						$this->forward('index');
+						$this->view->assign('error', array('solr' => $message));
 					}
 				}
 				catch (\Solarium\Exception\HttpException $exception) {
@@ -331,6 +331,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	 * @return array
 	 */
 	private function queryComponentsForQueryParameters ($query, $queryParameters) {
+
 		$queryComponents = array();
 
 		$queryFields = $this->settings['queryFields'];
