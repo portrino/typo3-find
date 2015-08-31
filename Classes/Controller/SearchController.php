@@ -112,6 +112,10 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 					$message = 'find: Solr Exception (Timeout?)';
 					$this->logError($message, \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR, array('requestArguments' => $this->requestArguments, 'exception' => $this->exceptionToArray($exception)), FALSE);
 					$this->view->assign('error', array('solr' => $exception));
+				} catch (\Solarium\Exception\UnexpectedValueException $exception) {
+					$message = 'find: Solr Exception (Bad response?)';
+					$this->logError($message, \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR, array('requestArguments' => $this->requestArguments, 'exception' => $this->exceptionToArray($exception)), FALSE);
+					$this->view->assign('error', array('solr' => $exception));
 				}
 
 				$this->signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . 'BeforeRender', array(&$resultSet));
