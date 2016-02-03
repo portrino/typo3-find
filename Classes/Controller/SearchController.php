@@ -273,6 +273,49 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		}
 	}
 
+	/**
+	 * Citation Action.
+	 */
+	public function citationAction() {
+
+		$arguments = $this->requestArguments;
+		if (array_key_exists('id', $arguments) && !empty($arguments['id'])) {
+			$id = $arguments['id'];
+			$exportType = $arguments['type'];
+			$assignments = array();
+
+			// Without underlying query information, just get the record specified.
+			$query = $this->createQuery();
+			$escapedID = $query->getHelper()->escapeTerm($id);
+			$query->setQuery('id:' . $escapedID);
+			try {
+				$selectResults = $this->solr->select($query);
+				if (count($selectResults) > 0) {
+					$assignments['results'] = $selectResults;
+					$resultSet = $selectResults->getDocuments();
+					$assignments['document'] = $resultSet[0];
+				}
+				else {
+					$message = 'find: »detail« action query for id »' . $id . '« returned no results.';
+					$this->logError($message, \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR, array('arguments' => $arguments));
+					$this->view->assign('error', array('solr' => $message));
+				}
+			}
+			catch (\Solarium\Exception\HttpException $exception) {
+				$message = 'find: Solr Exception (Timeout?)';
+				$this->logError($message, \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR, array('arguments' => $arguments, 'exception' => $this->exceptionToArray($exception)));
+				$this->view->assign('error', array('solr' => $exception));
+			}
+
+
+			$this->signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . 'BeforeRender', array(&$assignments));
+
+			$this->view->assignMultiple($assignments);
+			$this->view->assign('type', $exportType);
+			$this->addStandardAssignments();
+		}
+	}
+
 
 	/**
 	 * Assigns standard variables to the view.
