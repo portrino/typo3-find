@@ -389,7 +389,11 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 				// a) just a single string (e.g. text field)
 				// b) array of strings (e.g. date range field)
 				// c) single field with additional configuration (e.g. text field with alternate query)
-				$queryArguments = trim($queryParameters[$fieldID]);
+				if(is_string($queryParameters[$fieldID])) {
+					$queryArguments = trim($queryParameters[$fieldID]);
+				} else {
+					$queryArguments = $queryParameters[$fieldID];
+				}
 				$queryAlternate = NULL;
 				if (is_array($queryArguments) && array_key_exists('alternate', $queryArguments) && array_key_exists('queryAlternate', $fieldInfo)) {
 					$queryAlternate = $queryArguments['alternate'];
