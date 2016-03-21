@@ -462,6 +462,17 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 					$queryPart = str_replace('\\', '\\\\', $queryPart);
 				}
 
+				if($fieldInfo['and'] == '1') {
+
+					$queryPart = '_query_:';
+
+					preg_match_all('/"(?:\\\\.|[^\\\\"])*"|\S+/', $queryTerms[0], $matches);
+					foreach($matches[0] as $match) {
+						$queryPart .= $fieldID.':'.$match.' ';
+					}
+
+				}
+
 				if ($queryPart) {
 					$queryComponents[$fieldID] = $queryPart;
 				}
