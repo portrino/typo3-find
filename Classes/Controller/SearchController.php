@@ -472,6 +472,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 
 					preg_match_all('/"(?:\\\\.|[^\\\\"])*"|\S+/', $queryTerms[0], $matches);
 					foreach($matches[0] as $match) {
+						$match = str_replace(array('"', ' '), array('\\"', '\\ '), $match);
 						$queryPart .= $fieldID.':'.$match.' ';
 					}
 
