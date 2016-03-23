@@ -582,7 +582,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 
 			foreach ($facets as $facetTerm => $facetInfo) {
 
-				$facetQuery = $this->getFacetQuery($this->getFacetConfig($facetID), $facetTerm, $facetInfo['status']);
+				$facetQuery = $this->getFacetQuery($this->getFacetConfig($facetID), $query->getHelper()->escapeTerm($facetTerm), $facetInfo['status']);
 				if ($facetInfo['config']['queryStyle'] === 'and') {
 					// TODO: Do we really use this part of the condition? Can it be removed?
 					// Alternative query style: adding a conjunction to the main query.
