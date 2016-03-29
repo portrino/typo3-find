@@ -95,12 +95,17 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	public function indexAction() {
 		if (array_key_exists('id', $this->requestArguments)) {
 			$this->forward('detail');
-		}
-		else {
+		} elseif (array_key_exists('rsn', $this->requestArguments)) {
+			$this->forward('redirect');
+		} elseif (array_key_exists('bc', $this->requestArguments)) {
+			$this->forward('redirect');
+		} elseif (array_key_exists('ppn', $this->requestArguments)) {
+			$this->forward('redirect');
+		} else {
 
 			if(count($this->requestArguments['q']) > 0) {
 
-				$query = $this->createQueryForArguments($this->requestArguments);
+				$query = $this->createQueryForArguments($this->requestArguments);#
 
 				// Run the query.
 				try {
@@ -1382,6 +1387,53 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		}
 
 		return $array;
+	}
+
+
+	/**
+	 * Redirect View to detail action.
+	 */
+	public function redirectAction() {
+
+		$queryArguments = ['q' => []];
+
+		if (array_key_exists('rsn', $this->requestArguments)) {
+			$queryArguments['q']['rsn'] = $this->requestArguments['rsn'];
+		} elseif (array_key_exists('bc', $this->requestArguments)) {
+			$queryArguments['q']['barcode'] = $this->requestArguments['bc'];
+		} elseif (array_key_exists('ppn', $this->requestArguments)) {
+			$queryArguments['q']['ppn'] = $this->requestArguments['ppn'];
+		}
+
+		$query = $this->createQueryForArguments($queryArguments);
+
+		/** @var Result $selectResults */
+		$selectResults = $this->solr->select($query);
+
+		if (count($selectResults) > 0) {
+			$assignments['results'] = $selectResults;
+
+			$resultSet = $selectResults->getDocuments();
+
+			$arguments = array(
+				array('tx_find_find' =>
+					array(
+						'id' => $resultSet[0]['id'],
+					)
+				)
+			);
+
+			$uri = $this->uriBuilder->reset()->setTargetPageUid(intval($GLOBALS['TSFE']->id))->setCreateAbsoluteUri(TRUE)->setArguments($arguments)->build();
+
+			\TYPO3\CMS\Core\Utility\HttpUtility ::redirect($uri);
+
+		} else {
+			$uri = $this->uriBuilder->reset()->setTargetPageUid(intval($GLOBALS['TSFE']->id))->setCreateAbsoluteUri(TRUE)->setArguments([])->build();
+			\TYPO3\CMS\Core\Utility\HttpUtility ::redirect($uri);
+		}
+
+		die();
+
 	}
 
 }
