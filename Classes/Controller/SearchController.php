@@ -51,6 +51,11 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	 */
 	protected $requestArguments;
 
+	/**
+	 * @var array
+	 */
+	protected $timing;
+
 
 	/**
 	 * Array to collect the configuration information that will be added as a template variable.
@@ -86,6 +91,9 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		$this->requestArguments = $this->request->getArguments();
         $this->cleanArgumentsArray($this->requestArguments);
 		ksort($this->settings['queryFields']);
+
+		$this->timing['START'] = $GLOBALS['TYPO3_MISC']['microtime_start'];
+		$this->timing['INIT_START'] = microtime(true) - $this->timing['START'];
 	}
 
 	
@@ -93,6 +101,9 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	 * Index Action.
 	 */
 	public function indexAction() {
+
+		$this->timing['INDEX_START'] = microtime(true) - $this->timing['START'];
+
 		if (array_key_exists('id', $this->requestArguments)) {
 			$this->forward('detail');
 		} elseif (array_key_exists('rsn', $this->requestArguments)) {
@@ -110,9 +121,12 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 				// Run the query.
 				try {
 
+					$this->timing['INDEX_BEFORE_BeforeSelect_SLOT'] = microtime(true) - $this->timing['START'];
 					$this->signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . 'BeforeSelect', array(&$query, $this->requestArguments));
+					$this->timing['INDEX_AFTER_BeforeSelect_SLOT'] = microtime(true) - $this->timing['START'];
 
 					$resultSet = $this->solr->select($query);
+					$this->timing['INDEX_AFTER SOLR'] = microtime(true) - $this->timing['START'];
 				} catch (\Solarium\Exception\HttpException $exception) {
 					$message = 'find: Solr Exception (Timeout?)';
 					$this->logError($message, \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR, array('requestArguments' => $this->requestArguments, 'exception' => $this->exceptionToArray($exception)), FALSE);
@@ -123,7 +137,9 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 					$this->view->assign('error', array('solr' => $exception));
 				}
 
+				$this->timing['INDEX_BEFORE_BeforeRender_SLOT'] = microtime(true) - $this->timing['START'];
 				$this->signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . 'BeforeRender', array(&$resultSet));
+				$this->timing['INDEX_AFTER_BeforeRender_SLOT'] = microtime(true) - $this->timing['START'];
 
 				$this->view->assignMultiple(array(
 					'results' => $resultSet,
@@ -174,6 +190,9 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	 * Single Item View action.
 	 */
 	public function detailAction() {
+
+		$this->timing['DETAIL_START'] = microtime(true) - $this->timing['START'];
+
 		$arguments = $this->requestArguments;
 		if (array_key_exists('id', $arguments) && !empty($arguments['id'])) {
 			$id = $arguments['id'];
@@ -264,7 +283,9 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 				}
 			}
 
+			$this->timing['DETAIL_BEFORE_BeforeRender_SLOT'] = microtime(true) - $this->timing['START'];
 			$this->signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . 'BeforeRender', array(&$assignments));
+			$this->timing['DETAIL_AFTER_BeforeRender_SLOT'] = microtime(true) - $this->timing['START'];
 
 			$this->view->assignMultiple($assignments);
 			$this->addStandardAssignments();
@@ -340,6 +361,9 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 
 		// ksort($this->configuration);
 		$this->view->assign('config', $this->configuration);
+
+		$this->timing['BEFORE_RENDER'] =  microtime(true) - $this->timing['START'];
+		$this->view->assign('timing', $this->timing);
 	}
 
 
