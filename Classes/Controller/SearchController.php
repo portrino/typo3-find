@@ -271,7 +271,9 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 						$assignments['document'] = $resultSet[0];
 					}
 					else {
-						$message = 'find: »detail« action query for id »' . $id . '« returned no results.';
+						$localisationKey = 'LLL:' . $this->settings['languageRootPath'] . 'locallang.xml:exception.deatilNoresult';
+						$message = sprintf(\TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate($localisationKey, $this->request->getControllerExtensionKey()), $id);
+
 						$this->logError($message, \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR, array('arguments' => $arguments));
 						$this->view->assign('error', array('solr' => $message));
 					}
@@ -348,9 +350,9 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	 */
 	private function addStandardAssignments () {
 		$this->view->assign('arguments', $this->requestArguments);
-		
+
 		$this->configuration['extendedSearch'] = $this->isExtendedSearch();
-	
+
 		$contentObject = $this->configurationManager->getContentObject();
 		$uid = $contentObject->data['uid'];
 		$this->configuration['uid'] = $uid;
@@ -821,12 +823,12 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	}
 
 
-	
+
 	/**
 	 * Adds facet queries to $query from setup in TypoScript.
 	 * Provides the facet setup enriched with the default values when no configuration
 	 * is present in the »facets« template variable.
-	 * 
+	 *
 	 * @param \Solarium\QueryType\Select\Query\Query $query
 	 */
 	private function addFacetQueries ($query) {
@@ -859,11 +861,11 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 
 						$queryForFacet = $facetSet->createFacetField($facetID);
 						$queryForFacet->setField($facet['field'] ? $facet['field'] : $facetID)
-										->setMinCount($facet['fetchMinimum'])
-										->setLimit($facet['fetchMaximum'])
-										->setSort($facet['sortOrder']);
+							->setMinCount($facet['fetchMinimum'])
+							->setLimit($facet['fetchMaximum'])
+							->setSort($facet['sortOrder']);
 					}
-					
+
 					if ($facet['excludeOwnFilter'] == 1) {
 						$queryForFacet->addExclude($this->tagForFacet($facetID));
 					}
@@ -901,7 +903,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		if (!empty($this->settings['additionalFilters'])) {
 			foreach($this->settings['additionalFilters'] as $key => $filterQuery) {
 				$query->createFilterQuery('additionalFilter-' . $key)
-						->setQuery($filterQuery);
+					->setQuery($filterQuery);
 			}
 		}
 	}
@@ -944,7 +946,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	 * For the key »default« it contains the default sort order string.
 	 * For the key »selected« it contains the selected sort order string.
 	 *
-     * @param array $arguments request arguments
+	 * @param array $arguments request arguments
 	 */
 	private function addSortOrdersToTemplate ($arguments) {
 		$sortOptions = array('menu' => array());
@@ -1027,7 +1029,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	 * For the key »default« it contains the default number of results.
 	 * For the key »selected« it contains the the selected number of results.
 	 *
-     * @param array $arguments request arguments
+	 * @param array $arguments request arguments
 	 */
 	private function addResultCountOptionsToTemplate ($arguments) {
 		$resultCountOptions = array('menu' => array());
@@ -1180,7 +1182,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	}
 
 
-	
+
 	/**
 	 * Sets up the range of documents to be fetches by $query.
 	 *
@@ -1306,7 +1308,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	}
 
 
-	
+
 	/**
 	 * Stores information about the active query in the »underlyingQuery« JavaScript variable.
 	 *
@@ -1322,7 +1324,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		if ($this->settings['paging']['detailPagePaging']) {
 			$scriptTag = new \TYPO3\CMS\Fluid\Core\ViewHelper\TagBuilder('script');
 			$scriptTag->addAttribute('type', 'text/javascript');
-			
+
 			$underlyingQuery = array('q' => $query);
 			if (!empty($arguments['facet'])) {
 				$underlyingQuery['facet'] = $arguments['facet'];
@@ -1349,7 +1351,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	 *
 	 * Specifically aimed at the __hmac and __referrer keys introduced by Fluid
 	 * forms as well as the text submitted by empty search form fields.
-	 * 
+	 *
 	 * @param array $array
 	 */
 	private function cleanArgumentsArray (&$array) {
