@@ -85,6 +85,9 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 
 		$this->requestArguments = $this->request->getArguments();
         $this->cleanArgumentsArray($this->requestArguments);
+
+        $this->signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . 'AfterArgumentsFilled', array(&$this->requestArguments));
+
 		ksort($this->settings['queryFields']);
 	}
 
