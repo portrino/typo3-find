@@ -66,7 +66,13 @@ class ItemViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
 		}
 
 		if ($this->arguments['object'] !== NULL) {
-			$container[$this->arguments['subject']][$this->arguments['predicate']][$this->arguments['object']] = NULL;
+			if(is_array($this->arguments['object'])) {
+				foreach ($this->arguments['object'] as $value) {
+					$container[$this->arguments['subject']][$this->arguments['predicate']][$value] = NULL;
+				}
+			} else {
+				$container[$this->arguments['subject']][$this->arguments['predicate']][$this->arguments['object']] = NULL;
+			}
 		}
 		else {
 			$container[$this->arguments['subject']][$this->arguments['predicate']][$this->renderChildren()] = array('type' => $this->arguments['objectType'], 'language' => $this->arguments['language']);
