@@ -13,7 +13,7 @@
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Find',
     'description' => 'A frontend for Solr indexes',
-    'version' => '3.0.0',
+    'version' => '1.0.1',
     'state' => 'stable',
     'category' => 'frontend',
     'shy' => 0,
@@ -33,7 +33,7 @@ $EM_CONF[$_EXTKEY] = [
     'constraints' => [
         'depends' => [
             'php' => '5.5.0-7.0.99',
-            'typo3' => '6.2.0-8.99.99',
+            'typo3' => '6.2.0-6.2.99',
         ],
         'conflicts' => [],
         'suggests' => [],
