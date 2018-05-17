@@ -32,6 +32,13 @@ $EM_CONF[$_EXTKEY] = array(
 	'CGLcompliance_note' => '',
 	'dependencies' => 't3jquery',
 	'conflicts' => '',
+	'autoload' =>
+      array(
+            'psr-4' =>
+            array(
+              'Subugoe\\Find\\' => 'Classes'
+            )
+      ),
 	'constraints' => array(
 		'depends' => array(
 			'php' => '5.3.0-0.0.0',
