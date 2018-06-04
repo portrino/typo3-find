@@ -25,9 +25,9 @@
     "typo3-ter/find": "*",
     "subgoe/find": "*"
   },
-    "autoload": {
-        "psr-4": {
-            "Subugoe\\Find\\": "Classes"
-        }
+  "autoload": {
+    "psr-4": {
+      "Subugoe\\Find\\": "Classes"
     }
+  }
 }
