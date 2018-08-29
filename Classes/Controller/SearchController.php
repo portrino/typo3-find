@@ -1378,9 +1378,6 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	 * @param boolean $showFlashMessages whether to show the flash message or not (defaults to TRUE)
 	 */
 	private function logError ($message, $level, $extraInfo = NULL, $showFlashMessage = TRUE) {
-		if ($showFlashMessage) {
-			$this->addFlashMessage->add($message, $level);
-		}
 
 		/* translates between the equivalent \TYPO3\CMS\Core\Messaging and devLog log levels */
 		$logLevelTranslation = array(
@@ -1390,6 +1387,10 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 			\TYPO3\CMS\Core\Messaging\FlashMessage::WARNING => 2,
 			\TYPO3\CMS\Core\Messaging\FlashMessage::ERROR => 3
 		);
+
+        if ($showFlashMessage) {
+            $this->addFlashMessage($message, 'find', $logLevelTranslation[$level]);
+        }
 
 		\TYPO3\CMS\Core\Utility\GeneralUtility::devLog($message, 'find', $logLevelTranslation[$level], $extraInfo);
 	}
