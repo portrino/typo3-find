@@ -1379,7 +1379,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	 */
 	private function logError ($message, $level, $extraInfo = NULL, $showFlashMessage = TRUE) {
 		if ($showFlashMessage) {
-			$this->flashMessageContainer->add($message, $level);
+			$this->addFlashMessage->add($message, $level);
 		}
 
 		/* translates between the equivalent \TYPO3\CMS\Core\Messaging and devLog log levels */
