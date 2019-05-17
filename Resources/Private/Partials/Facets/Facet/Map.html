@@ -1,5 +1,4 @@
 {namespace s=Subugoe\Find\ViewHelpers}
-
 <f:comment>
 	Creates a map facet.
 
@@ -25,7 +24,7 @@
 	of facet values that are fetched the more granular the displayed results will be.
 
 	Sample TypoScript configuration:
-
+	
 		plugin.tx_find.settings.facet {
 			10 {
 				id = map
@@ -36,27 +35,6 @@
 			}
 		}
 </f:comment>
-
-<s:page.script file="EXT:find/Resources/Public/JavaScript/js-geohash/geohash.js" name="find_geohash"/>
-
-<s:page.script name="find_geohash">
-	tx_find_facetMap.init ({
-		container: jQuery('.facet-id-{facetInfo.id} .mapContainer')[0],
-		queryURLTemplate: {s:format.json(data:"{f:uri.action(
-			addQueryString:TRUE,
-			arguments:'{
-				q:\'{raw:\"###TERM###\"}\',
-				count:1000
-			}',
-			action:'index',
-			pageType:'1369315139',
-			format:'data',
-			noCacheHash:'1'
-		)}")},
-		facetData: {s:format.json(data:facetData.values)},
-		facetFetchMaximum: {facetInfo.fetchMaximum}
-	});
-</s:page.script>
 
 <div class="facetMap-container">
 	<div class="mapContainer"></div>

@@ -26,7 +26,7 @@
 		</div>
 
 		<f:render partial="Facets/Facets" arguments="{_all}"/>
-
+<f:debug>{results}</f:debug>
 		<ol id="c{config.uid}-resultList" class="resultList" start="{config.counterStart}">
 			<f:for each="{results.documents}" as="document">
 				<f:render partial="Display/Result" arguments="{_all}"/>
