@@ -1428,17 +1428,13 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	public function redirectAction() {
 
 		$queryArguments = ['q' => []];
-		$queryArgumentsDefault = '';
 
 		if (array_key_exists('rsn', $this->requestArguments)) {
 			$queryArguments['q']['rsn'] = $this->requestArguments['rsn'];
-            $queryArgumentsDefault = $this->requestArguments['rsn'];
 		} elseif (array_key_exists('bc', $this->requestArguments)) {
 			$queryArguments['q']['barcode'] = $this->requestArguments['bc'];
-            $queryArgumentsDefault = $this->requestArguments['bc'];
 		} elseif (array_key_exists('ppn', $this->requestArguments)) {
 			$queryArguments['q']['ppn'] = $this->requestArguments['ppn'];
-            $queryArgumentsDefault = $this->requestArguments['ppn'];
 		}
 
 		$query = $this->createQueryForArguments($queryArguments);
@@ -1446,7 +1442,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		/** @var Result $selectResults */
 		$selectResults = $this->solr->select($query);
 
-		if (count($selectResults) === 1) {
+		if (count($selectResults) > 0) {
 			$assignments['results'] = $selectResults;
 
 			$resultSet = $selectResults->getDocuments();
@@ -1460,21 +1456,11 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 			);
 
 			$uri = $this->uriBuilder->reset()->setTargetPageUid(intval($GLOBALS['TSFE']->id))->setCreateAbsoluteUri(TRUE)->setArguments($arguments)->build();
+
 			\TYPO3\CMS\Core\Utility\HttpUtility ::redirect($uri);
 
 		} else {
-
-            $arguments = array(
-                array('tx_find_find' =>
-                    array(
-                        'q' => array(
-                            'default' => $queryArgumentsDefault
-                        ),
-                    )
-                )
-            );
-
-			$uri = $this->uriBuilder->reset()->setTargetPageUid(intval($GLOBALS['TSFE']->id))->setCreateAbsoluteUri(TRUE)->setUseCacheHash(FALSE)->setArguments($arguments)->build();
+			$uri = $this->uriBuilder->reset()->setTargetPageUid(intval($GLOBALS['TSFE']->id))->setCreateAbsoluteUri(TRUE)->setArguments([])->build();
 			\TYPO3\CMS\Core\Utility\HttpUtility ::redirect($uri);
 		}
 
