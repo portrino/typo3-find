@@ -265,7 +265,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 				// Without underlying query information, just get the record specified.
 				$query = $this->createQuery();
 				$escapedID = $query->getHelper()->escapeTerm($id);
-				$query->setQuery('id:' . $escapedID);
+				$query->setQuery(sprintf($this->settings['idQuery'],$escapedID));
 				try {
 					$selectResults = $this->solr->select($query);
 					if (count($selectResults) > 0) {
@@ -837,6 +837,8 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	private function addFacetQueries ($query) {
 		$facetConfiguration = $this->settings['facets'];
 
+
+
 		if ($facetConfiguration) {
 			$facetSet = $query->getFacetSet();
 			foreach($facetConfiguration as $key => $facet) {
@@ -846,7 +848,6 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 					// start with defaults and overwrite with specific facet configuration
 					$facet = array_merge($this->settings['facetDefaults'], $facet);
 					$facetConfiguration[$key] = $facet;
-
 					$queryForFacet = NULL;
 					if (array_key_exists('facetQuery', $facet)) {
 						$queryForFacet = $facetSet->createFacetMultiQuery($facetID);
@@ -959,6 +960,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 			foreach ($this->settings['sort'] as $sortOptionIndex => $sortOption) {
 				if (array_key_exists('id', $sortOption) && array_key_exists('sortCriteria', $sortOption)) {
 					$localisationKey = 'LLL:' . $this->settings['languageRootPath'] . 'locallang-form.xml:input.sort-' . $sortOption['id'];
+					$localisedLabel = \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate($localisationKey, $this->request->getControllerExtensionKey());
 					$localisedLabel = \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate($localisationKey, $this->request->getControllerExtensionKey());
 					if (!$localisedLabel) {
 						$localisedLabel = $sortOption['id'];
@@ -1378,9 +1380,6 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	 * @param boolean $showFlashMessages whether to show the flash message or not (defaults to TRUE)
 	 */
 	private function logError ($message, $level, $extraInfo = NULL, $showFlashMessage = TRUE) {
-		if ($showFlashMessage) {
-			$this->flashMessageContainer->add($message, $level);
-		}
 
 		/* translates between the equivalent \TYPO3\CMS\Core\Messaging and devLog log levels */
 		$logLevelTranslation = array(
@@ -1390,6 +1389,10 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 			\TYPO3\CMS\Core\Messaging\FlashMessage::WARNING => 2,
 			\TYPO3\CMS\Core\Messaging\FlashMessage::ERROR => 3
 		);
+
+        if ($showFlashMessage) {
+            $this->addFlashMessage($message, 'find', $logLevelTranslation[$level]);
+        }
 
 		\TYPO3\CMS\Core\Utility\GeneralUtility::devLog($message, 'find', $logLevelTranslation[$level], $extraInfo);
 	}

@@ -187,6 +187,8 @@ plugin.tx_find {
 		JSPaths.10 = {$plugin.tx_find.settings.JSPath}
 
 		languageRootPath = {$plugin.tx_find.settings.languageRootPath}
+
+        idQuery = id:%1$s
 	}
 
 	view {
