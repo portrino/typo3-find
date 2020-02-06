@@ -154,6 +154,10 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 
 			} else {
 				$this->view->assign('noSearch', '1');
+
+				if(strlen($this->settings['nosearchRedirect']) > 0) {
+                    \TYPO3\CMS\Core\Utility\HttpUtility::redirect($this->settings['nosearchRedirect']);
+                }
 			}
 
 			$this->addQueryInformationAsJavaScript($this->requestArguments['q']);
