@@ -486,10 +486,14 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 				}
 
 				ksort($queryTerms);
-				$queryPart = '_query_:' . $query->getHelper()->escapePhrase(vsprintf($queryFormat, $queryTerms));
+				$queryPart = vsprintf($queryFormat, $queryTerms);
 
 				if($fieldInfo['escape'] && $fieldInfo['escape']['advanced']) {
-					$queryPart = '_query_:"' . vsprintf($queryFormat, array_map($query->getHelper()->escapePhrase, $queryTerms)).'"';
+					$queryPart = '"' . vsprintf($queryFormat, array_map($query->getHelper()->escapePhrase, $queryTerms)).'"';
+				}
+
+				if(!$fieldInfo['noSubQuery']) {
+					$queryPart = '_query_:' . $queryPart;
 				}
 
 				if($fieldInfo['escape'] && $fieldInfo['escape']['whitespace']) {
