@@ -486,6 +486,19 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 				}
 
 				ksort($queryTerms);
+
+                if($fieldInfo['escape'] && $fieldInfo['escape']['whitespace']) {
+                    $queryTerms = str_replace(' ', '\ ', $queryTerms);
+                }
+
+                if($fieldInfo['escape'] && $fieldInfo['escape']['parenthesis']) {
+                    $queryTerms = str_replace(['(',')'], ['\(', '\)'], $queryTerms);
+                }
+
+                if($fieldInfo['escape'] && $fieldInfo['escape']['escape']) {
+                    $queryTerms = str_replace('\\', '\\\\', $queryTerms);
+                }
+
 				$queryPart = vsprintf($queryFormat, $queryTerms);
 
 				if($fieldInfo['escape'] && $fieldInfo['escape']['advanced']) {
@@ -494,18 +507,6 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 
 				if(!$fieldInfo['noSubQuery']) {
 					$queryPart = '_query_:' . $queryPart;
-				}
-
-				if($fieldInfo['escape'] && $fieldInfo['escape']['whitespace']) {
-					$queryPart = str_replace(' ', '\ ', $queryPart);
-				}
-
-				if($fieldInfo['escape'] && $fieldInfo['escape']['parenthesis']) {
-					$queryPart = str_replace(['(',')'], ['\(', '\)'], $queryPart);
-				}
-
-				if($fieldInfo['escape'] && $fieldInfo['escape']['escape']) {
-					$queryPart = str_replace('\\', '\\\\', $queryPart);
 				}
 
 				if($fieldInfo['and'] == '1') {
