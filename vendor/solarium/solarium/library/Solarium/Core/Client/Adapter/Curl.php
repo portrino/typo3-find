@@ -96,6 +96,8 @@ class Curl extends Configurable implements AdapterInterface
         $handle = $this->createHandle($request, $endpoint);
         $httpResponse = curl_exec($handle);
 
+        //var_dump(curl_getinfo($handle));
+
         return $this->getResponse($handle, $httpResponse);
         // @codeCoverageIgnoreEnd
     }

@@ -115,6 +115,8 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 			$this->forward('redirect');
 		} elseif (array_key_exists('ppn', $this->requestArguments)) {
 			$this->forward('redirect');
+		} elseif (array_key_exists('oclc', $this->requestArguments)) {
+			$this->forward('redirect');
 		} else {
 
 			if(count($this->requestArguments['q']) > 0) {
@@ -1448,6 +1450,9 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		} elseif (array_key_exists('ppn', $this->requestArguments)) {
 			$queryArguments['q']['ppn'] = $this->requestArguments['ppn'];
             $queryArgumentsDefault = $this->requestArguments['ppn'];
+		} elseif (array_key_exists('oclc', $this->requestArguments)) {
+			$queryArguments['q']['oclc'] = $this->requestArguments['oclc'];
+            $queryArgumentsDefault = $this->requestArguments['oclc'];
 		}
 
 		$query = $this->createQueryForArguments($queryArguments);
