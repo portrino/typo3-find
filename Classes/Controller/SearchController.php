@@ -29,9 +29,7 @@
 
 namespace Subugoe\Find\Controller;
 
-
-
-use Solarium\QueryType\Select\Query\FilterQuery;
+use \TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('find') . 'vendor/autoload.php');
 
@@ -64,10 +62,18 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	protected $configuration = array();
 
 	/**
-	 * @var \TYPO3\CMS\Extbase\SignalSlot\Dispatcher
+	 * @var
 	 * @inject
 	 */
 	protected $signalSlotDispatcher;
+
+    /**
+     * @param Dispatcher $signalSlotDispatcher
+     */
+    public function __construct(Dispatcher $signalSlotDispatcher)
+    {
+        $this->signalSlotDispatcher = $signalSlotDispatcher;
+    }
 
 
 	/**
@@ -119,7 +125,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 			$this->forward('redirect');
 		} else {
 
-			if(count($this->requestArguments['q']) > 0) {
+			if(!empty($this->requestArguments['q']) && count($this->requestArguments['q']) > 0) {
 
 				$query = $this->createQueryForArguments($this->requestArguments);#
 
@@ -567,7 +573,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 
 		// Shards
 
-		if(count($this->settings['shards'])) {
+		if(is_array($this->settings['shards']) && count($this->settings['shards'])) {
 			$distributedSearch = $query->getDistributedSearch();
 			foreach($this->settings['shards'] as $name => $shard) {
 				$distributedSearch->addShard($name, $shard);
@@ -674,7 +680,6 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 
 							foreach($filterQueries as $filterQuery) {
 
-								/**	@var FilterQuery */
 								if(in_array('facet-'.$facetInfo['id'], $filterQuery->getTags())) {
 
 									$query->removeFilterQuery($filterQuery);

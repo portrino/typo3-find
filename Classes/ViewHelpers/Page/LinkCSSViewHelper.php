@@ -52,7 +52,8 @@ class LinkCSSViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHel
 	public function render() {
 		$CSSFileName = $GLOBALS['TSFE']->tmpl->getFileName($this->arguments['file']);
 		if ($CSSFileName) {
-			$GLOBALS['TSFE']->getPageRenderer()->addCSSFile($CSSFileName);
+            $pageRenderer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Page\PageRenderer::class);
+            $pageRenderer->addCSSFile($CSSFileName);
 		}
 	}
 

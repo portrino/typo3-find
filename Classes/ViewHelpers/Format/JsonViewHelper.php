@@ -41,7 +41,7 @@ class JsonViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
 	 */
 	public function initializeArguments() {
 		parent::initializeArguments();
-		$this->registerArgument('data', 'array|string|int|float', 'The data to output as JSON', FALSE, NULL);
+		$this->registerArgument('data', 'mixed', 'The data to output as JSON', FALSE, NULL);
 	}
 
 
