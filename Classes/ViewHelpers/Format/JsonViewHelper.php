@@ -34,6 +34,12 @@ namespace Subugoe\Find\ViewHelpers\Format;
  */
 class JsonViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
 
+    /**
+     * As this ViewHelper renders HTML, the output must not be escaped.
+     *
+     * @var bool
+     */
+    protected $escapeOutput = false;
 
 	/**
 	 * Registers own arguments.

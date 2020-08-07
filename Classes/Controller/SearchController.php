@@ -29,7 +29,9 @@
 
 namespace Subugoe\Find\Controller;
 
-use \TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('find') . 'vendor/autoload.php');
 
@@ -62,17 +64,16 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	protected $configuration = array();
 
 	/**
-	 * @var
-	 * @inject
+	 * @var Dispatcher
 	 */
 	protected $signalSlotDispatcher;
 
     /**
-     * @param Dispatcher $signalSlotDispatcher
+     *
      */
-    public function __construct(Dispatcher $signalSlotDispatcher)
+    public function __construct()
     {
-        $this->signalSlotDispatcher = $signalSlotDispatcher;
+        $this->signalSlotDispatcher = GeneralUtility::makeInstance(ObjectManager::class)->get(Dispatcher::class);;
     }
 
 

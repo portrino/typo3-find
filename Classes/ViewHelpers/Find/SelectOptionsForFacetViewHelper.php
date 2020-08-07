@@ -59,7 +59,7 @@ class SelectOptionsForFacetViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\A
 			$result[''] = '';
 		}
 
-		$extensionName = $this->controllerContext->getRequest()->getControllerExtensionName();
+		$extensionName = $this->renderingContext->getControllerContext()->getRequest()->getControllerExtensionName();
 		if (!empty($this->arguments['values'])) {
 			foreach ($this->arguments['values'] as $item => $count) {
 				// Localise item name.

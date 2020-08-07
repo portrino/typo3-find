@@ -33,7 +33,13 @@ namespace Subugoe\Find\ViewHelpers\Data;
  * Usage examples are available in Private/Partials/Test.html.
  */
 class NewArrayViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
-
+    
+    /**
+     * As this ViewHelper renders HTML, the output must not be escaped.
+     *
+     * @var bool
+     */
+    protected $escapeOutput = false;
 
 	/**
 	 * Register arguments.
