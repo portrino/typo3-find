@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\Data;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -23,47 +26,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-
-namespace Subugoe\Find\ViewHelpers\Data;
-
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * View Helper to return whether the variable is an array.
  *
  * Usage examples are available in Private/Partials/Test.html.
  */
-class IsArrayViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
+class IsArrayViewHelper extends AbstractViewHelper
+{
+    /**
+     * Register arguments.
+     */
+    public function initializeArguments()
+    {
+        parent::initializeArguments();
+        $this->registerArgument('subject', 'array|string|int', 'The variable to inspect', false, null);
+    }
 
+    /**
+     * @return bool
+     */
+    public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
+    {
+        $result = false;
 
-	/**
-	 * Register arguments.
-	 * @return void
-	 */
-	public function initializeArguments() {
-		parent::initializeArguments();
-		$this->registerArgument('subject', 'array|string|int', 'The variable to inspect', FALSE, NULL);
-	}
+        $subject = $arguments['subject'];
+        if (null === $subject) {
+            $subject = $renderChildrenClosure();
+        }
 
+        if (null !== $subject) {
+            $result = is_array($subject);
+        }
 
-	
-	/**
-	 * @return boolean
-	 */
-	public function render() {
-		$result = FALSE;
-
-		$subject = $this->arguments['subject'];
-		if ($subject === NULL) {
-			$subject = $this->renderChildren();
-		}
-
-		if ($subject !== NULL) {
-			$result = is_array($subject);
-		}
-
-		return $result;
-	}
-
+        return $result;
+    }
 }
-
-?>

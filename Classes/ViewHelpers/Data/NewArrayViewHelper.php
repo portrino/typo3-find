@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\Data;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -24,81 +27,72 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-namespace Subugoe\Find\ViewHelpers\Data;
-
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * View Helper to create a new array with the given keys and values.
  *
  * Usage examples are available in Private/Partials/Test.html.
  */
-class NewArrayViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
-    
-    /**
-     * As this ViewHelper renders HTML, the output must not be escaped.
-     *
-     * @var bool
-     */
+class NewArrayViewHelper extends AbstractViewHelper
+{
     protected $escapeOutput = false;
 
-	/**
-	 * Register arguments.
-	 * @return void
-	 */
-	public function initializeArguments() {
-		parent::initializeArguments();
-		$this->registerArgument('name', 'string', 'name of template variable to assign the result to', FALSE, NULL);
-		$this->registerArgument('array', 'array', 'existing array to add the new keys and values to', FALSE, array());
+    /**
+     * Register arguments.
+     */
+    public function initializeArguments()
+    {
+        parent::initializeArguments();
+        $this->registerArgument('name', 'string', 'name of template variable to assign the result to', false, null);
+        $this->registerArgument('array', 'array', 'existing array to add the new keys and values to', false, []);
 
-		$this->registerArgument('keys', 'array', 'array of keys', FALSE, NULL);
-		$this->registerArgument('values', 'array', 'array of values', FALSE, array());
+        $this->registerArgument('keys', 'array', 'array of keys', false, null);
+        $this->registerArgument('values', 'array', 'array of values', false, []);
 
-		$this->registerArgument('global', 'boolean', 'whether to make the variable available to all templates coming afterwards', FALSE, FALSE);
-		$this->registerArgument('omitEmptyFields', 'boolean', 'omits empty fields', FALSE, FALSE);
-	}
+        $this->registerArgument('global', 'boolean',
+            'whether to make the variable available to all templates coming afterwards', false, false);
+        $this->registerArgument('omitEmptyFields', 'boolean', 'omits empty fields', false, false);
+    }
 
+    /**
+     * @return array
+     */
+    public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
+    {
+        $result = $arguments['array'];
 
-	
-	/**
-	 * @return array
-	 */
-	public function render() {
-		$result = $this->arguments['array'];
+        if ($arguments['keys']) {
+            if (count($arguments['keys']) === count($arguments['values'])) {
+                foreach ($arguments['keys'] as $index => $key) {
+                    $value = $arguments['values'][$index];
+                    if (!$arguments['omitEmptyFields'] || $value) {
+                        $result[$key] = $value;
+                    }
+                }
+            } else {
+                $result = 'newArray View Helper: Number of keys and values must be the same.'.PHP_EOL.print_r($arguments,
+                        true);
+            }
+        } else {
+            foreach ($arguments['values'] as $value) {
+                $result[] = $value;
+            }
+        }
 
-		if ($this->arguments['keys']) {
-			if (count($this->arguments['keys']) === count($this->arguments['values'])) {
-				foreach ($this->arguments['keys'] as $index => $key) {
-					$value = $this->arguments['values'][$index];
-					if (!$this->arguments['omitEmptyFields'] || $value) {
-						$result[$key] = $value;
-					}
-				}
-			}
-			else {
-				$result = "newArray View Helper: Number of keys and values must be the same.\n" . print_r($this->arguments, TRUE);
-			}
-		}
-		else {
-			foreach ($this->arguments['values'] as $value) {
-				$result[] = $value;
-			}
-		}
+        $variableName = $arguments['name'];
+        if (null !== $variableName) {
+            if ($renderingContext->getVariableProvider()->exists($variableName)) {
+                $renderingContext->getVariableProvider()->remove($variableName);
+            }
+            $renderingContext->getVariableProvider()->add($variableName, $result);
+            $result = $renderChildrenClosure();
+            if (true !== $arguments['global']) {
+                $renderingContext->getVariableProvider()->remove($variableName);
+            }
+        }
 
-		$variableName = $this->arguments['name'];
-		if ($variableName !== NULL) {
-			if ($this->templateVariableContainer->exists($variableName)) {
-				$this->templateVariableContainer->remove($variableName);
-			}
-			$this->templateVariableContainer->add($variableName, $result);
-			$result = $this->renderChildren();
-			if ($this->arguments['global'] !== TRUE) {
-				$this->templateVariableContainer->remove($variableName);
-			}
-		}
-
-		return $result;
-	}
-
+        return $result;
+    }
 }
-
-?>

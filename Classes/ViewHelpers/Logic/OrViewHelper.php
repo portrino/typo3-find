@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\Logic;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -23,41 +26,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-
-namespace Subugoe\Find\ViewHelpers\Logic;
-
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * View Helper the truth value of all conditions joined by ||.
  *
  * Usage examples are available in Private/Partials/Test.html.
  */
-class OrViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
+class OrViewHelper extends AbstractViewHelper
+{
+    /**
+     * Registers own arguments.
+     */
+    public function initializeArguments()
+    {
+        parent::initializeArguments();
+        $this->registerArgument('conditions', 'array', 'the array of conditions to OR', true);
+    }
 
+    /**
+     * @return bool
+     */
+    public static function renderStatic(
+        array $arguments,
+        \Closure $renderChildrenClosure,
+        RenderingContextInterface $renderingContext
+    ) {
+        $result = false;
+        foreach ($arguments['conditions'] as $condition) {
+            $result |= (true == $condition);
+        }
 
-	/**
-	 * Registers own arguments.
-	 * @return void
-	 */
-	public function initializeArguments() {
-		parent::initializeArguments();
-		$this->registerArgument('conditions', 'array', 'the array of conditions to OR', TRUE);
-	}
-
-
-
-	/**
-	 * @return bool
-	 */
-	public function render() {
-		$result = FALSE;
-		foreach ($this->arguments['conditions'] as $condition) {
-			$result |= ($condition == TRUE);
-		}
-
-		return (bool)$result;
-	}
-
+        return (bool) $result;
+    }
 }
-
-?>

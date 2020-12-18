@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\Format;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -23,55 +26,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-
-namespace Subugoe\Find\ViewHelpers\Format;
-
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * View Helper to strip leading and trailing whitespace or other characters from a given string.
  *
  * Usage examples are available in Private/Partials/Test.html.
  */
-class StripViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
+class StripViewHelper extends AbstractViewHelper
+{
+    /**
+     * Registers own arguments.
+     */
+    public function initializeArguments()
+    {
+        parent::initializeArguments();
+        $this->registerArgument('string', 'string',
+            'The string to strip leading and trailing whitespace from; If not given, the tag content is used', false,
+            null);
+        $this->registerArgument('strip', 'string',
+            'The characters to strip from the string; If not given, defaults to standard PHP whitespace setting', false,
+            null);
+    }
 
     /**
-     * As this ViewHelper renders HTML, the output must not be escaped.
-     *
-     * @var bool
+     * @return array
      */
-    protected $escapeOutput = false;
+    public static function renderStatic(
+        array $arguments,
+        \Closure $renderChildrenClosure,
+        RenderingContextInterface $renderingContext
+    ) {
+        $string = $arguments['string'];
+        if (null === $string) {
+            $string = $renderChildrenClosure();
+        }
 
-	/**
-	 * Registers own arguments.
-	 * @return void
-	 */
-	public function initializeArguments() {
-		parent::initializeArguments();
-		$this->registerArgument('string', 'string', 'The string to strip leading and trailing whitespace from; If not given, the tag content is used', FALSE, NULL);
-		$this->registerArgument('strip', 'string', 'The characters to strip from the string; If not given, defaults to standard PHP whitespace setting', FALSE, NULL);
-	}
+        if (null === $arguments['strip']) {
+            $string = trim($string);
+        } else {
+            $string = trim($string, $arguments['strip']);
+        }
 
-
-
-	/**
-	 * @return array
-	 */
-	public function render() {
-		$string = $this->arguments['string'];
-		if ($string === NULL) {
-			$string = $this->renderChildren();
-		}
-
-		if ($this->arguments['strip'] === NULL) {
-			$string = trim($string);
-		}
-		else {
-			$string = trim($string, $this->arguments['strip']);
-		}
-
-		return $string;
-	}
-
+        return $string;
+    }
 }
-
-?>

@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\Data;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -24,41 +27,45 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-namespace Subugoe\Find\ViewHelpers\Data;
-
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * View Helper to split a string into an array of strings at the given separator.
- * 
+ *
  * Usage examples are available in Private/Partials/Test.html.
  */
-class SplitViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
+class SplitViewHelper extends AbstractViewHelper
+{
+    const DEFAULT_SEPARATOR = ', ';
 
+    /**
+     * Register arguments.
+     */
+    public function initializeArguments()
+    {
+        parent::initializeArguments();
+        $this->registerArgument('string', 'string', 'The string to split into components', false, null);
+        $this->registerArgument('separator', 'string', 'The string separating the components', false, self::DEFAULT_SEPARATOR);
+    }
 
-	/**
-	 * Register arguments.
-	 * @return void
-	 */
-	public function initializeArguments() {
-		parent::initializeArguments();
-		$this->registerArgument('string', 'string', 'The string to split into components', FALSE, NULL);
-		$this->registerArgument('separator', 'string', 'The string separating the components', FALSE, ', ');
-	}
+    /**
+     * @return array
+     */
+    public static function renderStatic(
+        array $arguments,
+        \Closure $renderChildrenClosure,
+        RenderingContextInterface $renderingContext
+    ) {
+        $string = $arguments['string'];
+        if (null === $string) {
+            $string = $renderChildrenClosure;
+        }
 
+        if (empty($arguments['separator'])) {
+            $arguments['separator'] = self::DEFAULT_SEPARATOR;
+        }
 
-	
-	/**
-	 * @return array
-	 */
-	public function render() {
-		$string = $this->arguments['string'];
-		if ($string === NULL) {
-			$string = $this->renderChildren();
-		}
-
-		return explode($this->arguments['separator'], $string);
-	}
-
+        return explode($arguments['separator'], $string);
+    }
 }
-
-?>

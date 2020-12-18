@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\Format;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -23,51 +26,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-
-namespace Subugoe\Find\ViewHelpers\Format;
-
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * View Helper to escape a string for Solr queries.
  *
  * Usage examples are available in Private/Partials/Test.html.
  */
-class SolrEscapeViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
+class SolrEscapeViewHelper extends AbstractViewHelper
+{
+    /**
+     * Registers own arguments.
+     */
+    public function initializeArguments()
+    {
+        parent::initializeArguments();
+        $this->registerArgument('string', 'string', 'the string to escape for Solr', false, null);
+        $this->registerArgument('phrase', 'boolean', 'whether to use phrase escaping', false, false);
+    }
 
+    /**
+     * @return string
+     */
+    public static function renderStatic(
+        array $arguments,
+        \Closure $renderChildrenClosure,
+        RenderingContextInterface $renderingContext
+    ) {
+        $string = $arguments['string'];
+        if (null === $string) {
+            $string = $renderChildrenClosure();
+        }
 
-	/**
-	 * Registers own arguments.
-	 * @return void
-	 */
-	public function initializeArguments() {
-		parent::initializeArguments();
-		$this->registerArgument('string', 'string', 'the string to escape for Solr', FALSE, NULL);
-		$this->registerArgument('phrase', 'boolean', 'whether to use phrase escaping', FALSE, FALSE);
-	}
+        $solariumHelper = new \Solarium\Core\Query\Helper();
 
+        if ($arguments['phrase']) {
+            $escapedString = $solariumHelper->escapePhrase($string);
+        } else {
+            $escapedString = $solariumHelper->escapeTerm($string);
+        }
 
-
-	/**
-	 * @return array
-	 */
-	public function render() {
-		$string = $this->arguments['string'];
-		if ($string === NULL) {
-			$string = $this->renderChildren();
-		}
-
-		$solariumHelper = new \Solarium\Core\Query\Helper();
-		
-		if ($this->arguments['phrase']) {
-			$escapedString = $solariumHelper->escapePhrase($string);
-		}
-		else {
-			$escapedString = $solariumHelper->escapeTerm($string);
-		}
-
-		return $escapedString;
-	}
-
+        return $escapedString;
+    }
 }
-
-?>

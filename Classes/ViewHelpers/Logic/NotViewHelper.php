@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\Logic;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -24,35 +27,33 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-namespace Subugoe\Find\ViewHelpers\Logic;
-
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * View Helper the truth value of all conditions joined by ||.
  *
  * Usage examples are available in Private/Partials/Test.html.
  */
-class NotViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
+class NotViewHelper extends AbstractViewHelper
+{
+    /**
+     * Registers own arguments.
+     */
+    public function initializeArguments()
+    {
+        parent::initializeArguments();
+        $this->registerArgument('condition', 'string|int|float|array', 'the condition to NOT', true);
+    }
 
-
-	/**
-	 * Registers own arguments.
-	 * @return void
-	 */
-	public function initializeArguments() {
-		parent::initializeArguments();
-		$this->registerArgument('condition', 'string|int|float|array', 'the condition to NOT', TRUE);
-	}
-
-
-
-	/**
-	 * @return bool
-	 */
-	public function render() {
-		return !($this->arguments['condition'] == TRUE);
-	}
-
+    /**
+     * @return bool
+     */
+    public static function renderStatic(
+        array $arguments,
+        \Closure $renderChildrenClosure,
+        RenderingContextInterface $renderingContext
+    ) {
+        return !(true == $arguments['condition']);
+    }
 }
-
-?>

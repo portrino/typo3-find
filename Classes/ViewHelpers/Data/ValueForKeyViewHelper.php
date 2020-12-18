@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\Data;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -24,49 +27,39 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-namespace Subugoe\Find\ViewHelpers\Data;
-
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * View Helper to return the value of a key in an array.
  *
  * Usage examples are available in Private/Partials/Test.html.
  */
-class ValueForKeyViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
+class ValueForKeyViewHelper extends AbstractViewHelper
+{
+    public function initializeArguments()
+    {
+        parent::initializeArguments();
+        $this->registerArgument('array', 'array', 'The array to extract the value from', true);
+        $this->registerArgument('key', 'string', 'The key to extract the value for', true);
+    }
 
+    /**
+     * @return string|int|bool|array
+     */
+    public static function renderStatic(
+        array $arguments,
+        \Closure $renderChildrenClosure,
+        RenderingContextInterface $renderingContext
+    ) {
+        $result = null;
 
-	/**
-	 * Register arguments.
-	 * @return void
-	 */
-	public function initializeArguments() {
-		parent::initializeArguments();
-		$this->registerArgument('array', 'mixed', 'The array to extract the value from', TRUE);
-		$this->registerArgument('key', 'string', 'The key to extract the value for', TRUE);
-	}
+        if ($arguments['array']) {
+            if (array_key_exists($arguments['key'], $arguments['array'])) {
+                $result = $arguments['array'][$arguments['key']];
+            }
+        }
 
-	
-
-	/**
-	 * @return string|int|boolean|array
-	 */
-	public function render() {
-		$result = NULL;
-
-		if ($this->arguments['array']) {
-
-			if(is_object($this->arguments['array'])) {
-				$this->arguments['array'] = (array)$this->arguments['array'];
-			}
-
-			if (array_key_exists($this->arguments['key'], $this->arguments['array'])) {
-				$result = $this->arguments['array'][$this->arguments['key']];
-			}
-		}
-
-		return $result;
-	}
-
+        return $result;
+    }
 }
-
-?>

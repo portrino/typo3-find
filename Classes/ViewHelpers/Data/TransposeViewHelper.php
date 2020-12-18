@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\Data;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -24,92 +27,92 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-namespace Subugoe\Find\ViewHelpers\Data;
-
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * View Helper to rearrange an array of columns into an array of rows and.
  *
  * Usage examples are available in Private/Partials/Test.html.
  */
-class TransposeViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
+class TransposeViewHelper extends AbstractViewHelper
+{
+    /**
+     * Register arguments.
+     */
+    public function initializeArguments()
+    {
+        parent::initializeArguments();
+        $this->registerArgument('arrays', 'array', 'Array with keys: field names and values: arrays', false, []);
+        $this->registerArgument('name', 'string', 'Variable name to assign the new array to', true);
+    }
 
-	/**
-	 * Register arguments.
-	 * @return void
-	 */
-	public function initializeArguments() {
-		parent::initializeArguments();
-		$this->registerArgument('arrays', 'array', 'Array with keys: field names and values: arrays', FALSE, array());
-		$this->registerArgument('name', 'string', 'Variable name to assign the new array to', TRUE);
-	}
+    /**
+     * @return string Rendered string
+     */
+    public static function renderStatic(
+        array $arguments,
+        \Closure $renderChildrenClosure,
+        RenderingContextInterface $renderingContext
+    ) {
+        $arrays = [];
+        $iterationArray = [];
+        // Strip non-numeric keys in the value arrays.
+        foreach ($arguments['arrays'] as $key => $array) {
+            $iterationArray = (null !== $array) ? $array : [];
+            $arrays[$key] = array_values($iterationArray);
+        }
 
+        if ($iterationArray && static::identicalLengths($arrays)) {
+            $rows = [];
+            foreach (array_keys($iterationArray) as $rowIndex) {
+                $row = [];
+                foreach ($arrays as $key => $array) {
+                    $row[$key] = $array[$rowIndex];
+                }
+                $rows[] = $row;
+            }
 
-	
-	/**
-	 * @return string Rendered string
-	 */
-	public function render() {
-		$arrays = array();
-		$iterationArray = array();
-		// Strip non-numeric keys in the value arrays.
-		foreach ($this->arguments['arrays'] as $key => $array) {
-			$iterationArray = ($array !== NULL) ? $array : array();
-			$arrays[$key] = array_values($iterationArray);
-		}
+            $variableName = $arguments['name'];
+            $renderingContext->getVariableProvider()->add($variableName, $rows);
+            $output = $renderChildrenClosure();
+            $renderingContext->getVariableProvider()->remove($variableName);
+        } else {
+            $info = [];
+            foreach ($arguments['arrays'] as $key => $array) {
+                $info[] = $key.': '.count($array);
+            }
 
-		if ($iterationArray && $this->identicalLengths($arrays)) {
-			$rows = array();
-			foreach(array_keys($iterationArray) as $rowIndex) {
-				$row = array();
-				foreach ($arrays as $key => $array) {
-					$row[$key] = $array[$rowIndex];
-				}
-				$rows[] = $row;
-			}
+            $output = 'The arrays passed in the »arrays« argument do not have identical numbers of values: ('.implode(', ',
+                    $info).')';
+        }
 
-			$variableName = $this->arguments['name'];
-			$this->templateVariableContainer->add($variableName, $rows);
-			$output = $this->renderChildren();
-			$this->templateVariableContainer->remove($variableName);
-		}
-		else {
-			$info = array();
-			foreach ($this->arguments['arrays'] as $key => $array) {
-				$info[] = $key . ': ' . count($array);
-			}
+        return $output;
+    }
 
-			$output = "The arrays passed in the »arrays« argument do not have identical numbers of values: (" . implode(', ', $info) . ')';
-		}
+    /**
+     * Returns TRUE if all elements of $arrays have the same count(), FALSE otherwise.
+     *
+     * @param array $arrays array of arrays
+     *
+     * @return bool
+     */
+    protected static function identicalLengths($arrays)
+    {
+        $result = true;
 
-		return $output;
-	}
+        $length = null;
+        foreach ($arrays as $array) {
+            if (null === $length) {
+                $length = count($array);
+            } else {
+                if ($length !== count($array)) {
+                    $result = false;
+                    break;
+                }
+            }
+        }
 
-
-
-	/**
-	 * Returns TRUE if all elements of $arrays have the same count(), FALSE otherwise.
-	 *
-	 * @param array $arrays array of arrays
-	 * @return boolean
-	 */
-	private function identicalLengths ($arrays) {
-		$result = TRUE;
-
-		$length = NULL;
-		foreach ($arrays as $array) {
-			if ($length === NULL) {
-				$length = count($array);
-			}
-			else if ($length !== count($array)) {
-				$result = FALSE;
-				break;
-			}
-		}
-
-		return $result;
-	}
-
+        return $result;
+    }
 }
-
-?>
