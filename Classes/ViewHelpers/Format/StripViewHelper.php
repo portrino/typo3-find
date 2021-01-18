@@ -37,6 +37,13 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 class StripViewHelper extends AbstractViewHelper
 {
     /**
+     * As this ViewHelper renders HTML, the output must not be escaped.
+     *
+     * @var bool
+     */
+    protected $escapeOutput = false;
+
+    /**
      * Registers own arguments.
      */
     public function initializeArguments()

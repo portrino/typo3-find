@@ -66,6 +66,10 @@ class SplitViewHelper extends AbstractViewHelper
             $arguments['separator'] = self::DEFAULT_SEPARATOR;
         }
 
+        if(!is_string($string)) {
+            return $string;
+        }
+
         return explode($arguments['separator'], $string);
     }
 }

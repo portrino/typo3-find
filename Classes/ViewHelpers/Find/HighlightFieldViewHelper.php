@@ -30,7 +30,7 @@ use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
- * View Helper for styling the content of index document’s result fields.
+ * View Helpe   r for styling the content of index document’s result fields.
  * Requires the query result object for finding the information as well as the
  * document and the field to work on.
  *
@@ -45,6 +45,14 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class HighlightFieldViewHelper extends AbstractViewHelper
 {
+
+    /**
+     * As this ViewHelper renders HTML, the output must not be escaped.
+     *
+     * @var bool
+     */
+    protected $escapeOutput = false;
+
     /**
      * Registers own arguments.
      */

@@ -47,8 +47,6 @@ class RegexpViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelp
 		$this->registerArgument('useMBEreg', 'boolean', 'Whether to use mb_ereg_replace() instead of preg_replace()', FALSE, FALSE);
 	}
 
-
-
 	/**
 	 * @return string
 	 */

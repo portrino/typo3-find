@@ -34,6 +34,12 @@ namespace Subugoe\Find\ViewHelpers\Format;
  */
 class CSVLineViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
 
+    /**
+     * As this ViewHelper renders HTML, the output must not be escaped.
+     *
+     * @var bool
+     */
+    protected $escapeOutput = false;
 
 	/**
 	 * Registers own arguments.
@@ -45,8 +51,6 @@ class CSVLineViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHel
 		$this->registerArgument('fieldDelimiter', 'string', 'The string to use as a column separator', FALSE, ',');
 		$this->registerArgument('fieldEnclosure', 'string', 'The string to enclose the field content in', FALSE, '"');
 	}
-
-
 
 	/**
 	 * @return string
