@@ -106,7 +106,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		$this->timing['INIT_START'] = microtime(true) - $this->timing['START'];
 	}
 
-	
+
 	/**
 	 * Index Action.
 	 */
@@ -387,7 +387,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 
 	/**
 	 * Returns whether extended search should be used or not.
-	 * 
+	 *
 	 * @return Boolean
 	 */
 	private function isExtendedSearch () {
@@ -410,11 +410,11 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 				}
 			}
 		}
-		
+
 		return $result;
 	}
 
-	
+
 	/**
 	 * Takes the array of search query parameters and builds an array of Solr
 	 * search strings from it, using the »queryFields« configuration from TypoScript.
@@ -617,7 +617,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		return $query;
 	}
 
-	
+
 
 	/**
 	 * Adds filter queries for active facets to $query.
@@ -1471,32 +1471,31 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 
 			$resultSet = $selectResults->getDocuments();
 
-			$arguments = array(
-				array('tx_find_find' =>
-					array(
-						'id' => $resultSet[0]['id'],
-					)
-				)
-			);
+			$arguments = [
+				'tx_find_find' => [
+					'action' => 'detail',
+					'controller' => 'Search',
+					'id' => $resultSet[0]['id']
+				]
+			];
 
-			$uri = $this->uriBuilder->reset()->setTargetPageUid(intval($GLOBALS['TSFE']->id))->setCreateAbsoluteUri(TRUE)->setArguments($arguments)->build();
-
-			\TYPO3\CMS\Core\Utility\HttpUtility ::redirect($uri);
+			$uri = $this->uriBuilder->reset()->setTargetPageUid(intval($GLOBALS['TSFE']->id))->setCreateAbsoluteUri(true)->setArguments($arguments)->build();
+			\TYPO3\CMS\Core\Utility\HttpUtility::redirect($uri);
 
 		} else {
 
-            $arguments = array(
-                array('tx_find_find' =>
-                    array(
-                        'q' => array(
-                            'default' => $queryArgumentsDefault
-                        ),
-                    )
-                )
-            );
+            $arguments = [
+				'tx_find_find' => [
+					'action' => 'index',
+					'controller' => 'Search',
+                    'q' => [
+                        'default' => $queryArgumentsDefault
+					]
+				]
+			];
 
-            $uri = $this->uriBuilder->reset()->setTargetPageUid(intval($GLOBALS['TSFE']->id))->setCreateAbsoluteUri(TRUE)->setUseCacheHash(FALSE)->setArguments($arguments)->build();
-			\TYPO3\CMS\Core\Utility\HttpUtility ::redirect($uri);
+            $uri = $this->uriBuilder->reset()->setTargetPageUid(intval($GLOBALS['TSFE']->id))->setCreateAbsoluteUri(true)->setUseCacheHash(false)->setArguments($arguments)->build();
+			\TYPO3\CMS\Core\Utility\HttpUtility::redirect($uri);
 		}
 
 		die();
