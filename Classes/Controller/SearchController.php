@@ -750,6 +750,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 				// Hack: convert strings »RANGE XX TO YY« Solr style range queries »[XX TO YY]«
 				// (because PHP loses ] in array keys during URL parsing)
 				$queryTerm = preg_replace('/RANGE (.*) TO (.*)/', '[\1 TO \2]', $queryTerm);
+				$queryTerm = preg_replace('/RANGE\\\ (.*)\\\ TO\\\ (.*)/', '[\1 TO \2]', $queryTerm);
 				$queryString = sprintf($queryPattern, $queryTerm);
 			}
 		}
