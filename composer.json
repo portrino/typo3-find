@@ -1,9 +1,8 @@
 {
   "name": "slub/find",
   "description": "A frontend for Solr indexes",
-  "version": "1.1.0",
   "type": "typo3-cms-extension",
-  "homepage": "",
+  "homepage": "https://github.com/slub/typo3-find",
   "keywords" : ["TYPO3 CMS"],
   "license": ["GPL-2.0+"],
   "authors" : [
@@ -14,15 +13,14 @@
     },
     {
       "name" : "Christof Rodejohann",
-      "email" : "chrtistof.rodejohann@slub-dresden.de",
+      "email" : "christof.rodejohann@slub-dresden.de",
       "role" : "Developer"
     }
   ],
   "require": {
-    "typo3/cms-core": "^9.5.0"
+    "typo3/cms-core": "^9.5.27"
   },
   "replace": {
-    "typo3-ter/find": "*",
     "subgoe/find": "*"
   },
   "autoload": {
