@@ -210,6 +210,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		$this->timing['DETAIL_START'] = microtime(true) - $this->timing['START'];
 
 		$arguments = $this->requestArguments;
+
 		if (array_key_exists('id', $arguments) && !empty($arguments['id'])) {
 			$id = $arguments['id'];
 			$assignments = array();
@@ -227,6 +228,8 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 					$arguments[$key] = $value;
 				}
 
+
+
 				$this->addQueryInformationAsJavaScript($underlyingQueryInfo['q'], (int)$underlyingQueryInfo['position'], $arguments);
 
 				$query = $this->createQueryForArguments($arguments);
@@ -234,8 +237,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 				$query->setRows($nextIndex - $previousIndex + 1);
 
 				try {
-
-					$this->signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . 'BeforePagingSelect', array(&$query, $arguments['underlyingQuery']));
+					$this->signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . 'BeforePagingSelect', array(&$query, $arguments['underlyingQuery'], $arguments) );
 
 					$selectResults = $this->solr->select($query);
 					if (count($selectResults) > 0) {
