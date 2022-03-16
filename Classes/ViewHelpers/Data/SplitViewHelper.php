@@ -59,7 +59,7 @@ class SplitViewHelper extends AbstractViewHelper
     ) {
         $string = $arguments['string'];
         if (null === $string) {
-            $string = $renderChildrenClosure;
+            $string = $renderChildrenClosure();
         }
 
         if (empty($arguments['separator'])) {
