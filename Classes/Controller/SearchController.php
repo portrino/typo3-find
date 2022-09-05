@@ -1495,7 +1495,7 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
                 )
             );
 
-            $uri = $this->uriBuilder->reset()->setTargetPageUid(intval($GLOBALS['TSFE']->id))->setCreateAbsoluteUri(TRUE)->setUseCacheHash(FALSE)->setArguments($arguments)->build();
+            $uri = $this->uriBuilder->reset()->setTargetPageUid(intval($GLOBALS['TSFE']->id))->setCreateAbsoluteUri(TRUE)->setArguments($arguments)->build();
 			\TYPO3\CMS\Core\Utility\HttpUtility ::redirect($uri);
 		}
 

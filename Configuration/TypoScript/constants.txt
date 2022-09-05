@@ -1,26 +1,2 @@
-plugin.tx_find {
-	settings {
-		connection {
-			host = 127.0.0.1
-			port = 8080
-			path = /solr/
-			timeout = 5
-			scheme = http
-		}
-		count = 20
-		 # cat=plugin.tx_find/file; type=string; label=Path to CSS file (FE)
-		CSSPath = EXT:find/Resources/Public/CSS/find.css
-		 # cat=plugin.tx_find/file; type=string; label=Path to JavaScript file (FE)
-		JSPath = EXT:find/Resources/Public/JavaScript/find.js
-		 # cat=plugin.tx_find/file; type=string; label=Path to template localisation files (FE)
-		languageRootPath = EXT:find/Resources/Private/Language/
-	}
-	view {
-		 # cat=plugin.tx_find/file; type=string; label=Path to template root (FE)
-		templateRootPath = EXT:find/Resources/Private/Templates/
-		 # cat=plugin.tx_find/file; type=string; label=Path to template partials (FE)
-		partialRootPath = EXT:find/Resources/Private/Partials/
-		 # cat=plugin.tx_find/file; type=string; label=Path to template layouts (FE)
-		layoutRootPath = EXT:find/Resources/Private/Layouts/
-	}
-}
+# Important: This file is deprecated and will removed with EXT:solr 12.x
+@import 'EXT:find/Configuration/TypoScript/constants.typoscript'
