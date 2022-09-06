@@ -26,13 +26,14 @@
 
 namespace Subugoe\Find\ViewHelpers\Page;
 
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * View Helper to join the elements of an array into a string.
  * 
  * Usage examples are available in Private/Partials/Test.html.
  */
-class TitleViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
+class TitleViewHelper extends AbstractViewHelper {
 
 
 	/**

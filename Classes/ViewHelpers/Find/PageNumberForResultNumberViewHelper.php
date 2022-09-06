@@ -26,33 +26,32 @@
 
 namespace Subugoe\Find\ViewHelpers\Find;
 
-
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * View Helper to return the number of the page the result at position resultNumber
  * appears on with resultsPerPage items per page, i.e. returns
  * resultNumber mod resultsPerPage.
  */
-class PageNumberForResultNumberViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
+class PageNumberForResultNumberViewHelper extends AbstractViewHelper
+{
 
+    /**
+     * Registers own arguments.
+     */
+    public function initializeArguments()
+    {
+        parent::initializeArguments();
+        $this->registerArgument('resultNumber', 'int', 'Number of the rsult to determine the page number for', TRUE);
+        $this->registerArgument('resultsPerPage', 'int', 'Number of results per page', TRUE);
+    }
 
-	/**
-	 * Registers own arguments.
-	 */
-	public function initializeArguments() {
-		parent::initializeArguments();
-		$this->registerArgument('resultNumber', 'int', 'Number of the rsult to determine the page number for', TRUE);
-		$this->registerArgument('resultsPerPage', 'int', 'Number of results per page', TRUE);
-	}
-
-
-	/**
-	 * @return string
-	 */
-	public function render() {
-		return ceil($this->arguments['resultNumber'] / $this->arguments['resultsPerPage']);
-	}
+    /**
+     * @return string
+     */
+    public function render()
+    {
+        return ceil($this->arguments['resultNumber'] / $this->arguments['resultsPerPage']);
+    }
 
 }
-
-?>

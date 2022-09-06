@@ -26,39 +26,37 @@
 
 namespace Subugoe\Find\ViewHelpers\Format;
 
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * View Helper to join the elements of an array into a string.
  *
  * Usage examples are available in Private/Partials/Test.html.
  */
-class JoinViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
+class JoinViewHelper extends AbstractViewHelper
+{
 
+    /**
+     * Registers own arguments.
+     * @return void
+     */
+    public function initializeArguments()
+    {
+        parent::initializeArguments();
+        $this->registerArgument('array', 'array', 'the array to join the elements of', FALSE, NULL);
+        $this->registerArgument('separator', 'string', 'the separator string placed between the elements of the array', FALSE, ', ');
+    }
 
-	/**
-	 * Registers own arguments.
-	 * @return void
-	 */
-	public function initializeArguments() {
-		parent::initializeArguments();
-		$this->registerArgument('array', 'array', 'the array to join the elements of', FALSE, NULL);
-		$this->registerArgument('separator', 'string', 'the separator string placed between the elements of the array', FALSE, ', ');
-	}
+    /**
+     * @return string
+     */
+    public function render()
+    {
+        $array = $this->arguments['array'];
+        if ($array === NULL) {
+            $array = $this->renderChildren();
+        }
 
-
-
-	/**
-	 * @return string
-	 */
-	public function render() {
-		$array = $this->arguments['array'];
-		if ($array === NULL) {
-			$array = $this->renderChildren();
-		}
-
-		return implode($array, $this->arguments['separator']);
-	}
-
+        return implode($array, $this->arguments['separator']);
+    }
 }
-
-?>
