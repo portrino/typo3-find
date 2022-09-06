@@ -1353,7 +1353,6 @@ class SearchController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		}
 
 		if ($this->settings['paging']['detailPagePaging']) {
-			//$scriptTag = new \TYPO3\CMS\Fluid\Core\ViewHelper\TagBuilder('script');
             $scriptTag = GeneralUtility::makeInstance(TagBuilder::class, 'script');
 			$scriptTag->addAttribute('type', 'text/javascript');
 
