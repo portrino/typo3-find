@@ -61,13 +61,11 @@ class SearchController extends ActionController
 
         if ($this->request->hasArgument('underlyingQuery')) {
             $underlyingQueryInfo = $this->request->getArgument('underlyingQuery');
-            $this->response->addAdditionalHeaderData(
-                FrontendUtility::addQueryInformationAsJavaScript(
-                    $underlyingQueryInfo['q'],
-                    $this->settings,
-                    (int) $underlyingQueryInfo['position'],
-                    $arguments
-                )
+            FrontendUtility::addQueryInformationAsJavaScript(
+                $underlyingQueryInfo['q'],
+                $this->settings,
+                (int) $underlyingQueryInfo['position'],
+                $arguments
             );
         }
 
@@ -89,13 +87,11 @@ class SearchController extends ActionController
             $this->forward('detail');
         } else {
             $this->searchProvider->setCounter();
-            $this->response->addAdditionalHeaderData(
-                FrontendUtility::addQueryInformationAsJavaScript(
-                    $this->searchProvider->getRequestArguments()['q'],
-                    $this->settings,
-                    null,
-                    $this->searchProvider->getRequestArguments()
-                )
+            FrontendUtility::addQueryInformationAsJavaScript(
+                $this->searchProvider->getRequestArguments()['q'],
+                $this->settings,
+                null,
+                $this->searchProvider->getRequestArguments()
             );
 
             $this->addStandardAssignments();

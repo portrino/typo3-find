@@ -27,6 +27,7 @@ namespace Subugoe\Find\Utility;
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
 
+use TYPO3\CMS\Core\Page\AssetCollector;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3Fluid\Fluid\Core\ViewHelper\TagBuilder;
 
@@ -42,12 +43,9 @@ class FrontendUtility
      * @param int|null $position  of the record in the result list
      * @param array    $arguments overrides $this->requestArguments if set
      */
-    public static function addQueryInformationAsJavaScript($query, array $settings, $position = null, $arguments = []): string
+    public static function addQueryInformationAsJavaScript($query, array $settings, $position = null, $arguments = []): void
     {
         if ($settings['paging']['detailPagePaging']) {
-            $scriptTag = GeneralUtility::makeInstance(TagBuilder::class, 'script');
-            $scriptTag->addAttribute('type', 'text/javascript');
-
             if (array_key_exists('underlyingQuery', $arguments)) {
                 $arguments = $arguments['underlyingQuery'];
             }
@@ -69,12 +67,8 @@ class FrontendUtility
                 $underlyingQuery['sort'] = $arguments['sort'];
             }
 
-            $scriptTag->setContent('var underlyingQuery = '.json_encode($underlyingQuery).';');
-
-            return $scriptTag->render();
+            GeneralUtility::makeInstance(AssetCollector::class)->addInlineJavaScript('find_underlyingQuery', 'const underlyingQuery = ' . json_encode($underlyingQuery) . ';');
         }
-
-        return '';
     }
 
     /**

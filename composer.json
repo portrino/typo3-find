@@ -33,8 +33,8 @@
     "ext-curl": "*",
     "ext-json": "*",
     "solarium/solarium": ">=6.0 <7.0",
-    "typo3/cms-core": "^10.4.10",
-    "typo3/cms-felogin": "^10.4.10"
+    "typo3/cms-core": "^10.4 || ^11.5",
+    "typo3/cms-felogin": "^10.4 || ^11.5"
   },
   "require-dev": {
     "nimut/testing-framework": "^6.0",
