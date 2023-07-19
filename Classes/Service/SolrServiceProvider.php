@@ -256,6 +256,39 @@ class SolrServiceProvider extends AbstractServiceProvider
         return $results;
     }
 
+    /**
+     * @param array $arguments
+     */
+    public function getTerms($arguments){
+	    // make sure the required parameters are provided
+	    if (array_key_exists('field', $arguments) && !empty($arguments['field'])) {
+            $connection = $this->getConnection();
+
+	        // get a terms query instance
+	        $query = $connection->createTerms();
+	        // set the fields for which term infos are requested
+	        $query->setFields( $arguments['field'] );
+	        
+	        // set limit as specified in the request; defaults to -1 (no limit)
+	        $limit = -1;
+	        if (array_key_exists('limit', $arguments) && !empty($arguments['limit'])) {
+	            $limit = $arguments['limit'];
+            }
+	        $query->setLimit($limit);
+	        
+	        // append info about lower bound if set in request
+	        if (array_key_exists('lowerBound', $arguments) && !empty($arguments['lowerBound'])){
+	            $query->setLowerbound($arguments['lowerBound']);
+            }
+	        
+	        // execute the query
+	        $resultset = $connection->terms($query);
+	        
+	        return $resultset;
+	    }
+	    return [];
+	}
+
     protected function addEDisMax(): void
     {
         $this->query->getEDisMax();

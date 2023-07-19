@@ -134,6 +134,14 @@ class SearchController extends ActionController
     }
 
     /**
+     * Query indexed terms for given fields.
+     */
+    public function termAction(){
+        $results = $this->searchProvider->getTerms($this->searchProvider->getRequestArguments());
+        $this->view->assign('terms', $results);
+    }
+
+    /**
      * Assigns standard variables to the view.
      */
     protected function addStandardAssignments()
