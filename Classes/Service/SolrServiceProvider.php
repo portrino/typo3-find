@@ -236,18 +236,22 @@ class SolrServiceProvider extends AbstractServiceProvider
      */
     public function suggestQuery($arguments): array
     {
-        $query = $this->getConnection()->createSuggester();
         $results = [];
         if (array_key_exists('q', $arguments)) {
+            $query = $this->getConnection()->createSuggester();
             $query->setQuery($arguments['q']);
             if ($arguments['dictionary']) {
                 $query->setDictionary($arguments['dictionary']);
             }
 
             $this->addFacetFilters($arguments);
-            $solrResults = $this->getConnection()->execute($query)->getResults();
-            foreach ($solrResults as $suggestions) {
-                $results = array_merge($results, $suggestions->getSuggestions());
+            $solrResults = $this->getConnection()->suggester($query);
+            foreach ($solrResults as $term => $termResult) {
+                foreach ($termResult as $result) {
+                    foreach ($result->getSuggestions() as $sug) {
+                        $results[]= $sug["term"];
+                    }
+                }
             }
         } else {
             // TODO: Error message in JSON?
