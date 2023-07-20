@@ -728,6 +728,8 @@ class SolrServiceProvider extends AbstractServiceProvider
         $this->addHighlighting($arguments);
         $this->setConfigurationValue('activeFacets', $this->addFacetFilters($arguments));
         $this->addFacetQueries();
+        		
+        $this->addGrouping($arguments);
     }
 
     /**
@@ -1211,6 +1213,70 @@ class SolrServiceProvider extends AbstractServiceProvider
         $this->addSortStringForQuery($sortString);
         $this->addSortOrdersToTemplate($arguments);
     }
+
+    /**
+	 * Sets up $query’s grouping parameters from URL arguments or the TypoScript default.
+	 *
+	 * @param \Solarium\QueryType\Select\Query\Query $query
+	 * @param array $arguments request arguments
+	 */
+	private function addGrouping ($arguments) {
+	    $limit = -1;
+	    $field = null;
+	    
+	    if (!empty($arguments["group"]) && $arguments["group"]){
+            if (!empty($this->settings['grouping'])) {
+                $groupSetting = $this->settings['grouping'];
+                
+                if ($arguments["groupfield"]){
+                    $field = $arguments["groupfield"];
+                } else{
+                    if (!empty($groupSetting["field"])){
+                        $field = $groupSetting["field"];
+                    }
+                }
+                
+                if ($arguments["grouplimit"]){
+                    $limit = $arguments["grouplimit"];
+                } else{
+                    if (!empty($groupSetting["limit"])){
+                        $limit = $groupSetting["limit"];
+                    }
+                }
+                
+                if (!empty($field)) {
+        	        $grouping = $this->query->getGrouping();
+        	        $grouping->setLimit((int)$limit);
+        	        $grouping->addField($field);
+                    $grouping->setNumberOfGroups(true);
+        	        
+        	        $this->addGroupLimitOptionsToTemplate($arguments);
+                }
+    	    }
+	    }
+	}
+
+	private function addGroupLimitOptionsToTemplate ($arguments) {
+	    $grouplimitOptions = array('menu' => array());
+	    
+	    if (is_array($this->settings['grouping']['menu'])) {
+	        ksort($this->settings['grouping']['menu']);
+	        foreach ($this->settings['grouping']['menu'] as $limit) {
+	            $grouplimitOptions['menu'][$limit] = $limit;
+	        }
+	        
+	        $grouplimitOptions['default'] = $this->settings['grouping']['limit'];
+	        
+	        if ($arguments['grouplimit'] && array_key_exists($arguments['grouplimit'], $grouplimitOptions['menu'])) {
+	            $grouplimitOptions['selected'] = $arguments['grouplimit'];
+	        }
+	        else {
+	            $grouplimitOptions['selected'] = $grouplimitOptions['default'];
+	        }
+	    }
+	    
+	    $this->configuration['grouplimitOptions'] = $grouplimitOptions;
+	}
 
     /**
      * Returns the facet/filter key for the given $facetID.
