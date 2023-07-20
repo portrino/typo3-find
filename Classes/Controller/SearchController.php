@@ -153,6 +153,7 @@ class SearchController extends ActionController
         );
         $this->searchProvider->setConfigurationValue('prefixID', 'tx_find_find');
         $this->searchProvider->setConfigurationValue('pageTitle', $GLOBALS['TSFE']->page['title']);
+        $this->searchProvider->setConfigurationValue('language', $GLOBALS['TSFE']->config['config']['language']);
     }
 
     /**

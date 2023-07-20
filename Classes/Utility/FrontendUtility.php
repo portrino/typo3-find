@@ -67,6 +67,10 @@ class FrontendUtility
                 $underlyingQuery['sort'] = $arguments['sort'];
             }
 
+            if ($arguments['group']) {
+			    $underlyingQuery['group'] = $arguments['group'];
+			}
+
             GeneralUtility::makeInstance(AssetCollector::class)->addInlineJavaScript('find_underlyingQuery', 'const underlyingQuery = ' . json_encode($underlyingQuery) . ';');
         }
     }

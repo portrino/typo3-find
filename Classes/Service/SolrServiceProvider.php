@@ -124,7 +124,7 @@ class SolrServiceProvider extends AbstractServiceProvider
         $arguments = $this->getRequestArguments();
 
         $assignments = [];
-        if ($this->settings['paging']['detailPagePaging'] && array_key_exists('underlyingQuery', $arguments)) {
+        if ($this->settings['paging']['detailPagePaging'] && array_key_exists('underlyingQuery', $arguments) && !$arguments["underlyingQuery"]["group"]) {
             // If underlying query has been sent, fetch more data to enable paging arrows.
             $underlyingQueryInfo = $arguments['underlyingQuery'];
 
