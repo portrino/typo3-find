@@ -38,6 +38,8 @@ use Subugoe\Find\Utility\SettingsUtility;
 use Subugoe\Find\Utility\UpgradeUtility;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\MetaTag\MetaTagManagerRegistry;
 
 /**
  * Service provider for solr.
@@ -144,7 +146,60 @@ class SolrServiceProvider extends AbstractServiceProvider
             $assignments = $this->getTheRecordSpecified($id, $assignments);
         }
 
+        // add page meta data based on the current document
+        $document = $assignments["document"];
+        if ($document && !empty($this->settings['detailPageMeta'])) {
+            $this->addDocumentPageMetaData($document);
+        }
+
         return $assignments;
+    }
+
+    private function addDocumentPageMetaData($document){
+        $dpm = $this->settings['detailPageMeta'];
+        $descriptionField = $dpm["descriptionFieldName"]??"";
+        $imageField = $dpm["imageFieldName"]??"";
+        
+        $imageUrl = null;
+        $description = null;
+        // get image URL from configured field
+        if (in_array($imageField, $document->getFields())) {
+            $difv = $document[$imageField];
+            if (is_array($difv)){
+                $imageUrl = $difv[0];
+            } else {
+                $imageUrl = $difv;
+            }
+        }
+        // get description from configured field
+        if (in_array($descriptionField, $document->getFields())) {
+            $ddfv = $document[$descriptionField];
+            if (is_array($ddfv)){
+                $description = $ddfv[0];
+            } else {
+                $description = $ddfv;
+            }
+        }
+
+        // allow to localize the description. To this end, LLL key 'meta.detailpage.description' is used 
+        // with the value of the configured description field handed over to fill potential placeholders. Fallback: use
+        // the description from the document as is
+        $descriptionToSet = LocalizationUtility::translate(
+            'LLL:' . $this->settings['languageRootPath'] . 'locallang:meta.detailpage.description',
+            $this->getControllerExtensionKey(), [$description]) ?? $description;
+
+        // set meta tags "og:image", "description", "og:description" and "twitter:description"
+        $registry = GeneralUtility::makeInstance(MetaTagManagerRegistry::class);
+        if (!empty($imageUrl)){
+            $metaTagManager = $registry->getManagerForProperty('og:image');
+            $metaTagManager->addProperty('og:image', $imageUrl, [], true);
+        }
+        if (!empty($description)) {
+            foreach (['description', 'og:description', 'twitter:description'] as $field) {
+                $metaTagManager = $registry->getManagerForProperty($field);
+                $metaTagManager->addProperty($field, $descriptionToSet, [], true);
+            }
+        }
     }
 
     /**
