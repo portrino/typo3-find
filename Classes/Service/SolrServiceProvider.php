@@ -97,28 +97,33 @@ class SolrServiceProvider extends AbstractServiceProvider
      */
     public function getDefaultQuery(): array
     {
-        $this->createQueryForArguments($this->getRequestArguments());
-        $error = null;
-        $resultSet = null;
+        $queryParamsPresent = !empty($this->requestArguments['q']) && count($this->requestArguments['q']) > 0;
+        if(!$queryParamsPresent && $this->settings["allowNoSearch"]) {
+            return ['noSearch' => '1'];
+        } else {
+            $this->createQueryForArguments($this->getRequestArguments());
+            $error = null;
+            $resultSet = null;
 
-        try {
-            $resultSet = $this->connection->execute($this->query);
-        } catch (HttpException $httpException) {
-            $this->logger->error(
-                'Solr Exception (Timeout?)',
-                [
-                    'requestArguments' => $this->getRequestArguments(),
-                    'exception' => LoggerUtility::exceptionToArray($httpException),
-                ]
-            );
+            try {
+                $resultSet = $this->connection->execute($this->query);
+            } catch (HttpException $httpException) {
+                $this->logger->error(
+                    'Solr Exception (Timeout?)',
+                    [
+                        'requestArguments' => $this->getRequestArguments(),
+                        'exception' => LoggerUtility::exceptionToArray($httpException),
+                    ]
+                );
 
-            $error = ['solr' => $httpException];
+                $error = ['solr' => $httpException];
+            }
+
+            return [
+                'results' => $resultSet,
+                'error' => $error,
+            ];
         }
-
-        return [
-            'results' => $resultSet,
-            'error' => $error,
-        ];
     }
 
     public function getDocumentById(string $id): array
