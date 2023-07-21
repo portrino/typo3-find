@@ -74,9 +74,27 @@ class SearchController extends ActionController
         $this->view->assignMultiple($detail);
         $this->view->assignMultiple([
             'arguments' => $arguments,
-            'config' => $this->searchProvider->getConfiguration(),
+            'config' => $this->searchProvider->getConfiguration()
         ]);
     }
+
+    /**
+	 * Citation Action.
+	 */
+	public function citationAction() {
+
+		$arguments = $this->requestArguments;
+        $detail = $this->searchProvider->getDocumentById($arguments["id"]);
+
+        $this->addStandardAssignments();
+        
+        $this->view->assignMultiple($detail);
+        $this->view->assignMultiple([
+            'arguments' => $arguments,
+            'config' => $this->searchProvider->getConfiguration(),
+            'type' => $arguments['type']
+        ]);
+	}
 
     /**
      * Index Action.

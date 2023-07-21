@@ -7,10 +7,10 @@ $autoexec = static function () {
         'Find',
         'Find',
         [
-            \Subugoe\Find\Controller\SearchController::class => 'index, detail, suggest, term',
+            \Subugoe\Find\Controller\SearchController::class => 'index, detail, suggest, term, citation',
         ],
         [
-            \Subugoe\Find\Controller\SearchController::class => 'index, detail, suggest, term',
+            \Subugoe\Find\Controller\SearchController::class => 'index, detail, suggest, term, citation',
         ]
     );
 
