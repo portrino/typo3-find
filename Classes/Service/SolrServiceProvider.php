@@ -1194,12 +1194,23 @@ class SolrServiceProvider extends AbstractServiceProvider
                             $queryTerms[$key] = str_replace($char, '\\'.$char, $term);
                         }
                     }
-
-                    $queryPart = $magicFieldPrefix.vsprintf($queryFormat, $queryTerms);
+                    if (!empty($fieldInfo["disjunctionWith"])){
+                        $queryPart = '('.$magicFieldPrefix.vsprintf($queryFormat, $queryTerms).' OR '.$magicFieldPrefix.vsprintf($fieldInfo["disjunctionWith"], $queryTerms).')';
+                    } else {
+                        $queryPart = $magicFieldPrefix.vsprintf($queryFormat, $queryTerms);
+                    }
                 } elseif (1 === (int) $fieldInfo['noescape']) {
-                    $queryPart = $magicFieldPrefix.vsprintf($queryFormat, $queryTerms);
+                    if (!empty($fieldInfo["disjunctionWith"])){
+                        $queryPart = '('.$magicFieldPrefix.vsprintf($queryFormat, $queryTerms).' OR '.$magicFieldPrefix.vsprintf($fieldInfo["disjunctionWith"], $queryTerms).')';
+                    } else {
+                        $queryPart = $magicFieldPrefix.vsprintf($queryFormat, $queryTerms);
+                    }
                 } else {
-                    $queryPart = $magicFieldPrefix.$this->query->getHelper()->escapePhrase(vsprintf($queryFormat, $queryTerms));
+                    if (!empty($fieldInfo["disjunctionWith"])){
+                        $queryPart = '('.$magicFieldPrefix.$this->query->getHelper()->escapePhrase(vsprintf($queryFormat, $queryTerms)).' OR '.$magicFieldPrefix.$this->query->getHelper()->escapePhrase(vsprintf($fieldInfo["disjunctionWith"], $queryTerms)).')';
+                    } else {
+                        $queryPart = $magicFieldPrefix.$this->query->getHelper()->escapePhrase(vsprintf($queryFormat, $queryTerms));
+                    }
                 }
 
                 if ('' !== $queryPart && '0' !== $queryPart) {
