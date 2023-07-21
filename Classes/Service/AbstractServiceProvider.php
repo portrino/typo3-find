@@ -19,7 +19,7 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
 
     protected array $settings = [];
 
-    public function __construct(string $connectionName, array $settings)
+    public function initialize(string $connectionName, array $settings)
     {
         $this->connectionName = $connectionName;
         $this->settings = $settings;

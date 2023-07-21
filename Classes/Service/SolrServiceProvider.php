@@ -40,6 +40,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\MetaTag\MetaTagManagerRegistry;
+use TYPO3\CMS\Core\TimeTracker\TimeTracker;
+use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 /**
  * Service provider for solr.
@@ -55,6 +57,15 @@ class SolrServiceProvider extends AbstractServiceProvider
     protected ?string $controllerExtensionKey = null;
 
     protected Query $query;
+
+    protected $timing;
+
+    private ?Dispatcher $signalSlotDispatcher = null;
+
+    public function injectDispatcher(Dispatcher $signalSlotDispatcher)
+    {
+        $this->signalSlotDispatcher = $signalSlotDispatcher;
+    }
 
     public function connect()
     {
@@ -85,6 +96,9 @@ class SolrServiceProvider extends AbstractServiceProvider
 
         $this->setConnection($client);
         $this->testConnection();
+
+        $this->timeTracker= GeneralUtility::makeInstance(TimeTracker::class);
+		$this->timing['INIT_START'] = $this->timeTracker->getDifferenceToStarttime();
     }
 
     public function getConfiguration(): array
@@ -106,7 +120,12 @@ class SolrServiceProvider extends AbstractServiceProvider
             $resultSet = null;
 
             try {
+                $this->timing['INDEX_BEFORE_BeforeSelect_SLOT'] = $this->timeTracker->getDifferenceToStarttime();
+                $this->signalSlotDispatcher->dispatch('Subugoe\Find\Controller\SearchController', 'indexActionBeforeSelect', array(&$this->$query, $this->requestArguments));
+                $this->timing['INDEX_AFTER_BeforeSelect_SLOT'] = $this->timeTracker->getDifferenceToStarttime();
+
                 $resultSet = $this->connection->execute($this->query);
+                $this->timing['INDEX_AFTER SOLR'] = $this->timeTracker->getDifferenceToStarttime();
             } catch (HttpException $httpException) {
                 $this->logger->error(
                     'Solr Exception (Timeout?)',
@@ -119,15 +138,32 @@ class SolrServiceProvider extends AbstractServiceProvider
                 $error = ['solr' => $httpException];
             }
 
+            $this->timing['INDEX_BEFORE_BeforeRender_SLOT'] = $this->timeTracker->getDifferenceToStarttime();
+            $this->signalSlotDispatcher->dispatch('Subugoe\Find\Controller\SearchController', 'indexActionBeforeRender', array(&$resultSet));
+            $this->timing['INDEX_AFTER_BeforeRender_SLOT'] = $this->timeTracker->getDifferenceToStarttime();
+
+            $this->timing['BEFORE_RENDER'] =  $this->timing['INDEX_AFTER_BeforeRender_SLOT'];
             return [
                 'results' => $resultSet,
                 'error' => $error,
+                'timing' => $this->timing
             ];
         }
     }
 
+    /**
+     * @param array $requestArguments
+     */
+    public function setRequestArguments($requestArguments)
+    {
+        $this->requestArguments = $requestArguments;
+        $this->signalSlotDispatcher->dispatch('Subugoe\Find\Controller\SearchController', 'initializeActionAfterArgumentsFilled', array(&$this->requestArguments));
+    }
+
     public function getDocumentById(string $id): array
     {
+        $this->timing['DETAIL_START'] = $this->timeTracker->getDifferenceToStarttime();
+
         $arguments = $this->getRequestArguments();
 
         $assignments = [];
@@ -145,6 +181,8 @@ class SolrServiceProvider extends AbstractServiceProvider
             $this->query->setStart($index['previousIndex']);
             $this->query->setRows($index['nextIndex'] - $index['previousIndex'] + 1);
 
+            $this->signalSlotDispatcher->dispatch('Subugoe\Find\Controller\SearchController', 'detailActionBeforePagingSelect', array(&$this->query, $arguments['underlyingQuery']));
+
             $assignments = $this->getRecordsWithUnderlyingQuery($assignments, $index, $id, $arguments);
         } else {
             // Without underlying query information, just get the record specified.
@@ -157,6 +195,12 @@ class SolrServiceProvider extends AbstractServiceProvider
             $this->addDocumentPageMetaData($document);
         }
 
+        $this->timing['DETAIL_BEFORE_BeforeRender_SLOT'] = $this->timeTracker->getDifferenceToStarttime();
+        $this->signalSlotDispatcher->dispatch('Subugoe\Find\Controller\SearchController', 'detailActionBeforeRender', array(&$assignments, $this->connection));
+        $this->timing['DETAIL_AFTER_BeforeRender_SLOT'] = $this->timeTracker->getDifferenceToStarttime();
+
+        $this->timing['BEFORE_RENDER'] =  $this->timing['DETAIL_AFTER_BeforeRender_SLOT'];
+        $assignments['timing'] = $this->timing;
         return $assignments;
     }
 
