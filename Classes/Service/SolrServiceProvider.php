@@ -1042,13 +1042,17 @@ class SolrServiceProvider extends AbstractServiceProvider
                         $assignments['document-next-number'] = $index['nextIndex'] + 1;
                     }
                 } else {
+                    $message =  sprintf('»detail« action query with underlying query could not retrieve record id »%s«.', $id);
                     $this->logger->error(
-                        sprintf('»detail« action query with underlying query could not retrieve record id »%d«.', $id),
+                        $message,
                         ['arguments' => $arguments]
                     );
+                    $assignments["error"] = ["solr" => $message];
                 }
             } else {
-                $this->logger->error('»detail« action query with underlying query returned no results.', ['arguments' => $arguments]);
+                $message = '»detail« action query with underlying query returned no results.';
+                $this->logger->error($message, ['arguments' => $arguments]);
+                $assignments["error"] = ["solr" => $message];
             }
         } catch (HttpException $httpException) {
             $this->logger->error(
@@ -1083,13 +1087,14 @@ class SolrServiceProvider extends AbstractServiceProvider
         try {
             /** @var \Solarium\QueryType\Select\Result\Result $selectResults */
             $selectResults = $connection->execute($this->query);
-
             if ($selectResults->getNumFound() > 0) {
                 $assignments['results'] = $selectResults;
                 $resultSet = $selectResults->getDocuments();
                 $assignments['document'] = $resultSet[0];
             } else {
-                $this->logger->error(sprintf('»detail« action query for id »%d« returned no results.', $id), ['arguments' => $this->getRequestArguments()]);
+                $message = sprintf('»detail« action query for id »%s« returned no results.', $id);
+                $this->logger->error($message, ['arguments' => $this->getRequestArguments()]);
+                $assignments['error'] = ['solr' => $message];
             }
         } catch (HttpException $httpException) {
             $this->logger->error(
