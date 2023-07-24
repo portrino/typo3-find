@@ -31,6 +31,7 @@ use Solarium\Client;
 use Solarium\Core\Client\Adapter\Curl;
 use Solarium\Core\Client\Adapter\Http;
 use Solarium\Exception\HttpException;
+use Solarium\Exception\UnexpectedValueException;
 use Solarium\QueryType\Select\Query\Query;
 use Subugoe\Find\Utility\FrontendUtility;
 use Subugoe\Find\Utility\LoggerUtility;
@@ -136,6 +137,15 @@ class SolrServiceProvider extends AbstractServiceProvider
                 );
 
                 $error = ['solr' => $httpException];
+            } catch (UnexpectedValueException $unexpectedValueException) {
+                $this->logger->error(
+                    'Solr Exception (Bad response?)',
+                    [
+                        'requestArguments' => $this->getRequestArguments(),
+                        'exception' => LoggerUtility::exceptionToArray($unexpectedValueException),
+                    ]
+                );
+                $error = ['solr' => $unexpectedValueException];
             }
 
             $this->timing['INDEX_BEFORE_BeforeRender_SLOT'] = $this->timeTracker->getDifferenceToStarttime();
