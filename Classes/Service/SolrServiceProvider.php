@@ -1092,7 +1092,11 @@ class SolrServiceProvider extends AbstractServiceProvider
                 $resultSet = $selectResults->getDocuments();
                 $assignments['document'] = $resultSet[0];
             } else {
-                $message = sprintf('»detail« action query for id »%s« returned no results.', $id);
+                $localisationKey = 'LLL:' . $this->settings['languageRootPath'] . 'locallang:exception.deatilNoresult';
+                $message = sprintf(\TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate($localisationKey, null), $id);
+                if (!$message) {
+                    $message = sprintf('»detail« action query for id »%s« returned no results.', $id);
+                }
                 $this->logger->error($message, ['arguments' => $this->getRequestArguments()]);
                 $assignments['error'] = ['solr' => $message];
             }
