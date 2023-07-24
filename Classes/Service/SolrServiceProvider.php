@@ -1075,7 +1075,11 @@ class SolrServiceProvider extends AbstractServiceProvider
 
         $this->createQuery();
         $escapedID = $this->query->getHelper()->escapeTerm($id);
-        $this->query->setQuery('id:'.$escapedID);
+        if (empty($this->settings['idQuery'])) {
+            $this->query->setQuery('id:' . $escapedID);
+        } else {
+            $this->query->setQuery(sprintf($this->settings['idQuery'],$escapedID));
+        }
         try {
             /** @var \Solarium\QueryType\Select\Result\Result $selectResults */
             $selectResults = $connection->execute($this->query);

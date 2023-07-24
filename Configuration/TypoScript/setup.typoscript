@@ -18,6 +18,8 @@ plugin.tx_find {
 
         nosearchRedirect = 
 
+        idQuery = id:%1$s
+
         queryFields {
             0 {
                 id = default
