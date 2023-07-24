@@ -122,6 +122,13 @@ class SearchController extends ActionController
 
             CoreArrayUtility::mergeRecursiveWithOverrule($viewValues, $defaultQuery);
             $this->view->assignMultiple($viewValues);
+
+            // if there are no search parameters provided, redirect to the URL given in setting 'nosearchRedirect'
+            if ($defaultQuery['noSearch']) {
+                if(strlen($this->settings['nosearchRedirect']) > 0) {
+                    \TYPO3\CMS\Core\Utility\HttpUtility::redirect($this->settings['nosearchRedirect']);
+                }
+            }
         }
     }
 
