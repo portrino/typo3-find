@@ -66,7 +66,13 @@ class ItemViewHelper extends AbstractViewHelper
         }
 
         if (null !== $arguments['object']) {
-            $container[$arguments['subject']][$arguments['predicate']][$arguments['object']] = null;
+            if(is_array($arguments['object'])) {
+				foreach ($arguments['object'] as $value) {
+					$container[$arguments['subject']][$arguments['predicate']][$value] = NULL;
+				}
+			} else {
+				$container[$arguments['subject']][$arguments['predicate']][$arguments['object']] = NULL;
+			}
         } else {
             $container[$arguments['subject']][$arguments['predicate']][$renderChildrenClosure()] = [
                 'type' => $arguments['objectType'],
