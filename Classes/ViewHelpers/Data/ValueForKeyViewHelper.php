@@ -40,7 +40,7 @@ class ValueForKeyViewHelper extends AbstractViewHelper
     public function initializeArguments()
     {
         parent::initializeArguments();
-        $this->registerArgument('array', 'array', 'The array to extract the value from', true);
+        $this->registerArgument('array', 'mixed', 'The array to extract the value from', true);
         $this->registerArgument('key', 'string', 'The key to extract the value for', true);
     }
 
@@ -52,10 +52,18 @@ class ValueForKeyViewHelper extends AbstractViewHelper
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext
     ) {
+        $array = $arguments['array'];
+        if (!$array) {
+            return null;
+        }
+        if(is_object($array)) {
+            $array = (array)$array;
+        }
+
         $result = null;
 
-        if ((is_int($arguments['key']) || is_string($arguments['key'])) && ($arguments['array'] && array_key_exists($arguments['key'], $arguments['array']))) {
-            $result = $arguments['array'][$arguments['key']];
+        if ((is_int($arguments['key']) || is_string($arguments['key'])) && array_key_exists($arguments['key'], $array)) {
+            $result = $array[$arguments['key']];
         }
 
         return $result;
