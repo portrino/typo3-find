@@ -1144,7 +1144,11 @@ class SolrServiceProvider extends AbstractServiceProvider
                 // a) just a single string (e.g. text field)
                 // b) array of strings (e.g. date range field)
                 // c) single field with additional configuration (e.g. text field with alternate query)
-                $queryArguments = $queryParameters[$fieldID];
+                if(is_string($queryParameters[$fieldID])) {
+					$queryArguments = trim($queryParameters[$fieldID]);
+				} else {
+					$queryArguments = $queryParameters[$fieldID];
+				}
                 $queryAlternate = null;
                 $queryTerms = null;
                 if (is_array($queryArguments) && array_key_exists('alternate', $queryArguments) && array_key_exists('queryAlternate', $fieldInfo)) {
