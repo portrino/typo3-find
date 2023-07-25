@@ -57,6 +57,8 @@ class FacetLinkArgumentsViewHelper extends AbstractViewHelper
             false, null);
         $this->registerArgument('activeFacets', 'array', 'Array of active facets', false, []);
         $this->registerArgument('mode', 'string', 'add|remove', false, 'add');
+        $this->registerArgument('not', 'boolean', 'Invert facet to not.', false, false);
+		$this->registerArgument('modifier', 'string', 'Choose a modifier.', false, '');
     }
 
     /**
@@ -94,6 +96,9 @@ class FacetLinkArgumentsViewHelper extends AbstractViewHelper
             $result['facet'] = [
                 $facetID => [$facetTerm => 1],
             ];
+			if ($arguments['modifier']) {
+				$result['facet'][$arguments['facetID']][$arguments['facetTerm']] = $arguments['modifier'];
+			}
         }
 
         return $result;

@@ -423,7 +423,7 @@ class SolrServiceProvider extends AbstractServiceProvider
         $activeFacetsForTemplate = [];
         foreach ($activeFacets as $facetID => $facets) {
             foreach ($facets as $facetTerm => $facetInfo) {
-                $facetQuery = $this->getFacetQuery($this->getFacetConfig($facetID), $facetTerm);
+                $facetQuery = $this->getFacetQuery($this->getFacetConfig($facetID), $facetTerm, $facetInfo['status']);
                 if ('and' === $facetInfo['config']['queryStyle']) {
                     // TODO: Do we really use this part of the condition? Can it be removed?
                     // Alternative query style: adding a conjunction to the main query.
@@ -948,7 +948,7 @@ class SolrServiceProvider extends AbstractServiceProvider
      *
      * @return string query string
      */
-    protected function getFacetQuery(array $facetConfig, string $queryTerm): ?string
+    protected function getFacetQuery(array $facetConfig, string $queryTerm, string $queryModifier): ?string
     {
         $queryString = null;
 
@@ -993,6 +993,10 @@ class SolrServiceProvider extends AbstractServiceProvider
                 ['requestArguments' => $this->requestArguments]
             );
         }
+
+        if($queryModifier && is_array($this->settings['modifier']) && $this->settings['modifier'][$queryModifier]) {
+			$queryString = sprintf($this->settings['modifier'][$queryModifier], $queryString);
+		}
 
         return $queryString;
     }
@@ -1260,12 +1264,13 @@ class SolrServiceProvider extends AbstractServiceProvider
     {
         $facetQueries = [];
         $facetConfig = $this->getFacetConfig($facetID);
-        foreach (array_keys($facetSelection) as $facetTerm) {
+        foreach ($facetSelection as $facetTerm => $facetStatus) {
             $facetInfo = [
                 'id' => $facetID,
                 'config' => $facetConfig,
                 'term' => $facetTerm,
-                'query' => $this->getFacetQuery($facetConfig, $facetTerm),
+                'status' => $facetStatus,
+				'query' => $this->getFacetQuery($facetConfig, $facetTerm, $facetStatus)
             ];
             $facetQueries[$facetTerm] = $facetInfo;
         }
