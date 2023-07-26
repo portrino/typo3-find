@@ -103,6 +103,14 @@ class SearchController extends ActionController
     {
         if (array_key_exists('id', $this->requestArguments)) {
             $this->forward('detail');
+        } elseif (array_key_exists('rsn', $this->requestArguments)) {
+			$this->forward('redirect');
+		} elseif (array_key_exists('bc', $this->requestArguments)) {
+			$this->forward('redirect');
+		} elseif (array_key_exists('ppn', $this->requestArguments)) {
+			$this->forward('redirect');
+        } elseif (array_key_exists('oclc', $this->requestArguments)) {
+			$this->forward('redirect');
         } else {
             $this->searchProvider->setCounter();
             FrontendUtility::addQueryInformationAsJavaScript(
@@ -131,6 +139,57 @@ class SearchController extends ActionController
             }
         }
     }
+
+    /**
+	 * Redirect View to detail action.
+	 */
+	public function redirectAction() {
+		$queryArguments = ['q' => []];
+        $queryArgumentsDefault = '';
+
+		if (array_key_exists('rsn', $this->requestArguments)) {
+			$queryArguments['q']['rsn'] = $this->requestArguments['rsn'];
+            $queryArgumentsDefault = $this->requestArguments['rsn'];
+		} elseif (array_key_exists('bc', $this->requestArguments)) {
+			$queryArguments['q']['barcode'] = $this->requestArguments['bc'];
+            $queryArgumentsDefault = $this->requestArguments['bc'];
+		} elseif (array_key_exists('ppn', $this->requestArguments)) {
+			$queryArguments['q']['ppn'] = $this->requestArguments['ppn'];
+            $queryArgumentsDefault = $this->requestArguments['ppn'];
+		} elseif (array_key_exists('oclc', $this->requestArguments)) {
+			$queryArguments['q']['oclc'] = $this->requestArguments['oclc'];
+            $queryArgumentsDefault = $this->requestArguments['oclc'];
+		}
+
+        $selectResults =$this->searchProvider->search($queryArguments);
+
+		if (count($selectResults) === 1) {
+			$resultSet = $selectResults->getDocuments();
+
+			$arguments = [
+				'tx_find_find' => [
+					'action' => 'detail',
+					'controller' => 'Search',
+					'id' => $resultSet[0]['id']
+                ]
+			];
+		} else {
+            $arguments = [
+				'tx_find_find' => [
+					'action' => 'index',
+					'controller' => 'Search',
+                    'q' => [
+                        'default' => $queryArgumentsDefault
+					]
+				]
+			];
+		}
+
+        $uri = $this->uriBuilder->reset()->setTargetPageUid(intval($GLOBALS['TSFE']->id))->setCreateAbsoluteUri(true)->setArguments($arguments)->build();
+        \TYPO3\CMS\Core\Utility\HttpUtility::redirect($uri);
+
+		die();
+	}
 
     /**
      * Initialisation and setup.

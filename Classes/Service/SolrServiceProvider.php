@@ -303,7 +303,12 @@ class SolrServiceProvider extends AbstractServiceProvider
      */
     public function search($query)
     {
-        // TODO: Implement search() method.
+        $this->createQueryForArguments($query);
+
+		/** @var Result $selectResults */
+		$selectResults = $this->connection->select($this->query);
+
+        return $selectResults;
     }
 
     /**
