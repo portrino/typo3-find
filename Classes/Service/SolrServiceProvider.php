@@ -1223,6 +1223,10 @@ class SolrServiceProvider extends AbstractServiceProvider
                     $magicFieldPrefix .= '{!edismax}';
                 }
 
+                if ($fieldInfo['noSubQuery']) {
+                    $magicFieldPrefix = '';
+                }
+
                 if (2 === (int) $fieldInfo['noescape']) {
                     $chars = explode(',', $fieldInfo['escapechar']);
                     foreach ($queryTerms as $key => $term) {
