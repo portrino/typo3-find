@@ -94,10 +94,10 @@ class FacetLinkArgumentsViewHelper extends AbstractViewHelper
             $result[] = 'tx_find_find[page]';
         } elseif ('add' === $mode) {
             $result['facet'] = [
-                $facetID => [$facetTerm => 1],
+                $facetID => [str_replace('&','%26', $facetTerm) => 1],
             ];
 			if ($arguments['modifier']) {
-				$result['facet'][$arguments['facetID']][$arguments['facetTerm']] = $arguments['modifier'];
+				$result['facet'][$facetID][str_replace('&','%26', $facetTerm)] = $arguments['modifier'];
 			}
         }
 
