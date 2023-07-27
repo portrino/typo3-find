@@ -1253,6 +1253,15 @@ class SolrServiceProvider extends AbstractServiceProvider
                     }
                 }
 
+                if($fieldInfo['and'] == '1') {
+					$queryPart = $magicFieldPrefix;
+
+					preg_match_all('/"(?:\\\\.|[^\\\\"])*"|\S+/', $queryTerms[0], $matches);
+					foreach($matches[0] as $match) {
+						$queryPart .= $fieldID.':'.$match.' ';
+					}
+				}
+
                 if ('' !== $queryPart && '0' !== $queryPart) {
                     $queryComponents[$fieldID] = $queryPart;
                 }
