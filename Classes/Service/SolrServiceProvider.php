@@ -427,6 +427,9 @@ class SolrServiceProvider extends AbstractServiceProvider
         $activeFacets = $this->getActiveFacets($arguments);
         $activeFacetsForTemplate = [];
         foreach ($activeFacets as $facetID => $facets) {
+
+            $combineFacets = [];
+
             foreach ($facets as $facetTerm => $facetInfo) {
                 $facetQuery = $this->getFacetQuery($this->getFacetConfig($facetID), $facetTerm, $facetInfo['status']);
                 if ('and' === $facetInfo['config']['queryStyle']) {
@@ -455,11 +458,50 @@ class SolrServiceProvider extends AbstractServiceProvider
                     // If facet.missing is active and facet is selected
                     // set solr query to exclude all known facet values
                     if ($facetTerm === $facetInfo['config']['labelMissing']) {
-                        $this->query->createFilterQuery($queryInfo)
-                            ->setQuery('-'.str_replace('("%s")', '[* TO *]', $facetInfo['config']['query']));
+                        $fq = $this->query->createFilterQuery($queryInfo)->setQuery('-'.str_replace('("%s")', '[* TO *]', $facetInfo['config']['query']));
+                        // in newer Solarium version, tags have to be set explicitly and are no longer considered when calling query->createFilterQuery($queryInfo)
+                        if ($queryInfo['tag']) {
+                            $fq->addTag($queryInfo['tag']);
+                        }
                     } else {
-                        $this->query->createFilterQuery($queryInfo)
-                            ->setQuery($facetQuery);
+                        if($facetInfo['status'] !== '1') {
+                            $fq = $this->query->createFilterQuery($queryInfo)->setQuery($facetQuery);
+                            if ($queryInfo['tag']) {
+                                $fq->addTag($queryInfo['tag']);
+                            }
+                        } else {
+                            if(!is_array($combineFacets[$facetInfo['id']])) {
+                                $combineFacets[$facetInfo['id']] = [ 'query' => $facetQuery, 'info' => $facetInfo ];
+    
+                                $fq = $this->query->createFilterQuery($queryInfo)->setQuery($facetQuery);
+                                if ($queryInfo['tag']) {
+                                    $fq->addTag($queryInfo['tag']);
+                                }
+                            } else {
+                                $combineFacets[$facetInfo['id']]['query'] .= ' OR ' . $facetQuery;
+
+                                $filterQueries = $this->query->getFilterQueries();
+
+                                $removed = false;
+
+                                /** @var FilterQuery $filterQuery */
+                                foreach($filterQueries as $filterQuery) {
+                                    if(in_array('facet-'.$facetInfo['id'], $filterQuery->getTags())) {
+                                        $this->query->removeFilterQuery($filterQuery);
+    
+                                        $removed = true;
+                                    }
+                                }
+    
+                                if($removed) {
+                                    $fq = $this->query->createFilterQuery($queryInfo)
+                                        ->setQuery($combineFacets[$facetInfo['id']]['query']);
+                                    if ($queryInfo['tag']) {
+                                        $fq->addTag($queryInfo['tag']);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
