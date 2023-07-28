@@ -640,6 +640,60 @@ plugin.tx_find.settings.sort {
 }
 ```
 
+### Detail Page Meta Data
+With the help of setting `detailPageMeta`, some page meta data headers ("og:image", "description", "og:description" and "twitter:description") are set for detail pages based on the shown document. This setting is an array that may carry the following keys:
+- `descriptionFieldName` (string): the name of the document field to be used for the meta tags "description", "og:description" and "twitter:description"
+- `imageFieldName` (string): the name of the document field to be used for the meta tag "og:image". Should be an valid URL.
+
+The description can be localized. To this end, LLL key `meta.detailpage.description` has to be provided and may contain a placeholder (sprintf style) which is filled with value of the configured description field. As fallback the value of `descriptionFieldName` from the document is utilized as is.
+
+Example:
+
+```
+plugin.tx_find.settings.detailPageMeta {
+    descriptionFieldName = name
+    imageFieldName = imageUrl
+}
+```
+
+### Behavior if no search parameters are provided
+
+In case there are no search parameters are provided to the controller's index action, the extension behaves according to the configuration defined:
+- By default with no special settings required, a "*" search is issued, listing all documents.
+- In certain scenarios it may be more desirable to display some kind of starting page instead. If setting `allowNoSearch` evaluates to true, parameter `noSearch` is handed over to the view and can then be used in custom Templates and Partials.
+- It is also possible to redirect to a given page. To do so, setting `nosearchRedirect` has to state the target URL (absolute or relative).
+
+
+### Grouping
+
+Results grouping can be enabled and configured with the help of the `grouping` setting.
+This array supports the following options:
+- `field` (string): the Solr field that serves for determining groups
+- `limit` (int): the maximum number of results per group (-1 for no limit)
+- `showMenu` (boolean): configures, whether the UI menu for selecting the number of results per page should be shown
+- `menu` (array): an array that enumerates the options to be shown in the UI menu
+
+Example:
+
+```
+plugin.tx_find.settings.grouping {
+    field = dataDeliverer
+    limit = 10
+    showMenu = 1
+    menu {
+        0 = 5
+        1 = 10
+        2 = 20
+        3 = 50
+        4 = 100
+    }
+}
+```
+
+### Query to fetch documents by ID
+
+Setting `idQuery` (string) [`id:%1$s`] enables to customize the query to fetch documents in the detail action.
+
 ### Paging
 
 Use the `paging` setting to adjust navigation in the results. In this
@@ -979,6 +1033,28 @@ The [TYPO3 Log Manager](https://docs.typo3.org/typo3cms/CoreApiReference/7.6/Api
 can be found under the component-key `find` in the TYPO3 log, i.e.:
 
 `06 Jun 2016 06:36:06 +0000 [ERROR] request="e2737b83ada7d" component="find": Solr Exception (Timeout?)`
+
+## Hooks
+
+The extension dispatches several signals that allow to hook into the query processing, e.g. for data enrichment purposes.
+
+- `initializeActionAfterArgumentsFilled`
+- `indexActionBeforeSelect`
+- `indexActionBeforeRender`
+- `detailActionBeforePagingSelect`
+- `detailActionBeforeRender`
+
+Example: Connect to signal `detailActionBeforeRender` to enrich the document
+
+```
+$signalSlotDispatcher = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class);
+$signalSlotDispatcher->connect(
+    'Subugoe\Find\Controller\SearchController',                 // Signal class name
+    'detailActionBeforeRender',                                 // Signal name
+    'My\Extension\Slots\Enricher',                              // Slot class name
+    'enrichDocument'                                            // Slot method name
+);
+```
 
 ## RealURL
 
