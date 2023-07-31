@@ -811,6 +811,7 @@ following fields:
 -   `alternateFields`: an array with keys the field name and values the
     corresponding alternate field name for situations where the
     highlighting does not work in the field itself
+-   `snippets` \[undefined\]: defines the maximum number of snippets per field
 
 Please note that particularly the final three options do not seem ideal
 yet and are considered experimental. Changes may be needed in the future

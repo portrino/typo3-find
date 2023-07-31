@@ -667,6 +667,11 @@ class SolrServiceProvider extends AbstractServiceProvider
             // Configure highlight fields.
             $highlight->addFields(implode(',', $highlightConfig['fields']));
 
+			// Configure the maximum number of highlighted snippets.
+            if (array_key_exists('snippets', $highlightConfig)) {
+			    $highlight->setSnippets((int) $highlightConfig['snippets']);
+            }
+
             // Configure the fragment length.
             $highlight->setFragSize((int) $highlightConfig['fragsize']);
 
