@@ -161,23 +161,24 @@ configure access to the Solr index. It contains:
 -   `timeout` \[5\]: number of seconds before a Solr request times out
 -   `scheme` \[http\]: URI scheme of the connection
 
-1.  Example:
-    ```
-    plugin.tx_find.settings {
-        connections {
-            default {
-                provider = Subugoe\Find\Service\SolrServiceProvider
-                options {
-                    host = 127.0.0.1
-                    port = 8080
-                    path = /solr/
-                    timeout = 5
-                    scheme = http
-                }
+Example:
+
+```
+plugin.tx_find.settings {
+    connections {
+        default {
+            provider = Subugoe\Find\Service\SolrServiceProvider
+            options {
+                host = 127.0.0.1
+                port = 8080
+                path = /solr/
+                timeout = 5
+                scheme = http
             }
         }
     }
-    ```
+}
+```
 
 ### Solr Components
 
@@ -189,6 +190,16 @@ In case the Solr version is lower than 8, the setting
 `plugin.tx_find.settings.luceneMatchVersion` has to be set to the major version
 that is used (for instance 6 or 7). By default this is set to 8 and affects
 a magic query prefix (see https://lucene.apache.org/solr/guide/6_6/the-extended-dismax-query-parser.html#TheExtendedDisMaxQueryParser-Usingthe_magicfields__val_and_query_).
+
+### Omitting Solr headers
+
+Solr headers can be disabled or enabled as required using the setting `omitHeader` \[true\].
+
+Example:
+
+```
+plugin.tx_find.settings.omitHeader = false
+```
 
 ### The search form
 

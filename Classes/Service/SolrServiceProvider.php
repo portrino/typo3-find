@@ -152,12 +152,19 @@ class SolrServiceProvider extends AbstractServiceProvider
             $this->signalSlotDispatcher->dispatch('Subugoe\Find\Controller\SearchController', 'indexActionBeforeRender', array(&$resultSet));
             $this->timing['INDEX_AFTER_BeforeRender_SLOT'] = $this->timeTracker->getDifferenceToStarttime();
 
-            $this->timing['BEFORE_RENDER'] =  $this->timing['INDEX_AFTER_BeforeRender_SLOT'];
-            return [
+            $assignments = [
                 'results' => $resultSet,
                 'error' => $error,
                 'timing' => $this->timing
             ];
+           	
+            // Add request URI to debug output.
+            if (array_key_exists('debug', $this->requestArguments)) {
+                $assignments['solrRequest'] = $this->connection->getEndpoint()->getBaseUri(). $resultSet->getQuery()->getRequestBuilder()->build($resultSet->getQuery())->getUri();
+            }
+
+            $this->timing['BEFORE_RENDER'] =  $this->timing['INDEX_AFTER_BeforeRender_SLOT'];
+            return $assignments;
         }
     }
 
@@ -848,6 +855,8 @@ class SolrServiceProvider extends AbstractServiceProvider
         $this->addFeatures();
         $this->addTypoScriptFilters();
         $this->addDefaultQueryOperator();
+
+        $this->query->setOmitHeader($this->settings['omitHeader']);
 
         $this->setConfigurationValue('solarium', $this->query);
     }
