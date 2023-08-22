@@ -122,7 +122,7 @@ class SolrServiceProvider extends AbstractServiceProvider
 
             try {
                 $this->timing['INDEX_BEFORE_BeforeSelect_SLOT'] = $this->timeTracker->getDifferenceToStarttime();
-                $this->signalSlotDispatcher->dispatch('Subugoe\Find\Controller\SearchController', 'indexActionBeforeSelect', array(&$this->$query, $this->requestArguments));
+                $this->signalSlotDispatcher->dispatch('Subugoe\Find\Controller\SearchController', 'indexActionBeforeSelect', array(&$this->query, $this->requestArguments));
                 $this->timing['INDEX_AFTER_BeforeSelect_SLOT'] = $this->timeTracker->getDifferenceToStarttime();
 
                 $resultSet = $this->connection->execute($this->query);
@@ -855,6 +855,13 @@ class SolrServiceProvider extends AbstractServiceProvider
         $this->addFeatures();
         $this->addTypoScriptFilters();
         $this->addDefaultQueryOperator();
+
+        if(is_array($this->settings['shards']) && count($this->settings['shards'])) {
+			$distributedSearch = $this->query->getDistributedSearch();
+			foreach($this->settings['shards'] as $name => $shard) {
+				$distributedSearch->addShard($name, $shard);
+			}
+		}
 
         $this->query->setOmitHeader($this->settings['omitHeader']);
 
