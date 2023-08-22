@@ -1,5 +1,5 @@
 {
-  "name": "subugoe/find",
+  "name": "slub/find",
   "description": "A frontend for Solr indexes",
   "type": "typo3-cms-extension",
   "keywords": [
@@ -13,6 +13,16 @@
       "name": "Sven-S. Porst, Ingo Pfennigstorf",
       "email": "pfennigstorf@sub.uni-goettingen.de",
       "role": "Developer"
+    },
+    {
+      "name" : "Christof Rodejohann",
+      "email" : "christof.rodejohann@slub-dresden.de",
+      "role" : "Developer"
+    },
+    {
+      "name" : "Carsten Radeck",
+      "email" : "carsten.radeck@slub-dresden.de",
+      "role" : "Developer"
     }
   ],
   "autoload": {
