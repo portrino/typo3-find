@@ -905,6 +905,7 @@ class SolrServiceProvider extends AbstractServiceProvider
 
         $this->setFields($arguments);
         $this->setRange($arguments);
+        $this->addResultCountOptionsToTemplate($arguments);
         $this->setSortOrder($arguments);
 
         $this->addHighlighting($arguments);
