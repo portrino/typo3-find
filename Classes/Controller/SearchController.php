@@ -59,8 +59,8 @@ class SearchController extends ActionController
         $arguments = $this->searchProvider->getRequestArguments();
         $detail = $this->searchProvider->getDocumentById($id);
 
-        if ($this->request->hasArgument('underlyingQuery')) {
-            $underlyingQueryInfo = $this->request->getArgument('underlyingQuery');
+        if ($arguments['underlyingQuery']) {
+            $underlyingQueryInfo = $arguments['underlyingQuery'];
             FrontendUtility::addQueryInformationAsJavaScript(
                 $underlyingQueryInfo['q'],
                 $this->settings,
