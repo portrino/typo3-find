@@ -26,13 +26,15 @@
 
 namespace Subugoe\Find\ViewHelpers\Format;
 
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * View Helper for converting XML to formatted XML.
  *
  * Usage examples are available in Private/Partials/Test.html.
  */
-class XMLViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
+class XMLViewHelper extends AbstractViewHelper
+{
 
     /**
      * As this ViewHelper renders HTML, the output must not be escaped.
@@ -41,37 +43,35 @@ class XMLViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper 
      */
     protected $escapeOutput = false;
 
-	/**
-	 * Registers own arguments.
-	 * @return void
-	 */
-	public function initializeArguments() {
-		parent::initializeArguments();
-		$this->registerArgument('htmloutput', 'Boolean', 'Whether to output as HTML', FALSE, FALSE);
-	}
+    /**
+     * Registers own arguments.
+     * @return void
+     */
+    public function initializeArguments()
+    {
+        parent::initializeArguments();
+        $this->registerArgument('htmloutput', 'Boolean', 'Whether to output as HTML', FALSE, FALSE);
+    }
 
-	/**
-	 * @return string
-	 */
-	public function render() {
-		$input = $this->renderChildren();
-		$XML = new \DOMDocument();
-		$XML->preserveWhiteSpace = FALSE;
-		$XML->formatOutput = TRUE;
-		$XML->encoding = 'UTF-8';
-		$XML->loadXML($input);
-		if ($this->arguments['htmloutput']) {
-			$result = $XML->saveHTML();
-		}
-		else {
-			$result = $XML->saveXML();
-		}
+    /**
+     * @return string
+     */
+    public function render()
+    {
+        $input = $this->renderChildren();
+        $XML = new \DOMDocument();
+        $XML->preserveWhiteSpace = FALSE;
+        $XML->formatOutput = TRUE;
+        $XML->encoding = 'UTF-8';
+        $XML->loadXML($input);
+        if ($this->arguments['htmloutput']) {
+            $result = $XML->saveHTML();
+        } else {
+            $result = $XML->saveXML();
+        }
 
-		// TODO: Error handling?
+        // TODO: Error handling?
 
-		return $result;
-	}
-
+        return $result;
+    }
 }
-
-?>

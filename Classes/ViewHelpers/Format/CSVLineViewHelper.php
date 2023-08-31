@@ -26,13 +26,15 @@
 
 namespace Subugoe\Find\ViewHelpers\Format;
 
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * View Helper to return the passed array, string or number as JSON.
  *
  * Usage examples are available in Private/Partials/Test.html.
  */
-class CSVLineViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
+class CSVLineViewHelper extends AbstractViewHelper
+{
 
     /**
      * As this ViewHelper renders HTML, the output must not be escaped.
@@ -41,35 +43,34 @@ class CSVLineViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHel
      */
     protected $escapeOutput = false;
 
-	/**
-	 * Registers own arguments.
-	 * @return void
-	 */
-	public function initializeArguments() {
-		parent::initializeArguments();
-		$this->registerArgument('data', 'array', 'The array to output as CSV line', FALSE, NULL);
-		$this->registerArgument('fieldDelimiter', 'string', 'The string to use as a column separator', FALSE, ',');
-		$this->registerArgument('fieldEnclosure', 'string', 'The string to enclose the field content in', FALSE, '"');
-	}
+    /**
+     * Registers own arguments.
+     * @return void
+     */
+    public function initializeArguments()
+    {
+        parent::initializeArguments();
+        $this->registerArgument('data', 'array', 'The array to output as CSV line', FALSE, NULL);
+        $this->registerArgument('fieldDelimiter', 'string', 'The string to use as a column separator', FALSE, ',');
+        $this->registerArgument('fieldEnclosure', 'string', 'The string to enclose the field content in', FALSE, '"');
+    }
 
-	/**
-	 * @return string
-	 */
-	public function render() {
-		$data = $this->arguments['data'];
-		if ($data === NULL) {
-			$data = $this->renderChildren();
-		}
+    /**
+     * @return string
+     */
+    public function render()
+    {
+        $data = $this->arguments['data'];
+        if ($data === NULL) {
+            $data = $this->renderChildren();
+        }
 
-		// Write CSV to pseudo-file as PHP cannot write it directly to a string.
-		$fp = fopen('php://temp', 'r+');
-		fputcsv($fp, $data, $this->arguments['fieldDelimiter'], $this->arguments['fieldEnclosure']);
-		rewind($fp);
-		$result = fgets($fp);
-		fclose($fp);
-		return $result;
-	}
-
+        // Write CSV to pseudo-file as PHP cannot write it directly to a string.
+        $fp = fopen('php://temp', 'r+');
+        fputcsv($fp, $data, $this->arguments['fieldDelimiter'], $this->arguments['fieldEnclosure']);
+        rewind($fp);
+        $result = fgets($fp);
+        fclose($fp);
+        return $result;
+    }
 }
-
-?>
