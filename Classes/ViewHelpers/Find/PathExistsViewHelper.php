@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\Find;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -24,32 +27,34 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-namespace Subugoe\Find\ViewHelpers\Find;
 
-
+use TYPO3\CMS\Core\Core\Environment;
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * View Helper to determine whether the given path exists in the file system.
  */
-class PathExistsViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
+class PathExistsViewHelper extends AbstractViewHelper
+{
+    /**
+     * Registers own arguments.
+     */
+    public function initializeArguments()
+    {
+        parent::initializeArguments();
+        $this->registerArgument('path', 'string', 'the path to check the existence of', true);
+    }
 
-
-	/**
-	 * Registers own arguments.
-	 */
-	public function initializeArguments() {
-		parent::initializeArguments();
-		$this->registerArgument('path', 'string', 'the path to check the existence of', TRUE);
-	}
-
-
-	/**
-	 * @return string
-	 */
-	public function render() {
-		return file_exists(PATH_site . $this->arguments['path']);
-	}
+    /**
+     * @return string
+     */
+    public static function renderStatic(
+        array $arguments,
+        \Closure $renderChildrenClosure,
+        RenderingContextInterface $renderingContext
+    ) {
+        return file_exists(Environment::getPublicPath().'/'.$arguments['path']);
+    }
 
 }
-
-?>

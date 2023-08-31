@@ -26,37 +26,35 @@
 
 namespace Subugoe\Find\ViewHelpers\Page;
 
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
- * View Helper 
+ * View Helper
  *
  * Usage examples are available in Private/Partials/Test.html.
  */
-class LinkCSSViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
+class LinkCSSViewHelper extends AbstractViewHelper
+{
 
+    /**
+     * Registers own arguments.
+     * @return void
+     */
+    public function initializeArguments()
+    {
+        parent::initializeArguments();
+        $this->registerArgument('file', 'string', 'Path to the CSS file', TRUE);
+    }
 
-	/**
-	 * Registers own arguments.
-	 * @return void
-	 */
-	public function initializeArguments() {
-		parent::initializeArguments();
-		$this->registerArgument('file', 'string', 'Path to the CSS file', TRUE);
-	}
-
-
-
-	/**
-	 * @return string
-	 */
-	public function render() {
-		$CSSFileName = $GLOBALS['TSFE']->tmpl->getFileName($this->arguments['file']);
-		if ($CSSFileName) {
+    /**
+     * @return string
+     */
+    public function render()
+    {
+        $CSSFileName = $GLOBALS['TSFE']->tmpl->getFileName($this->arguments['file']);
+        if ($CSSFileName) {
             $pageRenderer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Page\PageRenderer::class);
             $pageRenderer->addCSSFile($CSSFileName);
-		}
-	}
-
+        }
+    }
 }
-
-?>

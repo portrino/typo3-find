@@ -27,12 +27,14 @@
 namespace Subugoe\Find\ViewHelpers\Format;
 
 
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
+
 /**
  * View Helper to return the passed array, string or number as JSON.
  *
  * Usage examples are available in Private/Partials/Test.html.
  */
-class JsonViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
+class JsonViewHelper extends AbstractViewHelper {
 
     /**
      * As this ViewHelper renders HTML, the output must not be escaped.
