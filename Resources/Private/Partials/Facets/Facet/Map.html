@@ -37,12 +37,12 @@
 		}
 </f:comment>
 
-<s:page.script file="EXT:find/Resources/Public/JavaScript/js-geohash/geohash.js" name="find_geohash"/>
+<s:page.script file="https://raw.githubusercontent.com/subugoe/js-geohash/master/geohash.js" name="find_geohash"/>
 
 <s:page.script name="find_geohash">
 	tx_find_facetMap.init ({
 		container: jQuery('.facet-id-{facetInfo.id} .mapContainer')[0],
-		queryURLTemplate: {s:format.json(data:"{f:uri.action(
+		queryURLTemplate: {f:format.json(value:"{f:uri.action(
 			addQueryString:TRUE,
 			arguments:'{
 				q:\'{raw:\"###TERM###\"}\',
@@ -50,10 +50,9 @@
 			}',
 			action:'index',
 			pageType:'1369315139',
-			format:'data',
-			noCacheHash:'1'
+			format:'data'
 		)}")},
-		facetData: {s:format.json(data:facetData.values)},
+		facetData: {f:format.json(value:facetData.values)},
 		facetFetchMaximum: {facetInfo.fetchMaximum}
 	});
 </s:page.script>

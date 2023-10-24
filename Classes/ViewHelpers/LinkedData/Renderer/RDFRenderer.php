@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\LinkedData\Renderer;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -24,85 +27,92 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-namespace Subugoe\Find\ViewHelpers\LinkedData\Renderer;
-
-
-
-/*
- * http://www.w3.org/RDF/
- * http://www.w3.org/TR/REC-rdf-syntax/
+/**
+ * @see http://www.w3.org/RDF/
+ * @see http://www.w3.org/TR/REC-rdf-syntax/
  */
-class RDFRenderer extends AbstractRenderer {
+class RDFRenderer extends AbstractRenderer implements RendererInterface
+{
+    /**
+     * @param $items
+     *
+     * @return string
+     */
+    public function renderItems($items)
+    {
+        $doc = new \DOMDocument();
+        $this->prefixes['rdf'] = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
+        $rdf = $doc->createElement($this->prefixedName('rdf:RDF'));
+        $doc->appendChild($rdf);
 
-	public function renderItems ($items) {
-		$doc = new \DomDocument();
-		$this->prefixes['rdf'] = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
-		$rdf = $doc->createElement($this->prefixedName('rdf:RDF'));
-		$doc->appendChild($rdf);
+        // loop over subjects
+        foreach ($items as $subjectURI => $subjectStatements) {
+            $subjectDescription = $doc->createElement($this->prefixedName('rdf:Description'));
+            $subjectDescription->setAttribute($this->prefixedName('rdf:about'), $this->prefixedName($subjectURI, true));
 
-		// loop over subjects
-		foreach ($items as $subjectURI => $subjectStatements) {
-			$subjectDescription = $doc->createElement($this->prefixedName('rdf:Description'));
-			$subjectDescription->setAttribute($this->prefixedName('rdf:about'), $this->prefixedName($subjectURI, TRUE));
+            // loop over predicates
+            foreach ($subjectStatements as $predicate => $objects) {
+                // loop over objects
+                foreach ($objects as $object => $properties) {
+                    $predicateElement = $doc->createElement($this->prefixedName($predicate));
+                    $subjectDescription->appendChild($predicateElement);
 
-			// loop over predicates
-			foreach ($subjectStatements as $predicate => $objects) {
+                    if (null === $properties) {
+                        $objectParts = explode(':', $object, 2);
+                        if ($this->prefixes[$objectParts[0]] && 2 === count($objectParts)) {
+                            $object = $this->prefixes[$objectParts[0]].$objectParts[1];
+                        }
 
-				// loop over objects
-				foreach ($objects as $object => $properties) {
-					$predicateElement = $doc->createElement($this->prefixedName($predicate));
-					$subjectDescription->appendChild($predicateElement);
+                        $predicateElement->setAttribute($this->prefixedName('rdf:resource'),
+                            $this->prefixedName($object, true));
+                    } else {
+                        if ($properties['language']) {
+                            $predicateElement->setAttribute($this->prefixedName('xml:lang'), $properties['language']);
+                        }
 
-					if ($properties === NULL) {
-						$objectParts = explode(':', $object, 2);
-						if ($this->prefixes[$objectParts[0]] && count($objectParts) === 2) {
-							$object = $this->prefixes[$objectParts[0]] . $objectParts[1];
-						}
-						$predicateElement->setAttribute($this->prefixedName('rdf:resource'), $this->prefixedName($object, TRUE));
-					}
-					else {
-						if ($properties['language']) {
-							$predicateElement->setAttribute($this->prefixedName('xml:lang'), $properties['language']);
-						}
-						if ($properties['type']) {
-							$predicateElement->setAttribute($this->prefixedName('rdf:datatype'), $this->prefixedName($properties['type'], TRUE));
-						}
+                        if ($properties['type']) {
+                            $predicateElement->setAttribute($this->prefixedName('rdf:datatype'),
+                                $this->prefixedName($properties['type'], true));
+                        }
 
-						$predicateElement->appendChild($doc->createTextNode($object));
-					}
+                        $predicateElement->appendChild($doc->createTextNode($object));
+                    }
 
-					$subjectDescription->appendChild($predicateElement);
-				}
-			}
+                    $subjectDescription->appendChild($predicateElement);
+                }
+            }
 
-			$rdf->appendChild($subjectDescription);
-		}
+            $rdf->appendChild($subjectDescription);
+        }
 
-		// Add the prefixes that are used as xmlns.
-		foreach (array_keys($this->usedPrefixes) as $prefix) {
-			if ($this->prefixes[$prefix]) {
-				$doc->firstChild->setAttribute('xmlns:' . $prefix, $this->prefixes[$prefix]);
-			}
-		}
+        // Add the prefixes that are used as xmlns.
+        foreach (array_keys($this->usedPrefixes) as $prefix) {
+            if ($this->prefixes[$prefix]) {
+                $doc->firstChild->setAttribute('xmlns:'.$prefix, $this->prefixes[$prefix]);
+            }
+        }
 
-		$doc->formatOutput = TRUE;
-		return $doc->saveXML();
-	}
+        $doc->formatOutput = true;
 
+        return $doc->saveXML();
+    }
 
-	
-	private function prefixedName ($name, $expand = FALSE) {
-		$nameParts = explode(':', $name, 2);
-		if ($this->prefixes[$nameParts[0]]) {
-			$this->usedPrefixes[$nameParts[0]] = TRUE;
-			if ($expand && count($nameParts) > 1) {
-				$name = $this->prefixes[$nameParts[0]] . $nameParts[1];
-			}
-		}
+    /**
+     * @param $name
+     * @param bool $expand
+     *
+     * @return string
+     */
+    protected function prefixedName($name, $expand = false)
+    {
+        $nameParts = explode(':', $name, 2);
+        if ($this->prefixes[$nameParts[0]]) {
+            $this->usedPrefixes[$nameParts[0]] = true;
+            if ($expand && count($nameParts) > 1) {
+                $name = $this->prefixes[$nameParts[0]].$nameParts[1];
+            }
+        }
 
-		return $name;
-	}
-
+        return $name;
+    }
 }
-
-?>

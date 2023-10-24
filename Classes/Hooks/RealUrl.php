@@ -1,12 +1,14 @@
 <?php
 
+namespace Subugoe\Find\Hooks;
+
 /* * *************************************************************
  *  Copyright notice
  *
  *  (c) 2013 Ingo Pfennigstorf <pfennigstorf@sub-goettingen.de>
  *         & Sven-S. Porst <porst@sub.uni-goettingen.de>
  *      Göttingen State and University Library
- *  
+ *
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -27,46 +29,46 @@
  * ************************************************************* */
 
 /**
- * RealUrl Hook for automatic URL generation
+ * RealUrl Hook for automatic URL generation.
  */
-class Tx_Find_Hooks_RealUrl {
-
-	/**
-	 * Create automatic RealUrl Configuratoin
-	 *
-	 * @param $params
-	 * @param $pObj
-	 * @return array
-	 */
-	public function addRealUrlConfiguration($params, &$pObj) {
-		return array_merge_recursive($params['config'], array(
-				'postVarSets' => array(
-					'_DEFAULT' => array(
-						'id' => array(
-							array(
-								'GETvar' => 'tx_find_find[id]',
-							),
-						),
-						'a' => array(
-							array(
-								'GETvar' => 'tx_find_find[action]',
-								'valueMap' => array(
-									'data' => 'data',
-									'suggest' => 'suggest',
-								),
-								'noMatch' => 'bypass',
-							),
-						),
-						'c' => array(
-							array(
-								'GETvar' => 'tx_find_find[controller]',
-								'noMatch' => 'bypass',
-							),
-						),
-					)
-				)
-			)
-		);
-	}
-
+class RealUrl
+{
+    /**
+     * Create automatic RealUrl Configuratoin.
+     *
+     * @param $params
+     *
+     * @return array
+     */
+    public function addRealUrlConfiguration($params, &$pObj)
+    {
+        return array_merge_recursive($params['config'], [
+                'postVarSets' => [
+                    '_DEFAULT' => [
+                        'id' => [
+                            [
+                                'GETvar' => 'tx_find_find[id]',
+                            ],
+                        ],
+                        'a' => [
+                            [
+                                'GETvar' => 'tx_find_find[action]',
+                                'valueMap' => [
+                                    'data' => 'data',
+                                    'suggest' => 'suggest',
+                                ],
+                                'noMatch' => 'bypass',
+                            ],
+                        ],
+                        'c' => [
+                            [
+                                'GETvar' => 'tx_find_find[controller]',
+                                'noMatch' => 'bypass',
+                            ],
+                        ],
+                    ],
+                ],
+            ]
+        );
+    }
 }

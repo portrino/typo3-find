@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\Find;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -23,9 +26,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-
-namespace Subugoe\Find\ViewHelpers\Find;
-
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
@@ -34,61 +36,66 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class SelectOptionsForFacetViewHelper extends AbstractViewHelper
 {
-
     /**
      * Registers own arguments.
      */
     public function initializeArguments()
     {
         parent::initializeArguments();
-        $this->registerArgument('values', 'array', 'values array for a facet', FALSE, array());
-        $this->registerArgument('showCount', 'boolean', 'include the item count for the facet in the label?', FALSE, FALSE);
-        $this->registerArgument('leadingBlank', 'boolean', 'begin the select with a blank item? (for jquery.chosen)', FALSE, FALSE);
-        $this->registerArgument('sortByName', 'boolean', 'sort the items alphabetically?', FALSE, FALSE);
-        $this->registerArgument('sortPrefixSeparator', 'string', 'sort the whole string but only keep the part after the separator for display', FALSE, NULL);
-        $this->registerArgument('localisationPrefix', 'string', 'prefix for the localisation key', FALSE, '');
+        $this->registerArgument('values', 'array', 'values array for a facet', false, []);
+        $this->registerArgument('showCount', 'boolean', 'include the item count for the facet in the label?', false,
+            false);
+        $this->registerArgument('leadingBlank', 'boolean', 'begin the select with a blank item? (for jquery.chosen)',
+            false, false);
+        $this->registerArgument('sortByName', 'boolean', 'sort the items alphabetically?', false, false);
+        $this->registerArgument('sortPrefixSeparator', 'string',
+            'sort the whole string but only keep the part after the separator for display', false, null);
+        $this->registerArgument('localisationPrefix', 'string', 'prefix for the localisation key', false, '');
     }
 
     /**
      * @return array
      */
-    public function render()
-    {
-        $result = array();
+    public static function renderStatic(
+        array $arguments,
+        \Closure $renderChildrenClosure,
+        RenderingContextInterface $renderingContext
+    ) {
+        $result = [];
 
         // Start the select with a blank element?
-        if ($this->arguments['leadingBlank']) {
+        if ($arguments['leadingBlank']) {
             $result[''] = '';
         }
 
-        $extensionName = $this->renderingContext->getControllerContext()->getRequest()->getControllerExtensionName();
-        if (!empty($this->arguments['values'])) {
-            foreach ($this->arguments['values'] as $item => $count) {
+        if (!empty($arguments['values'])) {
+            foreach ($arguments['values'] as $item => $count) {
                 // Localise item name.
-                $localisationKey = $this->arguments['localisationPrefix'] . $item;
+                $localisationKey = $arguments['localisationPrefix'].$item;
 
-                $localisedItem = \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate($localisationKey, $extensionName);
+                $localisedItem = LocalizationUtility::translate($localisationKey, 'find');
                 if (!$localisedItem) {
                     $localisedItem = $item;
                 }
 
                 // Append count to item name?
-                $result[$item] = $localisedItem . ($this->arguments['showCount'] ? ' (' . $count . ')' : '');
+                $result[$item] = $localisedItem.($arguments['showCount'] ? ' ('.$count.')' : '');
             }
         }
 
         // Sort the array?
-        if ($this->arguments['sortByName']) {
+        if ($arguments['sortByName']) {
             ksort($result);
         }
 
         // Strip sort prefixes.
-        if ($this->arguments['sortPrefixSeparator']) {
-            $strippedResult = array();
+        if ($arguments['sortPrefixSeparator']) {
+            $strippedResult = [];
             foreach ($result as $key => $value) {
-                $valueParts = explode($this->arguments['sortPrefixSeparator'], $value, 2);
+                $valueParts = explode($arguments['sortPrefixSeparator'], $value, 2);
                 $strippedResult[$key] = $valueParts[count($valueParts) - 1];
             }
+
             $result = $strippedResult;
         }
 

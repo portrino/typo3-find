@@ -1,7 +1,7 @@
 {namespace s=Subugoe\Find\ViewHelpers}
 <f:comment>
 	Detect Solr errors and try to handle them:
-	
+
 	* query error: present a link that re-runs the query after escaping the parameters for fields with noescape = 1.
 	* timeout: note the timeout condition and suggest to rerun the query (are we lucky?) or use a simpler one.
 </f:comment>
@@ -31,7 +31,6 @@
 					argumentsToBeExcludedFromQueryString="{0:'{config.prefixID}[q]'}"
 					arguments="{escapedArguments}"
 					section="{settings.jumpToID}"
-					noCacheHash="1"
 					class="internal"
 				>
 					<f:translate key="Re-run the query with escaped terms."/>

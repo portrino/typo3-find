@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\LinkedData\Renderer;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -24,108 +27,110 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-namespace Subugoe\Find\ViewHelpers\LinkedData\Renderer;
-
-
-
-/*
- * http://www.w3.org/TR/2012/WD-turtle-20120710/
+/**
+ * @see http://www.w3.org/TR/2012/WD-turtle-20120710/
  */
-class TurtleRenderer extends AbstractRenderer {
+class TurtleRenderer extends AbstractRenderer implements RendererInterface
+{
+    /**
+     * @param $items
+     *
+     * @return string
+     */
+    public function renderItems($items)
+    {
+        $result = '';
 
-	public function renderItems ($items) {
-		// loop over subjects
-		$subjectArray = array();
-		foreach ($items as $subject => $subjectStatements) {
-			$subjectString = $this->turtleString($subject) . "\n\t";
+        // loop over subjects
+        $subjectArray = [];
+        foreach ($items as $subject => $subjectStatements) {
+            $subjectString = $this->turtleString($subject)."\n\t";
 
-			// loop over predicates
-			$predicateArray = array();
-			foreach ($subjectStatements as $predicate => $objects) {
-				$predicateString = $this->turtleString($predicate) . ' ';
+            // loop over predicates
+            $predicateArray = [];
+            foreach ($subjectStatements as $predicate => $objects) {
+                $predicateString = $this->turtleString($predicate).' ';
 
-				// loop over objects
-				$objectArray = array();
-				foreach ($objects as $object => $properties) {
-					$objectString = '';
-					if ($properties === NULL) {
-						$objectString = $this->turtleString($object);
-					}
-					else {
-						if (strpos($object, '"') === FALSE && strpos($object, "\r") === FALSE && strpos($object, "\n") === FALSE) {
-							$objectString = '"' . $object . '"';
-						}
-						else if (strpos($object, '"""') === FALSE) {
-							$objectString = '"""' . $object . '"""';
-						}
-						else if (strpos($object, "'''") === FALSE) {
-							$objectString = "'''" . $object . "'''";
-						}
-						else {
-							// TODO: Error Handling for could not escape.
-						}
-						if ($properties['language']) {
-							$objectString .= '@' . $properties['language'];
-						}
-						if ($properties['type']) {
-							$objectString .= '^^' . $this->turtleString($properties['type']);
-						}
-					}
-					$objectArray[] = $objectString;
-				}
-				$predicateString .= implode(', ', $objectArray);
-				$predicateArray[] = $predicateString;
-			}
+                // loop over objects
+                $objectArray = [];
+                foreach ($objects as $object => $properties) {
+                    $objectString = '';
+                    if (null === $properties) {
+                        $objectString = $this->turtleString($object);
+                    } else {
+                        if (false === strpos($object, '"') && false === strpos($object, "\r") && false === strpos($object,
+                            "\n")) {
+                            $objectString = '"'.$object.'"';
+                        } elseif (false === strpos($object, '"""')) {
+                            $objectString = '"""'.$object.'"""';
+                        } elseif (false === strpos($object, "'''")) {
+                            $objectString = "'''".$object."'''";
+                        } else {
+                            // TODO: Error Handling for could not escape.
+                        }
 
-			$subjectString .= implode(" ;\n\t", $predicateArray);
-			$subjectArray[] = $subjectString;
-		}
-		$result .= implode(" .\n\n", $subjectArray) . " .\n";
+                        if ($properties['language']) {
+                            $objectString .= '@'.$properties['language'];
+                        }
 
-		// Prepend the prefixes that are used.
-		$prefixes = array();
-		foreach ($this->prefixes as $acronym => $prefix) {
-			if ($this->usedPrefixes[$acronym] === TRUE) {
-				$prefixes[] = '@prefix ' . $acronym . ': ' . $this->turtleString($prefix, FALSE) . " .\n";
-			}
-		}
+                        if ($properties['type']) {
+                            $objectString .= '^^'.$this->turtleString($properties['type']);
+                        }
+                    }
 
-		$result = "\n" . implode('', $prefixes) . "\n" . $result;
+                    $objectArray[] = $objectString;
+                }
 
-		return $result;
-	}
+                $predicateString .= implode(', ', $objectArray);
+                $predicateArray[] = $predicateString;
+            }
 
+            $subjectString .= implode(" ;\n\t", $predicateArray);
+            $subjectArray[] = $subjectString;
+        }
 
-	
-	private function turtleString ($item, $usePrefixes = TRUE) {
-		$result = '<' . $item . '>';
+        $result .= implode(' .'.PHP_EOL.PHP_EOL, $subjectArray).' .'.PHP_EOL;
 
-		$itemParts = explode(':', $item, 2);
-		$rdfTypeURI = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
-		if ($item === $rdfTypeURI
-				|| (count($itemParts) > 1 && $this->prefixes[$itemParts[0]] . $itemParts[1] === $rdfTypeURI)) {
-			$result = 'a';
-		}
-		else {
-			if ($usePrefixes) {
-				foreach($this->prefixes as $acronym => $prefix) {
-					if (strpos($item, $prefix) === 0) {
-						$result = str_replace($prefix, $acronym . ':', $item);
-						$this->usedPrefixes[$acronym] = TRUE;
-						break;
-					}
-					else if ($itemParts[0] === $acronym) {
-						$result = $item;
-						$this->usedPrefixes[$acronym] = TRUE;
-						break;
-					}
-				}
-			}
-		}
+        // Prepend the prefixes that are used.
+        $prefixes = [];
+        foreach ($this->prefixes as $acronym => $prefix) {
+            if (true === $this->usedPrefixes[$acronym]) {
+                $prefixes[] = '@prefix '.$acronym.': '.$this->turtleString($prefix, false).' .'.PHP_EOL;
+            }
+        }
 
-		return $result;
-	}
+        return PHP_EOL.implode('', $prefixes).PHP_EOL.$result;
+    }
 
+    /**
+     * @param $item
+     * @param bool $usePrefixes
+     *
+     * @return mixed|string
+     */
+    protected function turtleString($item, $usePrefixes = true)
+    {
+        $result = '<'.$item.'>';
+
+        $itemParts = explode(':', $item, 2);
+        $rdfTypeURI = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
+        if ($item === $rdfTypeURI
+            || (count($itemParts) > 1 && $this->prefixes[$itemParts[0]].$itemParts[1] === $rdfTypeURI)) {
+            $result = 'a';
+        } elseif ($usePrefixes) {
+            foreach ($this->prefixes as $acronym => $prefix) {
+                if (0 === strpos($item, $prefix)) {
+                    $result = str_replace($prefix, $acronym.':', $item);
+                    $this->usedPrefixes[$acronym] = true;
+                    break;
+                } elseif ($itemParts[0] === $acronym) {
+                    $result = $item;
+                    $this->usedPrefixes[$acronym] = true;
+                    break;
+                }
+            }
+        }
+
+        return $result;
+    }
 }
-
-?>

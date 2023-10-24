@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\Find;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -23,9 +26,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-
-namespace Subugoe\Find\ViewHelpers\Find;
-
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
@@ -33,74 +34,73 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class PageListViewHelper extends AbstractViewHelper
 {
-
-
     /**
      * Registers own arguments.
      */
     public function initializeArguments()
     {
         parent::initializeArguments();
-        $this->registerArgument('currentPage', 'int', 'number of the current page', FALSE, 1);
-        $this->registerArgument('resultCount', 'int', 'total number of results', TRUE);
-        $this->registerArgument('perPage', 'int', 'number of results per page', FALSE, 10);
-        $this->registerArgument('adjacentPages', 'int', 'number of neighbours of the current page to show', FALSE, 3);
-        $this->registerArgument('minimumGapSize', 'int', 'gaps of fewer items than this are filles', FALSE, 2);
+        $this->registerArgument('currentPage', 'int', 'number of the current page', false, 1);
+        $this->registerArgument('resultCount', 'int', 'total number of results', true);
+        $this->registerArgument('perPage', 'int', 'number of results per page', false, 10);
+        $this->registerArgument('adjacentPages', 'int', 'number of neighbours of the current page to show', false, 3);
+        $this->registerArgument('minimumGapSize', 'int', 'gaps of fewer items than this are filles', false, 2);
     }
-
 
     /**
      * @return array
      */
-    public function render()
-    {
-        $currentPage = ($this->arguments['currentPage'] ? (int)$this->arguments['currentPage'] : 1);
-        $numberOfPages = (int)ceil($this->arguments['resultCount'] / $this->arguments['perPage']);
-        $adjacentPages = (int)$this->arguments['adjacentPages'];
+    public static function renderStatic(
+        array $arguments,
+        \Closure $renderChildrenClosure,
+        RenderingContextInterface $renderingContext
+    ) {
+        $currentPage = ($arguments['currentPage'] ? (int) $arguments['currentPage'] : 1);
+        $numberOfPages = (int) ceil($arguments['resultCount'] / $arguments['perPage']);
+        $adjacentPages = (int) $arguments['adjacentPages'];
         $adjacentFirst = max($currentPage - $adjacentPages, 1);
         $adjacentLast = min($currentPage + $adjacentPages, $numberOfPages);
-        $minimumGapSize = (int)$this->arguments['minimumGapSize'];
+        $minimumGapSize = (int) $arguments['minimumGapSize'];
 
         $pageIndex = 1;
         while ($pageIndex <= $numberOfPages) {
-            $pageInfo = array('number' => $pageIndex, 'current' => FALSE, 'gap' => FALSE);
+            $pageInfo = ['number' => $pageIndex, 'current' => false, 'gap' => false];
 
             if ($pageIndex === $currentPage) {
                 $pageInfo['status'] = 'current';
-                $pageInfo['current'] = TRUE;
-            } else if ($pageIndex === 1 | $pageIndex === $numberOfPages) {
+                $pageInfo['current'] = true;
+            } elseif ((1 === $pageIndex | $pageIndex === $numberOfPages) !== 0) {
                 $pageInfo['status'] = 'edge';
-            } else if (abs($pageIndex - $currentPage) <= $adjacentPages) {
+            } elseif (abs($pageIndex - $currentPage) <= $adjacentPages) {
                 $pageInfo['status'] = 'adjacent';
-            } else if (($pageIndex < $adjacentFirst && $adjacentFirst <= 1 + $minimumGapSize)
+            } elseif (($pageIndex < $adjacentFirst && $adjacentFirst <= 1 + $minimumGapSize)
                 || ($pageIndex > $adjacentLast && $numberOfPages - $adjacentLast <= $minimumGapSize)) {
                 $pageInfo['status'] = 'gapfiller';
             } else {
                 $pageInfo['status'] = 'gap';
-                $pageInfo['gap'] = TRUE;
+                $pageInfo['gap'] = true;
             }
 
-            if ($pageInfo['status'] === 'gap') {
+            if ('gap' === $pageInfo['status']) {
                 $pageInfo['text'] = '…';
                 if ($pageIndex < $currentPage) {
                     $pageIndex = $currentPage - $adjacentPages;
-                } else if ($pageIndex > $currentPage) {
+                } elseif ($pageIndex > $currentPage) {
                     $pageIndex = $numberOfPages;
                 }
             } else {
-                $pageInfo['text'] = (string)$pageIndex;
-                $pageIndex++;
+                $pageInfo['text'] = (string) $pageIndex;
+                ++$pageIndex;
             }
 
             $pages[] = $pageInfo;
         }
 
-        return array(
+        return [
             'pages' => $pages,
             'current' => $currentPage,
-            'previous' => ($currentPage === 1) ? NULL : $currentPage - 1,
-            'next' => ($currentPage === $numberOfPages) ? NULL : $currentPage + 1
-        );
+            'previous' => (1 === $currentPage) ? null : $currentPage - 1,
+            'next' => ($currentPage === $numberOfPages) ? null : $currentPage + 1,
+        ];
     }
-
 }

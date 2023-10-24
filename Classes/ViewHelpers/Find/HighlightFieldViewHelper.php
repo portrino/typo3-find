@@ -30,7 +30,7 @@ use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
- * View Helpe   r for styling the content of index document’s result fields.
+ * View Helper for styling the content of index document’s result fields.
  * Requires the query result object for finding the information as well as the
  * document and the field to work on.
  *
@@ -59,8 +59,8 @@ class HighlightFieldViewHelper extends AbstractViewHelper
     public function initializeArguments()
     {
         parent::initializeArguments();
-        $this->registerArgument('results', '\Solarium\QueryType\Select\Result\Result', 'Query results', true);
-        $this->registerArgument('document', '\Solarium\QueryType\Select\Result\Document', 'Result document to work on',
+        $this->registerArgument('results', \Solarium\QueryType\Select\Result\Result::class, 'Query results', true);
+        $this->registerArgument('document', \Solarium\QueryType\Select\Result\Document::class, 'Result document to work on',
             true);
         $this->registerArgument('field', 'string', 'name of field in document to highlight', true);
         $this->registerArgument('alternateField', 'string',
@@ -183,11 +183,7 @@ class HighlightFieldViewHelper extends AbstractViewHelper
 
         // If no highlighted string is present, use the original one.
         if (null === $result) {
-            if ($arguments['raw']) {
-                $result = $fieldString;
-            } else {
-                $result = htmlspecialchars($fieldString);
-            }
+            $result = $arguments['raw'] ? $fieldString : htmlspecialchars($fieldString);
         }
 
         return $result;

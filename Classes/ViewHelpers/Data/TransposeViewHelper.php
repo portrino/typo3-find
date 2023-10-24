@@ -70,6 +70,7 @@ class TransposeViewHelper extends AbstractViewHelper
                 foreach ($arrays as $key => $array) {
                     $row[$key] = $array[$rowIndex];
                 }
+
                 $rows[] = $row;
             }
 
@@ -84,7 +85,7 @@ class TransposeViewHelper extends AbstractViewHelper
             }
 
             $output = 'The arrays passed in the »arrays« argument do not have identical numbers of values: ('.implode(', ',
-                    $info).')';
+                $info).')';
         }
 
         return $output;
@@ -105,11 +106,9 @@ class TransposeViewHelper extends AbstractViewHelper
         foreach ($arrays as $array) {
             if (null === $length) {
                 $length = count($array);
-            } else {
-                if ($length !== count($array)) {
-                    $result = false;
-                    break;
-                }
+            } elseif ($length !== count($array)) {
+                $result = false;
+                break;
             }
         }
 

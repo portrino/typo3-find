@@ -1,13 +1,32 @@
 <?php
-defined('TYPO3') or die();
+defined('TYPO3_MODE') || exit;
 
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-	'Find',
-	'Find',
-	[ // An array holding the enabled controller-action-combinations
-		\Subugoe\Find\Controller\SearchController::class => 'index, detail, suggest, citation', // The first controller and its first action will be the default
-	],
-	[ // An array holding the non-cachable controller-action-combinations
-        \Subugoe\Find\Controller\SearchController::class => 'index, detail, suggest, citation', // The first controller and its first action will be the default
-	]
-);
+$autoexec = static function () {
+    \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+        'Find',
+        'Find',
+        [
+            \Subugoe\Find\Controller\SearchController::class => 'index, detail, suggest, term, citation',
+        ],
+        [
+            \Subugoe\Find\Controller\SearchController::class => 'index, detail, suggest, term, citation',
+        ]
+    );
+
+    if (TYPO3_MODE === 'BE') {
+        /*
+         * Register icons
+         */
+        /** @var \TYPO3\CMS\Core\Imaging\IconRegistry $iconRegistry */
+        $iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class);
+        $iconRegistry->registerIcon(
+            'ext-find-ce-wizard',
+            \TYPO3\CMS\Core\Imaging\IconProvider\FontawesomeIconProvider::class,
+            ['name' => 'search']
+        );
+    }
+
+    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig('<INCLUDE_TYPOSCRIPT: source="FILE:EXT:find/Configuration/TSconfig/ContentElementWizard.tsconfig">');
+};
+$autoexec();
+unset($autoexec);

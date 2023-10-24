@@ -1,5 +1,5 @@
 {namespace s=Subugoe\Find\ViewHelpers}
-<div class="pager listPager">
+<nav class="pager listPager">
 	<f:alias map="{pager:'{s:find.pageList(currentPage:arguments.page, perPage:settings.paging.perPage, resultCount:results.numfound)}'}">
 		<span class="previous">
 			<f:if condition="{pager.previous}">
@@ -8,7 +8,6 @@
 						arguments="{page:pager.previous}"
 						addQueryString="TRUE"
 						section="{settings.jumpToID}"
-						noCacheHash="1"
 						class="icon-left-dir internal"
 						title="{f:translate(key:'Go to previous page of results. (Page %s)', arguments:'{1:pager.previous}')}"
 					/>
@@ -24,10 +23,10 @@
 					<f:if condition="{current:page.current, gap:page.gap} == {current:FALSE , gap:FALSE}">
 						<f:then>
 							<f:link.action
+								title="{f:translate(key:'Go to page %s of the search results.', arguments:'{1:page.number}')}"
 								arguments="{page:page.number}"
 								addQueryString="TRUE"
 								section="{settings.jumpToID}"
-								noCacheHash="1"
 								class="internal"
 							>
 								{page.text}
@@ -47,7 +46,6 @@
 						arguments="{page:pager.next}"
 						addQueryString="TRUE"
 						section="{settings.jumpToID}"
-						noCacheHash="1"
 						class="icon-right-dir internal"
 						title="{f:translate(key:'Go to next page of results. (Page %s)', arguments:'{1:pager.next}')}"
 					/>
@@ -58,4 +56,4 @@
 			</f:if>
 		</span>
 	</f:alias>
-</div>
+</nav>

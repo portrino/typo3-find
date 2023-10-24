@@ -2,13 +2,26 @@
   "name": "slub/find",
   "description": "A frontend for Solr indexes",
   "type": "typo3-cms-extension",
-  "homepage": "https://github.com/slub/typo3-find",
-  "keywords" : ["TYPO3 CMS"],
-  "license": ["GPL-2.0+"],
-  "authors" : [
+  "keywords": [
+    "TYPO3 CMS"
+  ],
+  "license": [
+    "GPL-2.0-or-later"
+  ],
+  "authors": [
     {
-      "name" : "Sven-S. Porst, Ingo Pfennigstorf",
-      "email" : "porst@sub.uni-goettingen.de",
+      "name": "Sven-S. Porst, Ingo Pfennigstorf",
+      "email": "pfennigstorf@sub.uni-goettingen.de",
+      "role": "Developer"
+    },
+    {
+      "name" : "Christof Rodejohann",
+      "email" : "christof.rodejohann@slub-dresden.de",
+      "role" : "Developer"
+    },
+    {
+      "name" : "Carsten Radeck",
+      "email" : "carsten.radeck@slub-dresden.de",
       "role" : "Developer"
     },
     {
@@ -17,20 +30,68 @@
       "role" : "Developer"
     }
   ],
-  "require": {
-    "typo3/cms-core": "^10.4 || ^11.5"
-  },
-  "replace": {
-    "subgoe/find": "*"
-  },
   "autoload": {
     "psr-4": {
-      "Subugoe\\Find\\": "Classes"
+      "Subugoe\\Find\\": "Classes/"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Subugoe\\Find\\Tests\\": "Tests/"
+    }
+  },
+  "replace": {
+    "typo3-ter/find": "self.version"
+  },
+  "require": {
+    "php": "^7.4",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "solarium/solarium": ">=6.0 <7.0",
+    "typo3/cms-core": "^10.4 || ^11.5",
+    "typo3/cms-felogin": "^10.4 || ^11.5"
+  },
+  "require-dev": {
+    "nimut/testing-framework": "^6.0",
+    "friendsofphp/php-cs-fixer": "^3.0",
+    "phpunit/phpunit": "^8.5",
+    "ssch/typo3-rector": "^1.0",
+    "phpspec/prophecy": "^1.15"
+  },
+  "config": {
+    "vendor-dir": ".Build/vendor",
+    "bin-dir": ".Build/bin",
+    "allow-plugins": {
+      "typo3/class-alias-loader": true,
+      "typo3/cms-composer-installers": true
+    }
+  },
+  "scripts": {
+    "post-autoload-dump": [
+      "mkdir -p .Build/Web/typo3conf/ext/",
+      "[ -L .Build/Web/typo3conf/ext/find ] || ln -snvf ../../../../. .Build/Web/typo3conf/ext/find"
+    ],
+    "rector-lint": "rector process --dry-run",
+    "rector-fix": "rector process",
+    "php-cs-lint": "php-cs-fixer fix --dry-run",
+    "php-cs-fix": "php-cs-fixer fix",
+    "lint":  [
+      "@php-cs-lint",
+      "@rector-lint"
+    ],
+    "fix":  [
+      "@php-cs-fix",
+      "@rector-fix"
+    ]
+  },
+  "suggest": {
+    "solarium/solarium": "Allows using the SolrServiceProvider"
   },
   "extra": {
     "typo3/cms": {
-       "extension-key": "find"
+      "cms-package-dir": "{$vendor-dir}/typo3/cms",
+      "web-dir": ".Build/Web",
+      "extension-key": "find"
     }
   }
 }

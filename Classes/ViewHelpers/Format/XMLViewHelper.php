@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\Format;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -23,9 +26,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-
-namespace Subugoe\Find\ViewHelpers\Format;
-
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
@@ -45,33 +46,30 @@ class XMLViewHelper extends AbstractViewHelper
 
     /**
      * Registers own arguments.
-     * @return void
      */
     public function initializeArguments()
     {
         parent::initializeArguments();
-        $this->registerArgument('htmloutput', 'Boolean', 'Whether to output as HTML', FALSE, FALSE);
+        $this->registerArgument('htmloutput', 'Boolean', 'Whether to output as HTML', false, false);
     }
 
     /**
      * @return string
      */
-    public function render()
-    {
-        $input = $this->renderChildren();
+    public static function renderStatic(
+        array $arguments,
+        \Closure $renderChildrenClosure,
+        RenderingContextInterface $renderingContext
+    ) {
+        $input = $renderChildrenClosure();
         $XML = new \DOMDocument();
-        $XML->preserveWhiteSpace = FALSE;
-        $XML->formatOutput = TRUE;
+        $XML->preserveWhiteSpace = false;
+        $XML->formatOutput = true;
         $XML->encoding = 'UTF-8';
         $XML->loadXML($input);
-        if ($this->arguments['htmloutput']) {
-            $result = $XML->saveHTML();
-        } else {
-            $result = $XML->saveXML();
-        }
 
         // TODO: Error handling?
 
-        return $result;
+        return $arguments['htmloutput'] ? $XML->saveHTML() : $XML->saveXML();
     }
 }

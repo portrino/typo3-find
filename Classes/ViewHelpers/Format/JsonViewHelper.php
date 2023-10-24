@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\Format;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -23,18 +26,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-
-namespace Subugoe\Find\ViewHelpers\Format;
-
-
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * View Helper to return the passed array, string or number as JSON.
  *
  * Usage examples are available in Private/Partials/Test.html.
+ *
+ * @deprecated Please use f:format.json instead. This ViewHelper only acts as bridge to the Core ViewHelper.
  */
-class JsonViewHelper extends AbstractViewHelper {
+class JsonViewHelper extends AbstractViewHelper
+{
 
     /**
      * As this ViewHelper renders HTML, the output must not be escaped.
@@ -43,28 +46,33 @@ class JsonViewHelper extends AbstractViewHelper {
      */
     protected $escapeOutput = false;
 
-	/**
-	 * Registers own arguments.
-	 * @return void
-	 */
-	public function initializeArguments() {
-		parent::initializeArguments();
-		$this->registerArgument('data', 'mixed', 'The data to output as JSON', FALSE, NULL);
-	}
+    /**
+     * Registers own arguments.
+     */
+    public function initializeArguments()
+    {
+        parent::initializeArguments();
+        $this->registerArgument('data', 'mixed', 'The data to output as JSON', false, null);
+    }
 
+    /**
+     * @return string
+     */
+    public static function renderStatic(
+        array $arguments,
+        \Closure $renderChildrenClosure,
+        RenderingContextInterface $renderingContext
+    ) {
+        @trigger_error('Please use f:format.json instead', E_USER_DEPRECATED);
 
-	/**
-	 * @return string
-	 */
-	public function render() {
-		$data = $this->arguments['data'];
-		if ($data === NULL) {
-			$data = $this->renderChildren();
-		}
+        // Transform arguments for being compatible to the core ViewHelper arguments
+        $data = [];
+        $data['value'] = $arguments['data'];
+        $data['forceObject'] = false;
 
-		return json_encode($data);
-	}
+        // Call the Core ViewHelper
+        $jsonViewHelper = new \TYPO3\CMS\Fluid\ViewHelpers\Format\JsonViewHelper();
 
+        return $jsonViewHelper::renderStatic($data, $renderChildrenClosure, $renderingContext);
+    }
 }
-
-?>

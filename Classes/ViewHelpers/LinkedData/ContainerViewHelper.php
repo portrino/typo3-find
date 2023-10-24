@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\LinkedData;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -24,8 +27,7 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-namespace Subugoe\Find\ViewHelpers\LinkedData;
-
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
@@ -36,35 +38,35 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class ContainerViewHelper extends AbstractViewHelper
 {
-
     /**
      * Registers own arguments.
-     * @return void
      */
     public function initializeArguments()
     {
         parent::initializeArguments();
-        $this->registerArgument('format', 'string', 'The linked data format to create', FALSE, 'turtle');
-        $this->registerArgument('prefixes', 'array', 'The namespace names to use', FALSE, array());
-
-        $this->registerArgument('name', 'string', 'The name of the template variable to store the data in', FALSE, 'linkedDataContainer');
+        $this->registerArgument('format', 'string', 'The linked data format to create', false, 'turtle');
+        $this->registerArgument('prefixes', 'array', 'The namespace names to use', false, []);
+        $this->registerArgument('name', 'string', 'The name of the template variable to store the data in', false,
+            'linkedDataContainer');
     }
 
     /**
      * @return string
      */
-    public function render()
-    {
-        $this->templateVariableContainer->add($this->arguments['name'], array());
+    public static function renderStatic(
+        array $arguments,
+        \Closure $renderChildrenClosure,
+        RenderingContextInterface $renderingContext
+    ) {
+        $renderingContext->getVariableProvider()->add($arguments['name'], []);
 
-        $this->renderChildren();
-        $items = $this->templateVariableContainer->get($this->arguments['name']);
-        $this->templateVariableContainer->remove($this->arguments['name']);
+        $renderChildrenClosure();
+        $items = $renderingContext->getVariableProvider()->get($arguments['name']);
+        $renderingContext->getVariableProvider()->remove($arguments['name']);
 
-        $LDRenderer = Renderer\AbstractRenderer::instantiateSubclassForType($this->arguments['format']);
-        $LDRenderer->setPrefixes($this->arguments['prefixes']);
-        $result = $LDRenderer->renderItems($items);
+        $LDRenderer = Renderer\AbstractRenderer::instantiateSubclassForType($arguments['format']);
+        $LDRenderer->setPrefixes($arguments['prefixes']);
 
-        return $result;
+        return $LDRenderer->renderItems($items);
     }
 }

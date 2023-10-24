@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\LinkedData\Renderer;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -24,92 +27,90 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-namespace Subugoe\Find\ViewHelpers\LinkedData\Renderer;
-
-
-
-/*
- *
- * http://www.w3.org/TR/json-ld-syntax/
+/**
+ * @see http://www.w3.org/TR/json-ld-syntax/
  */
-class JSONLDRenderer extends AbstractRenderer {
+class JSONLDRenderer extends AbstractRenderer implements RendererInterface
+{
+    /**
+     * @param $items
+     *
+     * @return string
+     */
+    public function renderItems($items)
+    {
+        $graph = [];
 
-	public function renderItems ($items) {
-		$graph = array();
+        // loop over subjects
+        foreach ($items as $subjectURI => $subjectStatements) {
+            $subject = ['@id' => $this->prefixedName($subjectURI)];
 
-		// loop over subjects
-		foreach ($items as $subjectURI => $subjectStatements) {
-			$subject = array('@id' => $this->prefixedName($subjectURI));
+            // loop over predicates
+            foreach ($subjectStatements as $predicateURI => $objects) {
+                // loop over objects
+                foreach ($objects as $objectString => $properties) {
+                    if (null === $properties) {
+                        $object = $this->prefixedName($objectString);
+                    } else {
+                        $object = ['@value' => $objectString];
 
-			// loop over predicates
-			foreach ($subjectStatements as $predicateURI => $objects) {
+                        if ($properties['language']) {
+                            $object['@language'] = $properties['language'];
+                        }
 
-				// loop over objects
-				foreach ($objects as $objectString => $properties) {
-					if ($properties === NULL) {
-						$object = $this->prefixedName($objectString);
-					}
-					else {
-						$object = array('@value' => $objectString);
+                        if ($properties['type']) {
+                            $object['@type'] = $properties['type'];
+                        }
+                    }
 
-						if ($properties['language']) {
-							$object['@language'] = $properties['language'];
-						}
-						if ($properties['type']) {
-							$object['@type'] = $properties['type'];
-						}
-					}
+                    $predicateURI = $this->prefixedName($predicateURI);
+                    if ($subject[$predicateURI]) {
+                        if (is_array($subject[$predicateURI])) {
+                            $subject[$predicateURI][] = $object;
+                        } else {
+                            $subject[$predicateURI] = [$subject[$predicateURI], $object];
+                        }
+                    } else {
+                        $subject[$predicateURI] = $object;
+                    }
+                }
+            }
 
-					$predicateURI = $this->prefixedName($predicateURI);
-					if ($subject[$predicateURI]) {
-						if (is_array($subject[$predicateURI])) {
-							$subject[$predicateURI][] = $object;
- 						}
-						else {
-							$subject[$predicateURI] = array($subject[$predicateURI], $object);
-						}
-					}
-					else {
-						$subject[$predicateURI] = $object;
-					}
-				}
-			}
+            $graph[] = $subject;
+        }
 
-			$graph[] = $subject;
-		}
+        // Add the prefixes as the @context.
+        $context = [];
+        foreach (array_keys($this->usedPrefixes) as $prefix) {
+            if ($this->prefixes[$prefix]) {
+                $context[$prefix] = $this->prefixes[$prefix];
+            }
+        }
 
-		// Add the prefixes as the @context.
-		$context = array();
-		foreach (array_keys($this->usedPrefixes) as $prefix) {
-			if ($this->prefixes[$prefix]) {
-				$context[$prefix] = $this->prefixes[$prefix];
-			}
-		}
+        return json_encode([
+            '@context' => $context,
+            '@graph' => $graph,
+        ]);
+    }
 
-		return json_encode(array(
-			'@context' => $context,
-			'@graph' => $graph
-		));
-	}
+    /**
+     * @param $name
+     *
+     * @return mixed
+     */
+    protected function prefixedName($name)
+    {
+        foreach ($this->prefixes as $acronym => $URI) {
+            if (0 === strpos($name, $URI)) {
+                $name = str_replace($URI, $acronym.':', $name);
+                $this->usedPrefixes[$acronym] = true;
+                break;
+            } elseif (0 === strpos($name, $acronym.':')) {
+                $this->usedPrefixes[$acronym] = true;
+                break;
+            }
+        }
 
-
-	
-	private function prefixedName ($name) {
-		foreach ($this->prefixes as $acronym => $URI) {
-			if (strpos($name, $URI) === 0) {
-				$name = str_replace($URI, $acronym . ':', $name);
-				$this->usedPrefixes[$acronym] = TRUE;
-				break;
-			}
-			else if (strpos($name, $acronym . ':') === 0) {
-				$this->usedPrefixes[$acronym] = TRUE;
-				break;
-			}
-		}
-
-		return $name;
-	}
-
+        return $name;
+    }
 }
-
-?>

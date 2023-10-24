@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\LinkedData;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -24,8 +27,7 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-namespace Subugoe\Find\ViewHelpers\LinkedData;
-
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
@@ -34,50 +36,51 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class ItemViewHelper extends AbstractViewHelper
 {
-
     /**;
      * Registers own arguments.
-     * @return void
      */
     public function initializeArguments()
     {
         parent::initializeArguments();
-        $this->registerArgument('subject', 'string', 'The triple’s subject', TRUE);
-        $this->registerArgument('predicate', 'string', 'The triple’s predicate', TRUE);
-        $this->registerArgument('object', 'string', 'The triple’s object', FALSE, NULL);
-        $this->registerArgument('objectType', 'string', 'Type of the triple’s object', FALSE, NULL);
-        $this->registerArgument('language', 'string', 'ISO 639-1 language code for the triple’s object', FALSE, NULL);
-
-        $this->registerArgument('name', 'string', 'The name of the template variable to store the data in', FALSE, 'linkedDataContainer');
+        $this->registerArgument('subject', 'string', 'The triple’s subject', true);
+        $this->registerArgument('predicate', 'string', 'The triple’s predicate', true);
+        $this->registerArgument('object', 'string', 'The triple’s object', false, null);
+        $this->registerArgument('objectType', 'string', 'Type of the triple’s object', false, null);
+        $this->registerArgument('language', 'string', 'ISO 639-1 language code for the triple’s object', false, null);
+        $this->registerArgument('name', 'string', 'The name of the template variable to store the data in', false,
+            'linkedDataContainer');
     }
 
-    /**
-     * @return string
-     */
-    public function render()
-    {
-        $container = $this->templateVariableContainer->get($this->arguments['name']);
-        if (!$container[$this->arguments['subject']]) {
-            $container[$this->arguments['subject']] = array();
+    public static function renderStatic(
+        array $arguments,
+        \Closure $renderChildrenClosure,
+        RenderingContextInterface $renderingContext
+    ) {
+        $container = $renderingContext->getVariableProvider()->get($arguments['name']);
+        if (!$container[$arguments['subject']]) {
+            $container[$arguments['subject']] = [];
         }
 
-        if (!$container[$this->arguments['subject']][$this->arguments['predicate']]) {
-            $container[$this->arguments['subject']][$this->arguments['predicate']] = array();
+        if (!$container[$arguments['subject']][$arguments['predicate']]) {
+            $container[$arguments['subject']][$arguments['predicate']] = [];
         }
 
-        if ($this->arguments['object'] !== NULL) {
-            if (is_array($this->arguments['object'])) {
-                foreach ($this->arguments['object'] as $value) {
-                    $container[$this->arguments['subject']][$this->arguments['predicate']][$value] = NULL;
-                }
-            } else {
-                $container[$this->arguments['subject']][$this->arguments['predicate']][$this->arguments['object']] = NULL;
-            }
+        if (null !== $arguments['object']) {
+            if(is_array($arguments['object'])) {
+				foreach ($arguments['object'] as $value) {
+					$container[$arguments['subject']][$arguments['predicate']][$value] = NULL;
+				}
+			} else {
+				$container[$arguments['subject']][$arguments['predicate']][$arguments['object']] = NULL;
+			}
         } else {
-            $container[$this->arguments['subject']][$this->arguments['predicate']][$this->renderChildren()] = array('type' => $this->arguments['objectType'], 'language' => $this->arguments['language']);
+            $container[$arguments['subject']][$arguments['predicate']][$renderChildrenClosure()] = [
+                'type' => $arguments['objectType'],
+                'language' => $arguments['language'],
+            ];
         }
 
-        $this->templateVariableContainer->remove($this->arguments['name']);
-        $this->templateVariableContainer->add($this->arguments['name'], $container);
+        $renderingContext->getVariableProvider()->remove($arguments['name']);
+        $renderingContext->getVariableProvider()->add($arguments['name'], $container);
     }
 }

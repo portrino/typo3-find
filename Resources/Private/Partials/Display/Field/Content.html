@@ -68,7 +68,6 @@
 						q:queryArray,
 						facet:linkFacets
 					}"
-					noCacheHash="1"
 					class="internal"
 					title="{f:translate(
 						key:'Alle Datensätze mit %1$s »%2$s« zeigen.',
@@ -81,12 +80,14 @@
 		</f:alias>
 	</f:then>
 	<f:else>
-		<s:find.highlightField
-			field="{field}"
-			document="{document}"
-			results="{results}"
-			index="{iterator.index}"
-			alternateField="{s:data.valueForKey(array:config.highlight.alternateFields, key:field)}"
-		/>
+		<f:format.raw>
+			<s:find.highlightField
+				field="{field}"
+				document="{document}"
+				results="{results}"
+				index="{iterator.index}"
+				alternateField="{s:data.valueForKey(array:config.highlight.alternateFields, key:field)}"
+			/>
+		</f:format.raw>
 	</f:else>
 </f:if>

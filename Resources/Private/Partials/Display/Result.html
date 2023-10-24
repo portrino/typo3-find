@@ -6,13 +6,12 @@
 	(if configured) and a link to the document’s page.
 </f:comment>
 <li id="c{config.uid}-result-{document.id}">
-	<article>
+	<div>
 		<h1>
 			<f:link.action
 				action="detail"
 				arguments="{id:document.id}"
 				section="{settings.jumpToID}"
-				noCacheHash="1"
 				class="internal no-change"
 				onclick="{f:if(
 					condition:'{settings.paging.detailPagePaging == 1}',
@@ -48,5 +47,5 @@
 				}"/>
 			<f:render partial="Display/DetailLink" arguments="{_all}"/>
 		</p>
-	</article>
+	</div>
 </li>

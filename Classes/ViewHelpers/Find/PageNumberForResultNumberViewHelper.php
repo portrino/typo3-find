@@ -1,4 +1,7 @@
 <?php
+
+namespace Subugoe\Find\ViewHelpers\Find;
+
 /*******************************************************************************
  * Copyright notice
  *
@@ -24,8 +27,7 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-namespace Subugoe\Find\ViewHelpers\Find;
-
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
@@ -35,6 +37,12 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class PageNumberForResultNumberViewHelper extends AbstractViewHelper
 {
+    /**
+     * Avoid divisions by zero.
+     *
+     * @var int
+     */
+    public const DEFAULT_RESULTS_PER_PAGE = 20;
 
     /**
      * Registers own arguments.
@@ -42,16 +50,22 @@ class PageNumberForResultNumberViewHelper extends AbstractViewHelper
     public function initializeArguments()
     {
         parent::initializeArguments();
-        $this->registerArgument('resultNumber', 'int', 'Number of the rsult to determine the page number for', TRUE);
-        $this->registerArgument('resultsPerPage', 'int', 'Number of results per page', TRUE);
+        $this->registerArgument('resultNumber', 'int', 'number of the result to determine the page number for', true);
+        $this->registerArgument('resultsPerPage', 'int', 'number of results per page', false, self::DEFAULT_RESULTS_PER_PAGE);
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function render()
-    {
-        return ceil($this->arguments['resultNumber'] / $this->arguments['resultsPerPage']);
-    }
+    public static function renderStatic(
+        array $arguments,
+        \Closure $renderChildrenClosure,
+        RenderingContextInterface $renderingContext
+    ) {
+        if (0 === $arguments['resultsPerPage']) {
+            $arguments['resultsPerPage'] = self::DEFAULT_RESULTS_PER_PAGE;
+        }
 
+        return (int) ceil($arguments['resultNumber'] / $arguments['resultsPerPage']);
+    }
 }

@@ -20,10 +20,12 @@
 	<f:render partial="Page/Standard" arguments="{_all}"/>
 
 	<div class="results">
-		<div class="navigation top"/>
+		<div class="navigation top">
 			<f:render partial="Components/ResultCount" arguments="{_all}"/>
 			<f:render partial="Pager/ListPager" arguments="{_all}"/>
 		</div>
+
+		<f:render partial="Facets/Facet/List/ActiveFacets" arguments="{_all}"/>
 
 		<f:render partial="Facets/Facets" arguments="{_all}"/>
 
@@ -33,7 +35,7 @@
 			</f:for>
 		</ol>
 
-		<div class="navigation bottom"/>
+		<div class="navigation bottom">
 			<f:render partial="Pager/ListPager" arguments="{_all}"/>
 		</div>
 	</div>
