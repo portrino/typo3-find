@@ -1296,7 +1296,7 @@ class SolrServiceProvider extends AbstractServiceProvider
                     $chars = explode(',', $fieldInfo['escapechar']);
                     foreach ($queryTerms as $key => $term) {
                         foreach ($chars as $char) {
-                            $queryTerms[$key] = str_replace($char, '\\'.$char, $term);
+                            $queryTerms[$key] = str_replace($char, '\\'.$char, $queryTerms[$key]);
                         }
                     }
                     if (!empty($fieldInfo["disjunctionWith"])){
