@@ -1,6 +1,10 @@
 <?php
 
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
+use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
+
+defined('TYPO3') or die();
+
+ExtensionUtility::registerPlugin(
     'Find',
     'find',
     'find'

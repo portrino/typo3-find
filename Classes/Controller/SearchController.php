@@ -28,7 +28,12 @@ namespace Subugoe\Find\Controller;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
-
+use Psr\Log\LoggerInterface;
+use TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException;
+use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
+use Psr\Http\Message\ResponseInterface;
+use TYPO3\CMS\Extbase\Http\ForwardResponse;
+use TYPO3\CMS\Core\Utility\HttpUtility;
 use Subugoe\Find\Service\ServiceProviderInterface;
 use Subugoe\Find\Utility\ArrayUtility;
 use Subugoe\Find\Utility\FrontendUtility;
@@ -43,7 +48,7 @@ class SearchController extends ActionController
 
     protected ?object $searchProvider = null;
 
-    private \Psr\Log\LoggerInterface $logger;
+    private LoggerInterface $logger;
 
     public function __construct(LogManagerInterface $logManager)
     {
@@ -51,10 +56,10 @@ class SearchController extends ActionController
     }
 
     /**
-     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException
-     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
+     * @throws NoSuchArgumentException
+     * @throws StopActionException
      */
-    public function detailAction(string $id)
+    public function detailAction(string $id): ResponseInterface
     {
         $arguments = $this->searchProvider->getRequestArguments();
         $detail = $this->searchProvider->getDocumentById($id);
@@ -76,12 +81,13 @@ class SearchController extends ActionController
             'arguments' => $arguments,
             'config' => $this->searchProvider->getConfiguration()
         ]);
+        return $this->htmlResponse();
     }
 
     /**
 	 * Citation Action.
 	 */
-	public function citationAction() {
+	public function citationAction(): ResponseInterface {
 
 		$arguments = $this->requestArguments;
         $detail = $this->searchProvider->getDocumentById($arguments["id"]);
@@ -94,23 +100,24 @@ class SearchController extends ActionController
             'config' => $this->searchProvider->getConfiguration(),
             'type' => $arguments['type']
         ]);
+        return $this->htmlResponse();
 	}
 
     /**
      * Index Action.
      */
-    public function indexAction()
+    public function indexAction(): ResponseInterface
     {
         if (array_key_exists('id', $this->requestArguments)) {
-            $this->forward('detail');
+            return new ForwardResponse('detail');
         } elseif (array_key_exists('rsn', $this->requestArguments)) {
-			$this->forward('redirect');
+			return new ForwardResponse('redirect');
 		} elseif (array_key_exists('bc', $this->requestArguments)) {
-			$this->forward('redirect');
+			return new ForwardResponse('redirect');
 		} elseif (array_key_exists('ppn', $this->requestArguments)) {
-			$this->forward('redirect');
+			return new ForwardResponse('redirect');
         } elseif (array_key_exists('oclc', $this->requestArguments)) {
-			$this->forward('redirect');
+			return new ForwardResponse('redirect');
         } else {
             $this->searchProvider->setCounter();
             FrontendUtility::addQueryInformationAsJavaScript(
@@ -134,10 +141,11 @@ class SearchController extends ActionController
             // if there are no search parameters provided, redirect to the URL given in setting 'nosearchRedirect'
             if ($defaultQuery['noSearch']) {
                 if(strlen($this->settings['nosearchRedirect']) > 0) {
-                    \TYPO3\CMS\Core\Utility\HttpUtility::redirect($this->settings['nosearchRedirect']);
+                    HttpUtility::redirect($this->settings['nosearchRedirect']);
                 }
             }
         }
+        return $this->htmlResponse();
     }
 
     /**
@@ -186,7 +194,7 @@ class SearchController extends ActionController
 		}
 
         $uri = $this->uriBuilder->reset()->setTargetPageUid(intval($GLOBALS['TSFE']->id))->setCreateAbsoluteUri(true)->setArguments($arguments)->build();
-        \TYPO3\CMS\Core\Utility\HttpUtility::redirect($uri);
+        HttpUtility::redirect($uri);
 
 		die();
 	}
@@ -211,18 +219,20 @@ class SearchController extends ActionController
     /**
      * Suggest/Autocomplete action.
      */
-    public function suggestAction()
+    public function suggestAction(): ResponseInterface
     {
         $results = $this->searchProvider->suggestQuery($this->searchProvider->getRequestArguments());
         $this->view->assign('suggestions', $results);
+        return $this->htmlResponse();
     }
 
     /**
      * Query indexed terms for given fields.
      */
-    public function termAction(){
+    public function termAction(): ResponseInterface{
         $results = $this->searchProvider->getTerms($this->searchProvider->getRequestArguments());
         $this->view->assign('terms', $results);
+        return $this->htmlResponse();
     }
 
     /**

@@ -1177,7 +1177,7 @@ class SolrServiceProvider extends AbstractServiceProvider
                 $assignments['document'] = $resultSet[0];
             } else {
                 $localisationKey = 'LLL:' . $this->settings['languageRootPath'] . 'locallang:exception.deatilNoresult';
-                $message = sprintf(\TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate($localisationKey, null), $id);
+                $message = sprintf(LocalizationUtility::translate($localisationKey, null), $id);
                 if (!$message) {
                     $message = sprintf('»detail« action query for id »%s« returned no results.', $id);
                 }
@@ -1445,12 +1445,12 @@ class SolrServiceProvider extends AbstractServiceProvider
     }
 
     /**
-	 * Sets up $query’s grouping parameters from URL arguments or the TypoScript default.
-	 *
-	 * @param \Solarium\QueryType\Select\Query\Query $query
-	 * @param array $arguments request arguments
-	 */
-	private function addGrouping ($arguments) {
+     * Sets up $query’s grouping parameters from URL arguments or the TypoScript default.
+     *
+     * @param Query $query
+     * @param array $arguments request arguments
+     */
+    private function addGrouping ($arguments) {
 	    $limit = -1;
 	    $field = null;
 	    
