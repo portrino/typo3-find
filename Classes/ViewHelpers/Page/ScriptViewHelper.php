@@ -22,7 +22,7 @@ namespace Subugoe\Find\ViewHelpers\Page;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-
+use TYPO3\CMS\Frontend\Resource\FilePathSanitizer;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\TypoScript\TemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -45,14 +45,6 @@ class ScriptViewHelper extends AbstractViewHelper
         return GeneralUtility::makeInstance(PageRenderer::class);
     }
 
-    /**
-     * @return TemplateService
-     */
-    protected static function getTypoScriptTemplateService()
-    {
-        return $GLOBALS['TSFE']->tmpl;
-    }
-
     public function initializeArguments()
     {
         $this->registerArgument('file', 'string', 'File to append as script');
@@ -70,32 +62,15 @@ class ScriptViewHelper extends AbstractViewHelper
         $name = $arguments['name'];
         $pageRenderer = self::getPageRenderer();
 
-        $typo3VersionConstraint = version_compare(VersionNumberUtility::getNumericTypo3Version(), '9.5.0', '<');
-
-        if ($typo3VersionConstraint) {
-            $scriptPath = static::getTypoScriptTemplateService()->getFileName($arguments['file']);
-
-            if ($scriptPath) {
-                $pageRenderer->addJsFooterLibrary($name, $scriptPath);
-
-                return '';
-            }
-
+        $fileNameFromArguments = $arguments['file'];
+        if ($fileNameFromArguments) {
+            $scriptPath = GeneralUtility::makeInstance(FilePathSanitizer::class)->sanitize($fileNameFromArguments);
+            $pageRenderer->addJsFooterLibrary($name, $scriptPath);
+        } else {
             $content = $renderChildrenClosure();
             $pageRenderer->addJsFooterInlineCode($name, $content);
-
-            return '';
-        } else {
-            $fileNameFromArguments = $arguments['file'];
-            if ($fileNameFromArguments) {
-                $scriptPath = GeneralUtility::makeInstance(\TYPO3\CMS\Frontend\Resource\FilePathSanitizer::class)->sanitize($fileNameFromArguments);
-                $pageRenderer->addJsFooterLibrary($name, $scriptPath);
-            } else {
-                $content = $renderChildrenClosure();
-                $pageRenderer->addJsFooterInlineCode($name, $content);
-            }
-
-            return '';
         }
+
+        return '';
     }
 }
