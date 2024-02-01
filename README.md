@@ -152,6 +152,10 @@ provider and an options array.
 The `plugin.tx_find.settings.activeConnection` determines the currently
 used connection. The default value is `default`.
 
+Per default, the connection is tested upon initialization (ping request).
+Using the boolean setting `plugin.tx_find.settings.testConnection` this behavior 
+can be disabled.
+
 The `options` settings array in a connection definition is used to
 configure access to the Solr index. It contains:
 

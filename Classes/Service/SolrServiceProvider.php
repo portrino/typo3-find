@@ -96,7 +96,9 @@ class SolrServiceProvider extends AbstractServiceProvider
         $client = new Client($adapter, $eventDispatcher, $connectionSettings);
 
         $this->setConnection($client);
-        $this->testConnection();
+        if (filter_var($this->settings["testConnection"]??true, FILTER_VALIDATE_BOOLEAN)) {
+            $this->testConnection();
+        }
 
         $this->timeTracker= GeneralUtility::makeInstance(TimeTracker::class);
 		$this->timing['INIT_START'] = $this->timeTracker->getDifferenceToStarttime();
