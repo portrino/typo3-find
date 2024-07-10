@@ -61,7 +61,7 @@ class SolrServiceProvider extends AbstractServiceProvider
 
     protected $timing;
 
-    private ?Dispatcher $signalSlotDispatcher = null;
+    protected ?Dispatcher $signalSlotDispatcher = null;
 
     public function injectDispatcher(Dispatcher $signalSlotDispatcher)
     {
@@ -1353,6 +1353,10 @@ class SolrServiceProvider extends AbstractServiceProvider
     {
         $facetQueries = [];
         $facetConfig = $this->getFacetConfig($facetID);
+        if ($facetConfig == null) {
+            return;
+        }
+
         foreach ($facetSelection as $facetTerm => $facetStatus) {
             $facetInfo = [
                 'id' => $facetID,
