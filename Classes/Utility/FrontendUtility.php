@@ -69,6 +69,9 @@ class FrontendUtility
 
             if ($arguments['group']) {
 			    $underlyingQuery['group'] = $arguments['group'];
+				if ($arguments['grouplimit']) {
+					$underlyingQuery['grouplimit'] = $arguments['grouplimit'];
+				}
 			}
 
             GeneralUtility::makeInstance(AssetCollector::class)->addInlineJavaScript('find_underlyingQuery', 'const underlyingQuery = ' . json_encode($underlyingQuery) . ';');

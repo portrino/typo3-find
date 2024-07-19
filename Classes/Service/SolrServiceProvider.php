@@ -186,7 +186,7 @@ class SolrServiceProvider extends AbstractServiceProvider
         $arguments = $this->getRequestArguments();
 
         $assignments = [];
-        if ($this->settings['paging']['detailPagePaging'] && array_key_exists('underlyingQuery', $arguments) && !$arguments["underlyingQuery"]["group"]) {
+        if ($this->settings['paging']['detailPagePaging'] && array_key_exists('underlyingQuery', $arguments)) {
             // If underlying query has been sent, fetch more data to enable paging arrows.
             $underlyingQueryInfo = $arguments['underlyingQuery'];
 
@@ -197,8 +197,10 @@ class SolrServiceProvider extends AbstractServiceProvider
             }
 
             $this->createQueryForArguments($arguments);
-            $this->query->setStart($index['previousIndex']);
-            $this->query->setRows($index['nextIndex'] - $index['previousIndex'] + 1);
+            if (!$arguments["underlyingQuery"]["group"]) {
+                $this->query->setStart($index['previousIndex']);
+                $this->query->setRows($index['nextIndex'] - $index['previousIndex'] + 1);
+            }
 
             $this->signalSlotDispatcher->dispatch('Subugoe\Find\Controller\SearchController', 'detailActionBeforePagingSelect', array(&$this->query, $arguments['underlyingQuery']));
 
@@ -983,7 +985,7 @@ class SolrServiceProvider extends AbstractServiceProvider
         $count = (int) $this->settings['paging']['perPage'];
 
         if (array_key_exists('count', $arguments)) {
-            $count = (int) $this->requestArguments['count'];
+            $count = (int) $arguments['count'];
         }
 
         $maxCount = (int) $this->settings['paging']['maximumPerPage'];
@@ -1109,36 +1111,98 @@ class SolrServiceProvider extends AbstractServiceProvider
             /** @var \Solarium\QueryType\Select\Result\Result $selectResults */
             $selectResults = $connection->execute($this->query);
 
-            if ($selectResults->getNumFound() > 0) {
-                $assignments['results'] = $selectResults;
-                $resultSet = $selectResults->getDocuments();
+            if ($arguments['group']) {
+                // special handling for grouped results required
+				
+				$field = null;
+                $groupSetting = $this->settings['grouping'];
+                if ($arguments["groupfield"]){
+                    $field = $arguments["groupfield"];
+                } else{
+                    $field = $groupSetting["field"];
+                }
 
-                // the actual result is at position 0 (for the first document) or 1 (otherwise).
-                $document = $resultSet[$index['resultIndexOffset']];
-                if ($document['id'] === $id) {
-                    $assignments['document'] = $document;
-                    if (0 !== $index['resultIndexOffset']) {
-                        $assignments['document-previous'] = $resultSet[0];
-                        $assignments['document-previous-number'] = $index['previousIndex'] + 1;
-                    }
+                $groups = $selectResults->getGrouping();
+				$group = $groups->getGroup($field);
+				$numFound = $group->getMatches();
+				$valueGroups = $group->getValueGroups();
+				$numValueGroups = count($valueGroups);
 
-                    $nextResultIndex = 1 + $index['resultIndexOffset'];
-                    if (count($resultSet) > $nextResultIndex) {
-                        $assignments['document-next'] = $resultSet[$nextResultIndex];
-                        $assignments['document-next-number'] = $index['nextIndex'] + 1;
+				$document = null;
+				$docIdx = (int)$arguments["position"];
+				
+				$idx = 0;
+				$vidx = 0;
+				
+				foreach ($valueGroups as $valueGroup) {
+					$docs = $valueGroup->getDocuments();
+					$numDocsInGroup = count($docs);
+					
+					for ($i=0; $i < $numDocsInGroup; ++$i) {
+						$doc = $docs[$i];
+						if ($doc["id"] == $id) {
+							$document = $doc;
+							
+                            $assignments["document-previous"] = $docs[$i-1];
+                            $assignments['document-previous-number'] = $idx;
+                            $assignments["document-next"] = $docs[$i+1];
+                            $assignments['document-next-number'] = $idx+2;
+							
+							if ($i == 0 ) { // first doc in group
+								if ($vidx > 0) {
+									$prevVGdocs = $valueGroups[$vidx-1]->getDocuments();
+									$assignments["document-previous"] = $prevVGdocs[count($prevVGdocs)-1];
+								}
+							} 
+							if ($i == $numDocsInGroup - 1) { // last doc in current group
+								if ($vidx != $numValueGroups) {
+									$nextVGdocs = $valueGroups[$vidx+1]->getDocuments();
+									$assignments["document-next"] = $nextVGdocs[0];
+								}
+							}
+							break;
+						}
+						++$idx;
+					}
+					if ($document){
+						break;
+					}
+					++$vidx;
+				}
+				$assignments['document'] = $document;
+				$assignments['results'] = ["numfound" => $numFound];
+            } else {
+                if ($selectResults->getNumFound() > 0) {
+                    $assignments['results'] = $selectResults;
+                    $resultSet = $selectResults->getDocuments();
+
+                    // the actual result is at position 0 (for the first document) or 1 (otherwise).
+                    $document = $resultSet[$index['resultIndexOffset']];
+                    if ($document['id'] === $id) {
+                        $assignments['document'] = $document;
+                        if (0 !== $index['resultIndexOffset']) {
+                            $assignments['document-previous'] = $resultSet[0];
+                            $assignments['document-previous-number'] = $index['previousIndex'] + 1;
+                        }
+
+                        $nextResultIndex = 1 + $index['resultIndexOffset'];
+                        if (count($resultSet) > $nextResultIndex) {
+                            $assignments['document-next'] = $resultSet[$nextResultIndex];
+                            $assignments['document-next-number'] = $index['nextIndex'] + 1;
+                        }
+                    } else {
+                        $message =  sprintf('»detail« action query with underlying query could not retrieve record id »%s«.', $id);
+                        $this->logger->error(
+                            $message,
+                            ['arguments' => $arguments]
+                        );
+                        $assignments["error"] = ["solr" => $message];
                     }
                 } else {
-                    $message =  sprintf('»detail« action query with underlying query could not retrieve record id »%s«.', $id);
-                    $this->logger->error(
-                        $message,
-                        ['arguments' => $arguments]
-                    );
+                    $message = '»detail« action query with underlying query returned no results.';
+                    $this->logger->error($message, ['arguments' => $arguments]);
                     $assignments["error"] = ["solr" => $message];
                 }
-            } else {
-                $message = '»detail« action query with underlying query returned no results.';
-                $this->logger->error($message, ['arguments' => $arguments]);
-                $assignments["error"] = ["solr" => $message];
             }
         } catch (HttpException $httpException) {
             $this->logger->error(
@@ -1457,11 +1521,11 @@ class SolrServiceProvider extends AbstractServiceProvider
      * @param array $arguments request arguments
      */
     private function addGrouping ($arguments) {
-	    $limit = -1;
-	    $field = null;
-	    
 	    if (!empty($arguments["group"]) && $arguments["group"]){
             if (!empty($this->settings['grouping'])) {
+                $limit = -1;
+                $field = null;
+
                 $groupSetting = $this->settings['grouping'];
                 
                 if ($arguments["groupfield"]){
