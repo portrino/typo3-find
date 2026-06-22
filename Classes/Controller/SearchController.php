@@ -227,7 +227,7 @@ class SearchController extends ActionController
     /**
      * Initialisation and setup.
      */
-    protected function initializeAction()
+    protected function initializeAction(): void
     {
         ksort($this->settings['queryFields']);
 
