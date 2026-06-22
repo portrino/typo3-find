@@ -39,7 +39,7 @@ class IsArrayViewHelper extends AbstractViewHelper
     /**
      * Register arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('subject', 'array|string|int', 'The variable to inspect', false, null);
@@ -53,11 +53,11 @@ class IsArrayViewHelper extends AbstractViewHelper
         $result = false;
 
         $subject = $arguments['subject'];
-        if (null === $subject) {
+        if ($subject === null) {
             $subject = $renderChildrenClosure();
         }
 
-        if (null !== $subject) {
+        if ($subject !== null) {
             $result = is_array($subject);
         }
 

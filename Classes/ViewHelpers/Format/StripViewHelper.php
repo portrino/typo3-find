@@ -46,15 +46,23 @@ class StripViewHelper extends AbstractViewHelper
     /**
      * Registers own arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
-        $this->registerArgument('string', 'string',
-            'The string to strip leading and trailing whitespace from; If not given, the tag content is used', false,
-            null);
-        $this->registerArgument('strip', 'string',
-            'The characters to strip from the string; If not given, defaults to standard PHP whitespace setting', false,
-            null);
+        $this->registerArgument(
+            'string',
+            'string',
+            'The string to strip leading and trailing whitespace from; If not given, the tag content is used',
+            false,
+            null
+        );
+        $this->registerArgument(
+            'strip',
+            'string',
+            'The characters to strip from the string; If not given, defaults to standard PHP whitespace setting',
+            false,
+            null
+        );
     }
 
     /**
@@ -66,10 +74,10 @@ class StripViewHelper extends AbstractViewHelper
         RenderingContextInterface $renderingContext
     ) {
         $string = $arguments['string'];
-        if (null === $string) {
+        if ($string === null) {
             $string = $renderChildrenClosure();
         }
 
-        return null === $arguments['strip'] ? trim($string) : trim($string, $arguments['strip']);
+        return $arguments['strip'] === null ? trim($string) : trim($string, $arguments['strip']);
     }
 }

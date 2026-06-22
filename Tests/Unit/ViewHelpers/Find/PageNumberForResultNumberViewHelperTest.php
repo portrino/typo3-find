@@ -57,7 +57,7 @@ class PageNumberForResultNumberViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function pageNumberIsCorrectlyCalculated()
+    public function pageNumberIsCorrectlyCalculated(): void
     {
         $resultNumber = 55;
         $resultsPerPage = 20;
@@ -74,7 +74,7 @@ class PageNumberForResultNumberViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function pageNumerWhenResultIsZero()
+    public function pageNumerWhenResultIsZero(): void
     {
         $resultNumber = 0;
         $resultsPerPage = 20;
@@ -92,7 +92,7 @@ class PageNumberForResultNumberViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function divisionByZeroIsCaught()
+    public function divisionByZeroIsCaught(): void
     {
         $resultNumber = 0;
         $resultsPerPage = 0;
@@ -106,7 +106,7 @@ class PageNumberForResultNumberViewHelperTest extends ViewHelperBaseTestcase
         self::assertSame($expected, $this->fixture->initializeArgumentsAndRender());
     }
 
-    public function pageNumberFallBackForZeroResultsPerPage()
+    public function pageNumberFallBackForZeroResultsPerPage(): void
     {
         $resultNumber = 55;
         $resultsPerPage = 0;

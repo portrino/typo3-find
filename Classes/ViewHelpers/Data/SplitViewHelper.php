@@ -45,7 +45,7 @@ class SplitViewHelper extends AbstractViewHelper
     /**
      * Register arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('string', 'string', 'The string to split into components', false, null);
@@ -61,7 +61,7 @@ class SplitViewHelper extends AbstractViewHelper
         RenderingContextInterface $renderingContext
     ) {
         $string = $arguments['string'];
-        if (null === $string) {
+        if ($string === null) {
             $string = $renderChildrenClosure();
         }
 
@@ -69,7 +69,7 @@ class SplitViewHelper extends AbstractViewHelper
             $arguments['separator'] = self::DEFAULT_SEPARATOR;
         }
 
-        if(!is_string($string)) {
+        if (!is_string($string)) {
             return $string;
         }
 

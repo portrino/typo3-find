@@ -65,7 +65,7 @@ class CSVLineViewHelperTest extends ViewHelperBaseTestcase
             'fieldEnclosure' => $fieldEnclosure,
         ]);
 
-        $expected = 'hrdr,behedeti,chub'.PHP_EOL;
+        $expected = 'hrdr,behedeti,chub' . PHP_EOL;
         self::assertSame($expected, $this->fixture->initializeArgumentsAndRender());
     }
 
@@ -84,7 +84,7 @@ class CSVLineViewHelperTest extends ViewHelperBaseTestcase
             'fieldEnclosure' => $fieldEnclosure,
         ]);
 
-        $expected = 'hrdr;behedeti;chub'.PHP_EOL;
+        $expected = 'hrdr;behedeti;chub' . PHP_EOL;
         self::assertSame($expected, $this->fixture->initializeArgumentsAndRender());
     }
 
@@ -103,7 +103,7 @@ class CSVLineViewHelperTest extends ViewHelperBaseTestcase
             'fieldEnclosure' => $fieldEnclosure,
         ]);
 
-        $expected = '"hrdr horus";behedeti;"chub budan"'.PHP_EOL;
+        $expected = '"hrdr horus";behedeti;"chub budan"' . PHP_EOL;
         self::assertSame($expected, $this->fixture->initializeArgumentsAndRender());
     }
 
@@ -122,7 +122,7 @@ class CSVLineViewHelperTest extends ViewHelperBaseTestcase
             'fieldEnclosure' => $fieldEnclosure,
         ]);
 
-        $expected = '/hrdr horus/;behedeti;/chub budan/'.PHP_EOL;
+        $expected = '/hrdr horus/;behedeti;/chub budan/' . PHP_EOL;
         self::assertSame($expected, $this->fixture->initializeArgumentsAndRender());
     }
 }

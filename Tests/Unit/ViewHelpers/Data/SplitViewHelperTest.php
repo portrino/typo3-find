@@ -52,7 +52,7 @@ class SplitViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function stringIsExplodedCorrectlyWithoutPassedSeparator()
+    public function stringIsExplodedCorrectlyWithoutPassedSeparator(): void
     {
         $string = 'hrdr, behedeti, horus';
         $expected = ['hrdr', 'behedeti', 'horus'];
@@ -68,7 +68,7 @@ class SplitViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function stringIsExplodedCorrectlyWithPassedSeparator()
+    public function stringIsExplodedCorrectlyWithPassedSeparator(): void
     {
         $string = 'hrdr, behedeti, horus';
         $separator = ', ';
@@ -85,7 +85,7 @@ class SplitViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function stringIsExplodedCorrectlyWithNonDefaultSeparator()
+    public function stringIsExplodedCorrectlyWithNonDefaultSeparator(): void
     {
         $string = 'hrdrhorus behedetihorus horus';
         $separator = 'horus ';
@@ -101,7 +101,7 @@ class SplitViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function emptyArrayIsReturnedWhenPassingIt()
+    public function emptyArrayIsReturnedWhenPassingIt(): void
     {
         $string = '';
         $expected = [''];

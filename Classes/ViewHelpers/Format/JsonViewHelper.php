@@ -38,7 +38,6 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class JsonViewHelper extends AbstractViewHelper
 {
-
     /**
      * As this ViewHelper renders HTML, the output must not be escaped.
      *
@@ -49,7 +48,7 @@ class JsonViewHelper extends AbstractViewHelper
     /**
      * Registers own arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('data', 'mixed', 'The data to output as JSON', false, null);

@@ -45,9 +45,9 @@ abstract class AbstractRenderer
      */
     public static function instantiateSubclassForType($type)
     {
-        if ('rdf' === $type) {
+        if ($type === 'rdf') {
             $instance = GeneralUtility::makeInstance(RDFRenderer::class);
-        } elseif ('json-ld' === $type) {
+        } elseif ($type === 'json-ld') {
             $instance = GeneralUtility::makeInstance(JSONLDRenderer::class);
         } else {
             $instance = GeneralUtility::makeInstance(TurtleRenderer::class);
@@ -59,7 +59,7 @@ abstract class AbstractRenderer
     /**
      * @param $prefixes
      */
-    public function setPrefixes($prefixes)
+    public function setPrefixes($prefixes): void
     {
         $this->prefixes = $prefixes;
     }

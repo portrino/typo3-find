@@ -49,7 +49,7 @@ class JSONLDRenderer extends AbstractRenderer implements RendererInterface
             foreach ($subjectStatements as $predicateURI => $objects) {
                 // loop over objects
                 foreach ($objects as $objectString => $properties) {
-                    if (null === $properties) {
+                    if ($properties === null) {
                         $object = $this->prefixedName($objectString);
                     } else {
                         $object = ['@value' => $objectString];
@@ -101,11 +101,12 @@ class JSONLDRenderer extends AbstractRenderer implements RendererInterface
     protected function prefixedName($name)
     {
         foreach ($this->prefixes as $acronym => $URI) {
-            if (0 === strpos($name, $URI)) {
-                $name = str_replace($URI, $acronym.':', $name);
+            if (strpos($name, $URI) === 0) {
+                $name = str_replace($URI, $acronym . ':', $name);
                 $this->usedPrefixes[$acronym] = true;
                 break;
-            } elseif (0 === strpos($name, $acronym.':')) {
+            }
+            if (strpos($name, $acronym . ':') === 0) {
                 $this->usedPrefixes[$acronym] = true;
                 break;
             }

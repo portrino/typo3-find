@@ -28,19 +28,21 @@ namespace Subugoe\Find\Controller;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
-use Psr\Log\LoggerInterface;
-use TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException;
-use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
 use Psr\Http\Message\ResponseInterface;
-use TYPO3\CMS\Extbase\Http\ForwardResponse;
-use TYPO3\CMS\Core\Utility\HttpUtility;
+use Psr\Log\LoggerInterface;
 use Subugoe\Find\Service\ServiceProviderInterface;
 use Subugoe\Find\Utility\ArrayUtility;
 use Subugoe\Find\Utility\FrontendUtility;
 use TYPO3\CMS\Core\Log\LogManagerInterface;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\ArrayUtility as CoreArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Http\ForwardResponse;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException;
+use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 class SearchController extends ActionController
 {
@@ -69,7 +71,7 @@ class SearchController extends ActionController
             FrontendUtility::addQueryInformationAsJavaScript(
                 $underlyingQueryInfo['q'],
                 $this->settings,
-                (int) $underlyingQueryInfo['position'],
+                (int)$underlyingQueryInfo['position'],
                 $arguments
             );
         }
@@ -79,29 +81,29 @@ class SearchController extends ActionController
         $this->view->assignMultiple($detail);
         $this->view->assignMultiple([
             'arguments' => $arguments,
-            'config' => $this->searchProvider->getConfiguration()
+            'config' => $this->searchProvider->getConfiguration(),
         ]);
         return $this->htmlResponse();
     }
 
     /**
-	 * Citation Action.
-	 */
-	public function citationAction(): ResponseInterface {
-
-		$arguments = $this->requestArguments;
-        $detail = $this->searchProvider->getDocumentById($arguments["id"]);
+     * Citation Action.
+     */
+    public function citationAction(): ResponseInterface
+    {
+        $arguments = $this->requestArguments;
+        $detail = $this->searchProvider->getDocumentById($arguments['id']);
 
         $this->addStandardAssignments();
-        
+
         $this->view->assignMultiple($detail);
         $this->view->assignMultiple([
             'arguments' => $arguments,
             'config' => $this->searchProvider->getConfiguration(),
-            'type' => $arguments['type']
+            'type' => $arguments['type'],
         ]);
         return $this->htmlResponse();
-	}
+    }
 
     /**
      * Index Action.
@@ -110,109 +112,117 @@ class SearchController extends ActionController
     {
         if (array_key_exists('id', $this->requestArguments)) {
             return new ForwardResponse('detail');
-        } elseif (array_key_exists('rsn', $this->requestArguments)) {
-			return new ForwardResponse('redirect');
-		} elseif (array_key_exists('bc', $this->requestArguments)) {
-			return new ForwardResponse('redirect');
-		} elseif (array_key_exists('ppn', $this->requestArguments)) {
-			return new ForwardResponse('redirect');
-        } elseif (array_key_exists('oclc', $this->requestArguments)) {
-			return new ForwardResponse('redirect');
-        } else {
-            $this->searchProvider->setCounter();
-            FrontendUtility::addQueryInformationAsJavaScript(
-                $this->searchProvider->getRequestArguments()['q'],
-                $this->settings,
-                null,
-                $this->searchProvider->getRequestArguments()
-            );
+        }
+        if (array_key_exists('rsn', $this->requestArguments)) {
+            return new ForwardResponse('redirect');
+        }
+        if (array_key_exists('bc', $this->requestArguments)) {
+            return new ForwardResponse('redirect');
+        }
+        if (array_key_exists('ppn', $this->requestArguments)) {
+            return new ForwardResponse('redirect');
+        }
+        if (array_key_exists('oclc', $this->requestArguments)) {
+            return new ForwardResponse('redirect');
+        }
+        $this->searchProvider->setCounter();
+        FrontendUtility::addQueryInformationAsJavaScript(
+            $this->searchProvider->getRequestArguments()['q'] ?? [],
+            $this->settings,
+            null,
+            $this->searchProvider->getRequestArguments()
+        );
 
-            $this->addStandardAssignments();
-            $defaultQuery = $this->searchProvider->getDefaultQuery();
+        $this->addStandardAssignments();
+        $defaultQuery = $this->searchProvider->getDefaultQuery();
 
-            // Decode facet keys for display
-            $arguments = $this->searchProvider->getRequestArguments();
-            if (isset($arguments['facet']) && is_array($arguments['facet'])) {
-                foreach ($arguments['facet'] as $facetId => $facetTerms) {
-                    if (is_array($facetTerms)) {
-                        $decodedTerms = [];
-                        foreach ($facetTerms as $term => $value) {
-                            $decodedTerm = urldecode($term);
-                            $decodedTerms[$decodedTerm] = $value;
-                        }
-                        $arguments['facet'][$facetId] = $decodedTerms;
+        // Decode facet keys for display
+        $arguments = $this->searchProvider->getRequestArguments();
+        if (isset($arguments['facet']) && is_array($arguments['facet'])) {
+            foreach ($arguments['facet'] as $facetId => $facetTerms) {
+                if (is_array($facetTerms)) {
+                    $decodedTerms = [];
+                    foreach ($facetTerms as $term => $value) {
+                        $decodedTerm = urldecode($term);
+                        $decodedTerms[$decodedTerm] = $value;
                     }
-                }
-            }
-
-            $viewValues = [
-                'arguments' => $arguments,
-                'config' => $this->searchProvider->getConfiguration(),
-            ];
-
-            CoreArrayUtility::mergeRecursiveWithOverrule($viewValues, $defaultQuery);
-            $this->view->assignMultiple($viewValues);
-
-            // if there are no search parameters provided, redirect to the URL given in setting 'nosearchRedirect'
-            if ($defaultQuery['noSearch']) {
-                if(strlen($this->settings['nosearchRedirect']) > 0) {
-                    HttpUtility::redirect($this->settings['nosearchRedirect']);
+                    $arguments['facet'][$facetId] = $decodedTerms;
                 }
             }
         }
+
+        $viewValues = [
+            'arguments' => $arguments,
+            'config' => $this->searchProvider->getConfiguration(),
+        ];
+
+        CoreArrayUtility::mergeRecursiveWithOverrule($viewValues, $defaultQuery);
+        $this->view->assignMultiple($viewValues);
+
+        // if there are no search parameters provided, redirect to the URL given in setting 'nosearchRedirect'
+        if (isset($defaultQuery['noSearch']) && $defaultQuery['noSearch']) {
+            if (isset($this->settings['nosearchRedirect']) && $this->settings['nosearchRedirect'] !== '') {
+                $response = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\Psr\Http\Message\ResponseFactoryInterface::class)->createResponse(\TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_303)->withAddedHeader('location', $this->settings['nosearchRedirect']);
+                throw new \TYPO3\CMS\Core\Http\PropagateResponseException($response, 8491898626);
+            }
+        }
+
         return $this->htmlResponse();
     }
 
     /**
-	 * Redirect View to detail action.
-	 */
-	public function redirectAction() {
-		$queryArguments = ['q' => []];
+     * Redirect View to detail action.
+     */
+    public function redirectAction(): void
+    {
+        $queryArguments = ['q' => []];
         $queryArgumentsDefault = '';
 
-		if (array_key_exists('rsn', $this->requestArguments)) {
-			$queryArguments['q']['rsn'] = $this->requestArguments['rsn'];
+        if (array_key_exists('rsn', $this->requestArguments)) {
+            $queryArguments['q']['rsn'] = $this->requestArguments['rsn'];
             $queryArgumentsDefault = $this->requestArguments['rsn'];
-		} elseif (array_key_exists('bc', $this->requestArguments)) {
-			$queryArguments['q']['barcode'] = $this->requestArguments['bc'];
+        } elseif (array_key_exists('bc', $this->requestArguments)) {
+            $queryArguments['q']['barcode'] = $this->requestArguments['bc'];
             $queryArgumentsDefault = $this->requestArguments['bc'];
-		} elseif (array_key_exists('ppn', $this->requestArguments)) {
-			$queryArguments['q']['ppn'] = $this->requestArguments['ppn'];
+        } elseif (array_key_exists('ppn', $this->requestArguments)) {
+            $queryArguments['q']['ppn'] = $this->requestArguments['ppn'];
             $queryArgumentsDefault = $this->requestArguments['ppn'];
-		} elseif (array_key_exists('oclc', $this->requestArguments)) {
-			$queryArguments['q']['oclc'] = $this->requestArguments['oclc'];
+        } elseif (array_key_exists('oclc', $this->requestArguments)) {
+            $queryArguments['q']['oclc'] = $this->requestArguments['oclc'];
             $queryArgumentsDefault = $this->requestArguments['oclc'];
-		}
+        }
 
         $selectResults =$this->searchProvider->search($queryArguments);
 
-		if (count($selectResults) === 1) {
-			$resultSet = $selectResults->getDocuments();
+        if (count($selectResults) === 1) {
+            $resultSet = $selectResults->getDocuments();
 
-			$arguments = [
-				'tx_find_find' => [
-					'action' => 'detail',
-					'controller' => 'Search',
-					'id' => $resultSet[0]['id']
-                ]
-			];
-		} else {
             $arguments = [
-				'tx_find_find' => [
-					'action' => 'index',
-					'controller' => 'Search',
+                'tx_find_find' => [
+                    'action' => 'detail',
+                    'controller' => 'Search',
+                    'id' => $resultSet[0]['id'],
+                ],
+            ];
+        } else {
+            $arguments = [
+                'tx_find_find' => [
+                    'action' => 'index',
+                    'controller' => 'Search',
                     'q' => [
-                        'default' => $queryArgumentsDefault
-					]
-				]
-			];
-		}
+                        'default' => $queryArgumentsDefault,
+                    ],
+                ],
+            ];
+        }
 
-        $uri = $this->uriBuilder->reset()->setTargetPageUid(intval($GLOBALS['TSFE']->id))->setCreateAbsoluteUri(true)->setArguments($arguments)->build();
-        HttpUtility::redirect($uri);
+        $uri = $this->uriBuilder->reset()->setTargetPageUid((int)($GLOBALS['TSFE']->id))->setCreateAbsoluteUri(true)->setArguments($arguments)->build();
 
-		die();
-	}
+        $response = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\Psr\Http\Message\ResponseFactoryInterface::class)->createResponse(\TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_303)->withAddedHeader('location', $uri);
+        throw new \TYPO3\CMS\Core\Http\PropagateResponseException($response, 6097036578);
+
+        die();
+    }
 
     /**
      * Initialisation and setup.
@@ -244,7 +254,8 @@ class SearchController extends ActionController
     /**
      * Query indexed terms for given fields.
      */
-    public function termAction(): ResponseInterface{
+    public function termAction(): ResponseInterface
+    {
         $results = $this->searchProvider->getTerms($this->searchProvider->getRequestArguments());
         $this->view->assign('terms', $results);
         return $this->htmlResponse();
@@ -253,16 +264,30 @@ class SearchController extends ActionController
     /**
      * Assigns standard variables to the view.
      */
-    protected function addStandardAssignments()
+    protected function addStandardAssignments(): void
     {
+        $contentObject = $this->request->getAttribute('currentContentObject');
+        $frontendController = $this->request->getAttribute('frontend.controller') ?? $GLOBALS['TSFE'] ?? null;
+        $siteLanguage = $this->request->getAttribute('language');
+
+        if (!$siteLanguage instanceof SiteLanguage && $frontendController instanceof TypoScriptFrontendController) {
+            $siteLanguage = $frontendController->getLanguage();
+        }
+
         $this->searchProvider->setConfigurationValue('extendedSearch', $this->searchProvider->isExtendedSearch());
         $this->searchProvider->setConfigurationValue(
             'uid',
-            $this->configurationManager->getContentObject()->data['uid']
+            $contentObject instanceof ContentObjectRenderer ? (int)($contentObject->data['uid'] ?? 0) : 0
         );
         $this->searchProvider->setConfigurationValue('prefixID', 'tx_find_find');
-        $this->searchProvider->setConfigurationValue('pageTitle', $GLOBALS['TSFE']->page['title']);
-        $this->searchProvider->setConfigurationValue('language', $GLOBALS['TSFE']->config['config']['language']);
+        $this->searchProvider->setConfigurationValue(
+            'pageTitle',
+            $frontendController instanceof TypoScriptFrontendController ? (string)($frontendController->page['title'] ?? '') : ''
+        );
+        $this->searchProvider->setConfigurationValue(
+            'language',
+            $siteLanguage instanceof SiteLanguage ? $siteLanguage->getTypo3Language() : ''
+        );
     }
 
     /**

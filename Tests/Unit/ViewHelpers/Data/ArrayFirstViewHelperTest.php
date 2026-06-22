@@ -51,7 +51,7 @@ class ArrayFirstViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function isFirstElementOfAnArrayReturned()
+    public function isFirstElementOfAnArrayReturned(): void
     {
         $array = ['hrdr', 'horus', 'behedeti'];
         $this->fixture->setArguments(['array' => $array]);
@@ -62,7 +62,7 @@ class ArrayFirstViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function nullIsReturnedOnNullValue()
+    public function nullIsReturnedOnNullValue(): void
     {
         $array = null;
         $this->fixture->setArguments(['array' => $array]);
@@ -73,7 +73,7 @@ class ArrayFirstViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function nullIsReturnedWhenPassingAStringInsteadOfAnArray()
+    public function nullIsReturnedWhenPassingAStringInsteadOfAnArray(): void
     {
         $array = 'hrdr';
         $this->fixture->setArguments(['array' => $array]);
@@ -84,7 +84,7 @@ class ArrayFirstViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function theValueFromTheFirstArrayIsReturnedOnMultidimensionalArrays()
+    public function theValueFromTheFirstArrayIsReturnedOnMultidimensionalArrays(): void
     {
         $array = ['hrdr' => 'horus', 'behedeti'];
         $this->fixture->setArguments(['array' => $array]);
@@ -95,7 +95,7 @@ class ArrayFirstViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function anEmptyArrayCausesSomething()
+    public function anEmptyArrayCausesSomething(): void
     {
         $array = [];
         $this->fixture->setArguments(['array' => $array]);

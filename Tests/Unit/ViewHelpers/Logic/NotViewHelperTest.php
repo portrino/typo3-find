@@ -48,7 +48,7 @@ class NotViewHelperTest extends ViewHelperBaseTestcase
                 true,
             ],
             [
-                (bool) 1,
+                (bool)1,
                 true,
             ],
             [

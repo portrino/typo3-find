@@ -42,7 +42,7 @@ class NewArrayViewHelper extends AbstractViewHelper
     /**
      * Register arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('name', 'string', 'name of template variable to assign the result to', false, null);
@@ -51,8 +51,13 @@ class NewArrayViewHelper extends AbstractViewHelper
         $this->registerArgument('keys', 'array', 'array of keys', false, null);
         $this->registerArgument('values', 'array', 'array of values', false, []);
 
-        $this->registerArgument('global', 'boolean',
-            'whether to make the variable available to all templates coming afterwards', false, false);
+        $this->registerArgument(
+            'global',
+            'boolean',
+            'whether to make the variable available to all templates coming afterwards',
+            false,
+            false
+        );
         $this->registerArgument('omitEmptyFields', 'boolean', 'omits empty fields', false, false);
     }
 
@@ -72,8 +77,10 @@ class NewArrayViewHelper extends AbstractViewHelper
                     }
                 }
             } else {
-                $result = 'newArray View Helper: Number of keys and values must be the same.'.PHP_EOL.print_r($arguments,
-                    true);
+                $result = 'newArray View Helper: Number of keys and values must be the same.' . PHP_EOL . print_r(
+                    $arguments,
+                    true
+                );
             }
         } else {
             foreach ($arguments['values'] as $value) {
@@ -82,14 +89,14 @@ class NewArrayViewHelper extends AbstractViewHelper
         }
 
         $variableName = $arguments['name'];
-        if (null !== $variableName) {
+        if ($variableName !== null) {
             if ($renderingContext->getVariableProvider()->exists($variableName)) {
                 $renderingContext->getVariableProvider()->remove($variableName);
             }
 
             $renderingContext->getVariableProvider()->add($variableName, $result);
             $result = $renderChildrenClosure();
-            if (true !== $arguments['global']) {
+            if ($arguments['global'] !== true) {
                 $renderingContext->getVariableProvider()->remove($variableName);
             }
         }

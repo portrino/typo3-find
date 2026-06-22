@@ -41,7 +41,7 @@ class ArrayFirstViewHelper extends AbstractViewHelper
     /**
      * Register arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('array', 'array|string', 'the array to return the first value of', false, null);
@@ -55,11 +55,11 @@ class ArrayFirstViewHelper extends AbstractViewHelper
         $result = null;
 
         $array = $arguments['array'];
-        if (null === $array) {
+        if ($array === null) {
             $array = $renderChildrenClosure();
         }
 
-        if (is_array($array) && [] !== $array) {
+        if (is_array($array) && $array !== []) {
             $arrayKeys = array_keys($array);
             $firstKey = $arrayKeys[0];
             $result = $array[$firstKey];

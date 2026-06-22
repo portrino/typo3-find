@@ -49,7 +49,7 @@ class SearchControllerTest extends UnitTestCase
     /**
      * @test
      */
-    public function implementTests()
+    public function implementTests(): void
     {
         self::markTestIncomplete();
     }

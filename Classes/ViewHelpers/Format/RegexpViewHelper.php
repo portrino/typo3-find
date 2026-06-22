@@ -40,15 +40,25 @@ class RegexpViewHelper extends AbstractViewHelper
     /**
      * Registers own arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
-        $this->registerArgument('string', 'string',
-            'The string to work on; if not given, the content of the tag is used', false, null);
+        $this->registerArgument(
+            'string',
+            'string',
+            'The string to work on; if not given, the content of the tag is used',
+            false,
+            null
+        );
         $this->registerArgument('match', 'string', 'The regular expression used for matching', true);
         $this->registerArgument('replace', 'string', 'The regular expression replacement string', false, null);
-        $this->registerArgument('useMBEreg', 'boolean', 'Whether to use mb_ereg_replace() instead of preg_replace()',
-            false, false);
+        $this->registerArgument(
+            'useMBEreg',
+            'boolean',
+            'Whether to use mb_ereg_replace() instead of preg_replace()',
+            false,
+            false
+        );
     }
 
     /**
@@ -60,12 +70,12 @@ class RegexpViewHelper extends AbstractViewHelper
         RenderingContextInterface $renderingContext
     ) {
         $input = $arguments['string'];
-        if (null === $input) {
+        if ($input === null) {
             $input = $renderChildrenClosure();
         }
 
         $result = null;
-        if (null === $arguments['replace']) {
+        if ($arguments['replace'] === null) {
             $result = preg_match($arguments['match'], $input);
         } elseif (!$arguments['useMBEreg']) {
             $result = preg_replace($arguments['match'], $arguments['replace'], $input);

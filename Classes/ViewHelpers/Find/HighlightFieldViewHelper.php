@@ -26,8 +26,8 @@ namespace Subugoe\Find\ViewHelpers\Find;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-use Solarium\QueryType\Select\Result\Result;
 use Solarium\QueryType\Select\Result\Document;
+use Solarium\QueryType\Select\Result\Result;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
@@ -47,7 +47,6 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class HighlightFieldViewHelper extends AbstractViewHelper
 {
-
     /**
      * As this ViewHelper renders HTML, the output must not be escaped.
      *
@@ -58,22 +57,45 @@ class HighlightFieldViewHelper extends AbstractViewHelper
     /**
      * Registers own arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('results', Result::class, 'Query results', true);
-        $this->registerArgument('document', Document::class, 'Result document to work on',
-            true);
+        $this->registerArgument(
+            'document',
+            Document::class,
+            'Result document to work on',
+            true
+        );
         $this->registerArgument('field', 'string', 'name of field in document to highlight', true);
-        $this->registerArgument('alternateField', 'string',
-            'name of alternate field in document to use for highlighting', false, null);
-        $this->registerArgument('index', 'int', 'if the field is an array: index of the single element to highlight',
-            false);
+        $this->registerArgument(
+            'alternateField',
+            'string',
+            'name of alternate field in document to use for highlighting',
+            false,
+            null
+        );
+        $this->registerArgument(
+            'index',
+            'int',
+            'if the field is an array: index of the single element to highlight',
+            false
+        );
         $this->registerArgument('idKey', 'string', 'name of the field in document that is its ID', false, 'id');
-        $this->registerArgument('highlightTagOpen', 'string', 'opening tag to insert to begin highlighting', false,
-            '<em class="highlight">');
-        $this->registerArgument('highlightTagClose', 'string', 'closing tag to insert to end highlighting', false,
-            '</em>');
+        $this->registerArgument(
+            'highlightTagOpen',
+            'string',
+            'opening tag to insert to begin highlighting',
+            false,
+            '<em class="highlight">'
+        );
+        $this->registerArgument(
+            'highlightTagClose',
+            'string',
+            'closing tag to insert to end highlighting',
+            false,
+            '</em>'
+        );
         $this->registerArgument('raw', 'boolean', 'whether to not HTML escape the output', false, false);
     }
 
@@ -88,12 +110,11 @@ class HighlightFieldViewHelper extends AbstractViewHelper
         if ($arguments['document']) {
             $fields = $arguments['document']->getFields();
             $fieldContent = $fields[$arguments['field']];
-            if (null !== $arguments['index']) {
+            if ($arguments['index'] !== null) {
                 if (is_array($fieldContent) && count($fieldContent) > $arguments['index']) {
                     $fieldContent = $fieldContent[$arguments['index']];
-                } else {
-                    // TODO: error message
                 }
+                // TODO: error message
             }
 
             return self::highlightField($fieldContent, $arguments);
@@ -167,7 +188,7 @@ class HighlightFieldViewHelper extends AbstractViewHelper
 
         foreach ($highlightInfo as $highlightItem) {
             $highlightItemStripped = str_replace(['\ueeee', '\ueeef'], ['', ''], $highlightItem);
-            if (null !== strpos($fieldString, $highlightItemStripped)) {
+            if (strpos($fieldString, $highlightItemStripped) !== null) {
                 // HTML escape the text here if not explicitly configured to not do so.
                 // Use f:format.raw in the template to avoid double escaping the HTML tags.
                 if (!$arguments['raw']) {
@@ -177,14 +198,15 @@ class HighlightFieldViewHelper extends AbstractViewHelper
                 $highlightItemMarkedUp = str_replace(
                     ['\ueeee', '\ueeef'],
                     [$arguments['highlightTagOpen'], $arguments['highlightTagClose']],
-                    $highlightItem);
+                    $highlightItem
+                );
                 $result = str_replace($highlightItemStripped, $highlightItemMarkedUp, $fieldString);
                 break;
             }
         }
 
         // If no highlighted string is present, use the original one.
-        if (null === $result) {
+        if ($result === null) {
             $result = $arguments['raw'] ? $fieldString : htmlspecialchars($fieldString);
         }
 

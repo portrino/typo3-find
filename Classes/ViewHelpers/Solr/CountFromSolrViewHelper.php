@@ -22,9 +22,8 @@ namespace Subugoe\Find\ViewHelpers\Solr;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Solarium\QueryType\Select\Query\Query;
 use Solarium\Client;
+use Solarium\QueryType\Select\Query\Query;
 use Solarium\QueryType\Select\Result\Result;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
@@ -42,13 +41,13 @@ class CountFromSolrViewHelper extends AbstractViewHelper
      */
     protected $solr;
 
-    public function initialize()
+    public function initialize(): void
     {
         $configuration = [
             'endpoint' => [
                 'localhost' => [
                     'host' => $this->templateVariableContainer->get('settings')['connection']['host'],
-                    'port' => (int) $this->templateVariableContainer->get('settings')['connection']['port'],
+                    'port' => (int)$this->templateVariableContainer->get('settings')['connection']['port'],
                     'path' => $this->templateVariableContainer->get('settings')['connection']['path'],
                     'timeout' => $this->templateVariableContainer->get('settings')['connection']['timeout'],
                     'scheme' => $this->templateVariableContainer->get('settings')['connection']['scheme'],
@@ -61,19 +60,17 @@ class CountFromSolrViewHelper extends AbstractViewHelper
 
     /**
      * Register arguments.
-     *
-     * @return void
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('query', 'string|array', 'Solr querystring or array of query fields and their query values.', true);
         $this->registerArgument('activeFacets', 'array', 'Array with active facets', false);
     }
 
-    public function render()
+    public function render(): void
     {
-        $findParameter = GeneralUtility::_GP('tx_find_find');
+        $findParameter = $GLOBALS['TYPO3_REQUEST']->getParsedBody()['tx_find_find'] ?? $GLOBALS['TYPO3_REQUEST']->getQueryParams()['tx_find_find'] ?? null;
 
         $activeFacets = $this->arguments['activeFacets'];
         $queryConcat = $this->arguments['queryConcat'];
@@ -81,19 +78,19 @@ class CountFromSolrViewHelper extends AbstractViewHelper
         $newQuery = $this->arguments['query'];
 
         if ($findParameter['q']['default']) {
-            $newQuery = $newQuery.' AND '.$findParameter['q']['default'];
+            $newQuery = $newQuery . ' AND ' . $findParameter['q']['default'];
         }
 
         if ($activeFacets) {
             foreach ($activeFacets as $facetInfo) {
                 foreach ($facetInfo as $facet) {
-                    $newQuery = $newQuery.' AND '.$facet['query'];
+                    $newQuery = $newQuery . ' AND ' . $facet['query'];
                 }
             }
         }
 
         if ($queryConcat) {
-            $newQuery .= ' AND '.$queryConcat;
+            $newQuery .= ' AND ' . $queryConcat;
         }
 
         $query = $this->createQuery($newQuery);
@@ -117,7 +114,7 @@ class CountFromSolrViewHelper extends AbstractViewHelper
      *
      * @param Query $query
      */
-    private function createQueryComponents(&$query)
+    private function createQueryComponents(&$query): void
     {
         // Shards
         if ($this->templateVariableContainer->get('settings')['shards'] && count($this->templateVariableContainer->get('settings')['shards'])) {
@@ -133,11 +130,11 @@ class CountFromSolrViewHelper extends AbstractViewHelper
      *
      * @param Query $query
      */
-    private function addTypoScriptFilters($query)
+    private function addTypoScriptFilters($query): void
     {
         if (!empty($this->templateVariableContainer->get('settings')['additionalFilters'])) {
             foreach ($this->templateVariableContainer->get('settings')['additionalFilters'] as $key => $filterQuery) {
-                $query->createFilterQuery('additionalFilter-'.$key)
+                $query->createFilterQuery('additionalFilter-' . $key)
                     ->setQuery($filterQuery);
             }
         }

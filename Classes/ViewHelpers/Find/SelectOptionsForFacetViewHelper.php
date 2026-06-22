@@ -39,17 +39,32 @@ class SelectOptionsForFacetViewHelper extends AbstractViewHelper
     /**
      * Registers own arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('values', 'array', 'values array for a facet', false, []);
-        $this->registerArgument('showCount', 'boolean', 'include the item count for the facet in the label?', false,
-            false);
-        $this->registerArgument('leadingBlank', 'boolean', 'begin the select with a blank item? (for jquery.chosen)',
-            false, false);
+        $this->registerArgument(
+            'showCount',
+            'boolean',
+            'include the item count for the facet in the label?',
+            false,
+            false
+        );
+        $this->registerArgument(
+            'leadingBlank',
+            'boolean',
+            'begin the select with a blank item? (for jquery.chosen)',
+            false,
+            false
+        );
         $this->registerArgument('sortByName', 'boolean', 'sort the items alphabetically?', false, false);
-        $this->registerArgument('sortPrefixSeparator', 'string',
-            'sort the whole string but only keep the part after the separator for display', false, null);
+        $this->registerArgument(
+            'sortPrefixSeparator',
+            'string',
+            'sort the whole string but only keep the part after the separator for display',
+            false,
+            null
+        );
         $this->registerArgument('localisationPrefix', 'string', 'prefix for the localisation key', false, '');
     }
 
@@ -71,7 +86,7 @@ class SelectOptionsForFacetViewHelper extends AbstractViewHelper
         if (!empty($arguments['values'])) {
             foreach ($arguments['values'] as $item => $count) {
                 // Localise item name.
-                $localisationKey = $arguments['localisationPrefix'].$item;
+                $localisationKey = $arguments['localisationPrefix'] . $item;
 
                 $localisedItem = LocalizationUtility::translate($localisationKey, 'find');
                 if (!$localisedItem) {
@@ -79,7 +94,7 @@ class SelectOptionsForFacetViewHelper extends AbstractViewHelper
                 }
 
                 // Append count to item name?
-                $result[$item] = $localisedItem.($arguments['showCount'] ? ' ('.$count.')' : '');
+                $result[$item] = $localisedItem . ($arguments['showCount'] ? ' (' . $count . ')' : '');
             }
         }
 

@@ -39,7 +39,7 @@ class ItemViewHelper extends AbstractViewHelper
     /**;
      * Registers own arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('subject', 'string', 'The triple’s subject', true);
@@ -47,15 +47,20 @@ class ItemViewHelper extends AbstractViewHelper
         $this->registerArgument('object', 'string', 'The triple’s object', false, null);
         $this->registerArgument('objectType', 'string', 'Type of the triple’s object', false, null);
         $this->registerArgument('language', 'string', 'ISO 639-1 language code for the triple’s object', false, null);
-        $this->registerArgument('name', 'string', 'The name of the template variable to store the data in', false,
-            'linkedDataContainer');
+        $this->registerArgument(
+            'name',
+            'string',
+            'The name of the template variable to store the data in',
+            false,
+            'linkedDataContainer'
+        );
     }
 
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext
-    ) {
+    ): void {
         $container = $renderingContext->getVariableProvider()->get($arguments['name']);
         if (!$container[$arguments['subject']]) {
             $container[$arguments['subject']] = [];
@@ -65,14 +70,14 @@ class ItemViewHelper extends AbstractViewHelper
             $container[$arguments['subject']][$arguments['predicate']] = [];
         }
 
-        if (null !== $arguments['object']) {
-            if(is_array($arguments['object'])) {
-				foreach ($arguments['object'] as $value) {
-					$container[$arguments['subject']][$arguments['predicate']][$value] = NULL;
-				}
-			} else {
-				$container[$arguments['subject']][$arguments['predicate']][$arguments['object']] = NULL;
-			}
+        if ($arguments['object'] !== null) {
+            if (is_array($arguments['object'])) {
+                foreach ($arguments['object'] as $value) {
+                    $container[$arguments['subject']][$arguments['predicate']][$value] = null;
+                }
+            } else {
+                $container[$arguments['subject']][$arguments['predicate']][$arguments['object']] = null;
+            }
         } else {
             $container[$arguments['subject']][$arguments['predicate']][$renderChildrenClosure()] = [
                 'type' => $arguments['objectType'],

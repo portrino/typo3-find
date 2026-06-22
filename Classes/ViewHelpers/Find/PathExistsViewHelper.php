@@ -39,7 +39,7 @@ class PathExistsViewHelper extends AbstractViewHelper
     /**
      * Registers own arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('path', 'string', 'the path to check the existence of', true);
@@ -53,6 +53,6 @@ class PathExistsViewHelper extends AbstractViewHelper
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext
     ) {
-        return file_exists(Environment::getPublicPath().'/'.$arguments['path']);
+        return file_exists(Environment::getPublicPath() . '/' . $arguments['path']);
     }
 }

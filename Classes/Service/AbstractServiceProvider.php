@@ -19,7 +19,7 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
 
     protected array $settings = [];
 
-    public function initialize(string $connectionName, array $settings)
+    public function initialize(string $connectionName, array $settings): void
     {
         $this->connectionName = $connectionName;
         $this->settings = $settings;
@@ -37,7 +37,7 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
     /**
      * @param array $requestArguments
      */
-    public function setRequestArguments($requestArguments)
+    public function setRequestArguments($requestArguments): void
     {
         $this->requestArguments = $requestArguments;
     }

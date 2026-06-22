@@ -36,7 +36,6 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class XMLViewHelper extends AbstractViewHelper
 {
-
     /**
      * As this ViewHelper renders HTML, the output must not be escaped.
      *
@@ -47,7 +46,7 @@ class XMLViewHelper extends AbstractViewHelper
     /**
      * Registers own arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('htmloutput', 'Boolean', 'Whether to output as HTML', false, false);

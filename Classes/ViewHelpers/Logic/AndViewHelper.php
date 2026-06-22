@@ -40,7 +40,7 @@ class AndViewHelper extends AbstractViewHelper
     /**
      * Registers own arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('conditions', 'array', 'the array of conditions to AND', true);
@@ -56,9 +56,9 @@ class AndViewHelper extends AbstractViewHelper
     ) {
         $result = true;
         foreach ($arguments['conditions'] as $condition) {
-            $result &= (true == $condition);
+            $result &= ($condition == true);
         }
 
-        return (bool) $result;
+        return (bool)$result;
     }
 }

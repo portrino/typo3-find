@@ -29,7 +29,6 @@ namespace Subugoe\Find\Utility;
 
 use TYPO3\CMS\Core\Page\AssetCollector;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3Fluid\Fluid\Core\ViewHelper\TagBuilder;
 
 /**
  * Utility for JavaScripts, Views, ...
@@ -45,7 +44,7 @@ class FrontendUtility
      */
     public static function addQueryInformationAsJavaScript($query, array $settings, $position = null, $arguments = []): void
     {
-        if ($settings['paging']['detailPagePaging']) {
+        if (!empty($settings['paging']['detailPagePaging'])) {
             if (array_key_exists('underlyingQuery', $arguments)) {
                 $arguments = $arguments['underlyingQuery'];
             }
@@ -55,24 +54,24 @@ class FrontendUtility
                 $underlyingQuery['facet'] = $arguments['facet'];
             }
 
-            if (null !== $position) {
+            if ($position !== null) {
                 $underlyingQuery['position'] = $position;
             }
 
-            if ($arguments['count']) {
+            if (!empty($arguments['count'])) {
                 $underlyingQuery['count'] = $arguments['count'];
             }
 
-            if ($arguments['sort']) {
+            if (!empty($arguments['sort'])) {
                 $underlyingQuery['sort'] = $arguments['sort'];
             }
 
-            if ($arguments['group']) {
-			    $underlyingQuery['group'] = $arguments['group'];
-				if ($arguments['grouplimit']) {
-					$underlyingQuery['grouplimit'] = $arguments['grouplimit'];
-				}
-			}
+            if (!empty($arguments['group'])) {
+                $underlyingQuery['group'] = $arguments['group'];
+                if (!empty($arguments['grouplimit'])) {
+                    $underlyingQuery['grouplimit'] = $arguments['grouplimit'];
+                }
+            }
 
             GeneralUtility::makeInstance(AssetCollector::class)->addInlineJavaScript('find_underlyingQuery', 'const underlyingQuery = ' . json_encode($underlyingQuery) . ';');
         }

@@ -48,17 +48,21 @@ class FacetLinkArgumentsViewHelper extends AbstractViewHelper
     /**
      * Register arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('facetID', 'string', 'ID of the facet to determine the selection status of', true);
-        $this->registerArgument('facetTerm', 'string',
+        $this->registerArgument(
+            'facetTerm',
+            'string',
             'Term of the facet item to determine the selection status of; if NULL any facet with the given facetID matches',
-            false, null);
+            false,
+            null
+        );
         $this->registerArgument('activeFacets', 'array', 'Array of active facets', false, []);
         $this->registerArgument('mode', 'string', 'add|remove', false, 'add');
         $this->registerArgument('not', 'boolean', 'Invert facet to not.', false, false);
-		$this->registerArgument('modifier', 'string', 'Choose a modifier.', false, '');
+        $this->registerArgument('modifier', 'string', 'Choose a modifier.', false, '');
     }
 
     /**
@@ -79,12 +83,12 @@ class FacetLinkArgumentsViewHelper extends AbstractViewHelper
         $facetTerm = $arguments['facetTerm'];
         $activeFacets = $arguments['activeFacets'];
         $mode = $arguments['mode'];
-        if ('remove' === $mode && $activeFacets) {
+        if ($mode === 'remove' && $activeFacets) {
             if (array_key_exists($facetID, $activeFacets)) {
-                $itemToRemove = 'tx_find_find[facet]['.$facetID.']';
+                $itemToRemove = 'tx_find_find[facet][' . $facetID . ']';
 
                 if (array_key_exists($facetTerm, $activeFacets[$facetID])) {
-                    $itemToRemove .= '['.$facetTerm.']';
+                    $itemToRemove .= '[' . $facetTerm . ']';
                 }
 
                 $result[] = $itemToRemove;
@@ -92,9 +96,9 @@ class FacetLinkArgumentsViewHelper extends AbstractViewHelper
 
             // Go back to page 1.
             $result[] = 'tx_find_find[page]';
-        } elseif ('add' === $mode) {
+        } elseif ($mode === 'add') {
             $result['facet'] = [
-                $facetID => [$facetTerm => 1]
+                $facetID => [$facetTerm => 1],
             ];
             if ($arguments['modifier']) {
                 $result['facet'][$facetID][$facetTerm] = $arguments['modifier'];

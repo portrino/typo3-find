@@ -44,12 +44,12 @@
     "typo3-ter/find": "self.version"
   },
   "require": {
-    "php": "^7.4",
+    "php": "^8.3",
     "ext-curl": "*",
     "ext-json": "*",
     "solarium/solarium": ">=6.3 <7.0",
-    "typo3/cms-core": "^10.4 || ^11.5",
-    "typo3/cms-felogin": "^10.4 || ^11.5"
+    "typo3/cms-core": "^12.4",
+    "typo3/cms-felogin": "^12.4"
   },
   "require-dev": {
     "nimut/testing-framework": "^6.0",
@@ -68,8 +68,8 @@
   },
   "scripts": {
     "post-autoload-dump": [
-      "mkdir -p .Build/Web/typo3conf/ext/",
-      "[ -L .Build/Web/typo3conf/ext/find ] || ln -snvf ../../../../. .Build/Web/typo3conf/ext/find"
+      "mkdir -p .Build/vendor/slub/",
+      "[ -L .Build/vendor/slub/find/ ] || ln -snvf ../../../../. .Build/vendor/slub/find"
     ],
     "rector-lint": "rector process --dry-run",
     "rector-fix": "rector process",

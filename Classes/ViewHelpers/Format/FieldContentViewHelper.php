@@ -37,7 +37,7 @@ class FieldContentViewHelper extends AbstractViewHelper
     /**
      * Registers own arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('string', 'string', 'String to be examined for display', false, null);

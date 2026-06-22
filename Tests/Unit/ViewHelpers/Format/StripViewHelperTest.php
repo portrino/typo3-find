@@ -66,7 +66,7 @@ class StripViewHelperTest extends ViewHelperBaseTestcase
      * @test
      * @dataProvider stringProvider
      */
-    public function whitespaceIsCorrectlyRemovedFromString($string, $strip, $expected)
+    public function whitespaceIsCorrectlyRemovedFromString($string, $strip, $expected): void
     {
         $this->fixture->setArguments([
             'string' => $string,

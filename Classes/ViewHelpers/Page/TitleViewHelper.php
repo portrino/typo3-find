@@ -39,7 +39,7 @@ class TitleViewHelper extends AbstractViewHelper
     /**
      * Registers own arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('title', 'string', 'the title to set for the page', false, null);
@@ -49,9 +49,9 @@ class TitleViewHelper extends AbstractViewHelper
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext
-    ) {
+    ): void {
         $title = $arguments['title'];
-        if (null === $title) {
+        if ($title === null) {
             $title = $renderChildrenClosure();
         }
 
@@ -66,8 +66,11 @@ class TitleViewHelper extends AbstractViewHelper
          * appearing once inside the <title> tag. Otherwise the order of the components in the page title will be wrong.
          */
         if ($GLOBALS['TSFE']->content) {
-            $GLOBALS['TSFE']->content = preg_replace('/(<title>.*)'.$GLOBALS['TSFE']->page['title'].'(.*<\/title>)/',
-                '$1'.$title.'$2', $GLOBALS['TSFE']->content);
+            $GLOBALS['TSFE']->content = preg_replace(
+                '/(<title>.*)' . $GLOBALS['TSFE']->page['title'] . '(.*<\/title>)/',
+                '$1' . $title . '$2',
+                $GLOBALS['TSFE']->content
+            );
         } else {
             $GLOBALS['TSFE']->page['title'] = $title;
         }

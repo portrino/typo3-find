@@ -40,7 +40,7 @@ class NotViewHelper extends AbstractViewHelper
     /**
      * Registers own arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('condition', 'string|int|float|array', 'the condition to NOT', true);
@@ -51,6 +51,6 @@ class NotViewHelper extends AbstractViewHelper
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext
     ): bool {
-        return true != $arguments['condition'];
+        return $arguments['condition'] != true;
     }
 }

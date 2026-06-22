@@ -40,7 +40,7 @@ class TransposeViewHelper extends AbstractViewHelper
     /**
      * Register arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('arrays', 'array', 'Array with keys: field names and values: arrays', false, []);
@@ -59,7 +59,7 @@ class TransposeViewHelper extends AbstractViewHelper
         $iterationArray = [];
         // Strip non-numeric keys in the value arrays.
         foreach ($arguments['arrays'] as $key => $array) {
-            $iterationArray = (null !== $array) ? $array : [];
+            $iterationArray = ($array !== null) ? $array : [];
             $arrays[$key] = array_values($iterationArray);
         }
 
@@ -81,11 +81,13 @@ class TransposeViewHelper extends AbstractViewHelper
         } else {
             $info = [];
             foreach ($arguments['arrays'] as $key => $array) {
-                $info[] = $key.': '.count($array);
+                $info[] = $key . ': ' . count($array);
             }
 
-            $output = 'The arrays passed in the »arrays« argument do not have identical numbers of values: ('.implode(', ',
-                $info).')';
+            $output = 'The arrays passed in the »arrays« argument do not have identical numbers of values: (' . implode(
+                ', ',
+                $info
+            ) . ')';
         }
 
         return $output;
@@ -104,7 +106,7 @@ class TransposeViewHelper extends AbstractViewHelper
 
         $length = null;
         foreach ($arrays as $array) {
-            if (null === $length) {
+            if ($length === null) {
                 $length = count($array);
             } elseif ($length !== count($array)) {
                 $result = false;

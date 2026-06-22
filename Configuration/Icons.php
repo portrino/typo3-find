@@ -1,10 +1,10 @@
 <?php
 
-use \TYPO3\CMS\Core\Imaging\IconProvider\FontawesomeIconProvider;
+use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
 
 return [
     'ext-find-ce-wizard' => [
-        'provider' => FontawesomeIconProvider::class,
-        'name' => 'search'
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:core/Resources/Public/Icons/T3Icons/actions/actions-search.svg',
     ],
 ];

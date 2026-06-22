@@ -54,7 +54,7 @@ class HighlightFieldViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function fieldIsCorrectlyHighlighted()
+    public function fieldIsCorrectlyHighlighted(): void
     {
         self::markTestIncomplete('Still something to do with mocking solarium');
     }

@@ -51,7 +51,7 @@ class SelectOptionsForFacetViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function returnTrueIfAPathExists()
+    public function returnTrueIfAPathExists(): void
     {
         $arguments = [
             'values' => [],

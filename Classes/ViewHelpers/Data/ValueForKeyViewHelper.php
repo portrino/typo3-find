@@ -37,7 +37,7 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class ValueForKeyViewHelper extends AbstractViewHelper
 {
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('array', 'mixed', 'The array to extract the value from', true);
@@ -56,7 +56,7 @@ class ValueForKeyViewHelper extends AbstractViewHelper
         if (!$array) {
             return null;
         }
-        if(is_object($array)) {
+        if (is_object($array)) {
             $array = (array)$array;
         }
 

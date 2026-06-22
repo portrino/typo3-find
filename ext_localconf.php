@@ -1,4 +1,5 @@
 <?php
+
 defined('TYPO3') or die();
 
 $autoexec = static function () {
@@ -12,7 +13,7 @@ $autoexec = static function () {
             \Subugoe\Find\Controller\SearchController::class => 'index, detail, suggest, term, citation',
         ]
     );
-    
+
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig('<INCLUDE_TYPOSCRIPT: source="FILE:EXT:find/Configuration/TSconfig/ContentElementWizard.tsconfig">');
 };
 $autoexec();

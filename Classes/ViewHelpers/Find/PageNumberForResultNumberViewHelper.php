@@ -47,7 +47,7 @@ class PageNumberForResultNumberViewHelper extends AbstractViewHelper
     /**
      * Registers own arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('resultNumber', 'int', 'number of the result to determine the page number for', true);
@@ -62,10 +62,10 @@ class PageNumberForResultNumberViewHelper extends AbstractViewHelper
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext
     ) {
-        if (0 === $arguments['resultsPerPage']) {
+        if ($arguments['resultsPerPage'] === 0) {
             $arguments['resultsPerPage'] = self::DEFAULT_RESULTS_PER_PAGE;
         }
 
-        return (int) ceil($arguments['resultNumber'] / $arguments['resultsPerPage']);
+        return (int)ceil($arguments['resultNumber'] / $arguments['resultsPerPage']);
     }
 }

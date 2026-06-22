@@ -40,7 +40,7 @@ class SolrEscapeViewHelper extends AbstractViewHelper
     /**
      * Registers own arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('string', 'string', 'the string to escape for Solr', false, null);
@@ -56,7 +56,7 @@ class SolrEscapeViewHelper extends AbstractViewHelper
         RenderingContextInterface $renderingContext
     ) {
         $string = $arguments['string'];
-        if (null === $string) {
+        if ($string === null) {
             $string = $renderChildrenClosure();
         }
 

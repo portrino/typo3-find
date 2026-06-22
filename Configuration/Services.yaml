@@ -4,5 +4,11 @@ services:
     autoconfigure: true
     public: false
 
+  Subugoe\Find\:
+    resource: '../Classes/*'
+
+  Subugoe\Find\SignalSlot\Dispatcher:
+    public: true
+
   Subugoe\Find\Service\SolrServiceProvider:
     public: true

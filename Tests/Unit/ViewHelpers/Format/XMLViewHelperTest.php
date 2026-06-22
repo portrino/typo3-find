@@ -55,9 +55,9 @@ class XMLViewHelperTest extends ViewHelperBaseTestcase
     <c/>
   </b>
   <b>d</b>
-</a>'.PHP_EOL,
+</a>' . PHP_EOL,
             ],
-            ['<a><b><c/></b><b>d</b></a>', true, '<a><b><c></c></b><b>d</b></a>'.PHP_EOL],
+            ['<a><b><c/></b><b>d</b></a>', true, '<a><b><c></c></b><b>d</b></a>' . PHP_EOL],
         ];
     }
 
@@ -74,7 +74,7 @@ class XMLViewHelperTest extends ViewHelperBaseTestcase
      * @test
      * @dataProvider stringProvider
      */
-    public function xmlIsCorrectlyFormatted($string, $htmloutput, $expected)
+    public function xmlIsCorrectlyFormatted($string, $htmloutput, $expected): void
     {
         $this->fixture->method('renderChildren')->willReturn($string);
 

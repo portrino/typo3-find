@@ -39,7 +39,7 @@ class OrViewHelper extends AbstractViewHelper
     /**
      * Registers own arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('conditions', 'array', 'the array of conditions to OR', true);
@@ -55,9 +55,9 @@ class OrViewHelper extends AbstractViewHelper
     ) {
         $result = false;
         foreach ($arguments['conditions'] as $condition) {
-            $result |= (true == $condition);
+            $result |= ($condition == true);
         }
 
-        return (bool) $result;
+        return (bool)$result;
     }
 }

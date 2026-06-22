@@ -54,7 +54,7 @@ class FacetLinkArgumentsViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function filterIsCorrectlyRemovedOnTextQueries()
+    public function filterIsCorrectlyRemovedOnTextQueries(): void
     {
         $this->fixture->setArguments([
             'facetID' => 'title',
@@ -70,7 +70,7 @@ class FacetLinkArgumentsViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function filterIsCorrectlyAddedOnTextQueries()
+    public function filterIsCorrectlyAddedOnTextQueries(): void
     {
         $this->fixture->setArguments([
             'facetID' => 'title',

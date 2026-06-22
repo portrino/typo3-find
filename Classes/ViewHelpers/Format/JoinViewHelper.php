@@ -39,12 +39,17 @@ class JoinViewHelper extends AbstractViewHelper
     /**
      * Registers own arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('array', 'array', 'the array to join the elements of', false, null);
-        $this->registerArgument('separator', 'string', 'the separator string placed between the elements of the array',
-            false, ', ');
+        $this->registerArgument(
+            'separator',
+            'string',
+            'the separator string placed between the elements of the array',
+            false,
+            ', '
+        );
     }
 
     /**
@@ -56,7 +61,7 @@ class JoinViewHelper extends AbstractViewHelper
         RenderingContextInterface $renderingContext
     ) {
         $array = $arguments['array'];
-        if (null === $array) {
+        if ($array === null) {
             $array = $renderChildrenClosure();
         }
 

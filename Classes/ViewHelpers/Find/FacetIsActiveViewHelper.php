@@ -40,13 +40,17 @@ class FacetIsActiveViewHelper extends AbstractViewHelper
     /**
      * Register arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('facetID', 'string', 'ID of the facet to determine the selection status of', true);
-        $this->registerArgument('facetTerm', 'string',
+        $this->registerArgument(
+            'facetTerm',
+            'string',
             'Term of the facet item to determine the selection status of; if NULL any facet with the given facetID matches',
-            false, null);
+            false,
+            null
+        );
         $this->registerArgument('activeFacets', 'array', 'Array of active facets', false, []);
         $this->registerArgument('type', 'string', 'Query type [string, range]', false, 'string');
     }
@@ -66,7 +70,7 @@ class FacetIsActiveViewHelper extends AbstractViewHelper
         foreach ($arguments['activeFacets'] as $facets) {
             foreach ($facets as $facetInfo) {
                 if ($facetInfo['id'] === $arguments['facetID']
-                    && ($facetInfo['term'] === $arguments['facetTerm'] || null === $arguments['facetTerm'])
+                    && ($facetInfo['term'] === $arguments['facetTerm'] || $arguments['facetTerm'] === null)
                 ) {
                     return true;
                 }

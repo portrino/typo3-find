@@ -105,7 +105,7 @@ class AndViewHelperTest extends ViewHelperBaseTestcase
      * @test
      * @dataProvider conditionProvider
      */
-    public function conditionIsTrue($conditions, $expected)
+    public function conditionIsTrue($conditions, $expected): void
     {
         $this->fixture->setArguments([
             'conditions' => $conditions,

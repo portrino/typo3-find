@@ -37,7 +37,6 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class CSVLineViewHelper extends AbstractViewHelper
 {
-
     /**
      * As this ViewHelper renders HTML, the output must not be escaped.
      *
@@ -48,7 +47,7 @@ class CSVLineViewHelper extends AbstractViewHelper
     /**
      * Registers own arguments.
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('data', 'array', 'The array to output as CSV line', false, null);
@@ -65,7 +64,7 @@ class CSVLineViewHelper extends AbstractViewHelper
         RenderingContextInterface $renderingContext
     ) {
         $data = $arguments['data'];
-        if (null === $data) {
+        if ($data === null) {
             $data = $renderChildrenClosure();
         }
 

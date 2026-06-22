@@ -57,7 +57,7 @@ class TransposeViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function arrayIsTransposed()
+    public function arrayIsTransposed(): void
     {
         $arguments = [
             'arrays' => [
@@ -87,7 +87,7 @@ class TransposeViewHelperTest extends ViewHelperBaseTestcase
     /**
      * @test
      */
-    public function anErrorIsReportedWhenArraysDoNotMatchInLength()
+    public function anErrorIsReportedWhenArraysDoNotMatchInLength(): void
     {
         $arguments = [
             'arrays' => [
@@ -97,7 +97,9 @@ class TransposeViewHelperTest extends ViewHelperBaseTestcase
         ];
 
         $this->fixture->setArguments($arguments);
-        self::assertStringContainsStringIgnoringCase('The arrays passed in the »arrays« argument do not have identical numbers of values',
-            $this->fixture->initializeArgumentsAndRender());
+        self::assertStringContainsStringIgnoringCase(
+            'The arrays passed in the »arrays« argument do not have identical numbers of values',
+            $this->fixture->initializeArgumentsAndRender()
+        );
     }
 }

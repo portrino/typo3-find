@@ -22,11 +22,9 @@ namespace Subugoe\Find\ViewHelpers\Page;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-use TYPO3\CMS\Frontend\Resource\FilePathSanitizer;
 use TYPO3\CMS\Core\Page\PageRenderer;
-use TYPO3\CMS\Core\TypoScript\TemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+use TYPO3\CMS\Frontend\Resource\FilePathSanitizer;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
@@ -45,7 +43,7 @@ class ScriptViewHelper extends AbstractViewHelper
         return GeneralUtility::makeInstance(PageRenderer::class);
     }
 
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         $this->registerArgument('file', 'string', 'File to append as script');
         $this->registerArgument('name', 'string', 'Name to use', true);

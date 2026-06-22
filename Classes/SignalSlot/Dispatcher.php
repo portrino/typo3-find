@@ -1,0 +1,58 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Subugoe\Find\SignalSlot;
+
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
+final class Dispatcher
+{
+    /**
+     * @var array<string, array<int, array{slotClassName:string, slotMethodName:string, passSignalInformation:bool}>>
+     */
+    private static array $connections = [];
+
+    public function connect(
+        string $signalClassName,
+        string $signalName,
+        string $slotClassName,
+        string $slotMethodName,
+        bool $passSignalInformation = false
+    ): void {
+        $key = $this->buildKey($signalClassName, $signalName);
+
+        self::$connections[$key][] = [
+            'slotClassName' => $slotClassName,
+            'slotMethodName' => $slotMethodName,
+            'passSignalInformation' => $passSignalInformation,
+        ];
+    }
+
+    /**
+     * @param array<int, mixed> $signalArguments
+     */
+    public function dispatch(string $signalClassName, string $signalName, array $signalArguments = []): void
+    {
+        $key = $this->buildKey($signalClassName, $signalName);
+
+        foreach (self::$connections[$key] ?? [] as $connection) {
+            $slotInstance = GeneralUtility::makeInstance($connection['slotClassName']);
+            $arguments = $signalArguments;
+
+            if ($connection['passSignalInformation']) {
+                $arguments[] = [
+                    'class' => $signalClassName,
+                    'signal' => $signalName,
+                ];
+            }
+
+            call_user_func_array([$slotInstance, $connection['slotMethodName']], $arguments);
+        }
+    }
+
+    private function buildKey(string $signalClassName, string $signalName): string
+    {
+        return $signalClassName . '::' . $signalName;
+    }
+}
