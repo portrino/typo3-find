@@ -1091,7 +1091,7 @@ depending on the `id` s used for fields and facets.
 
 To run the unit tests, clone this repository, and run
 * `composer install`
-* `.Build/bin/phpunit --colors -c .Build/vendor/nimut/testing-framework/res/Configuration/UnitTests.xml Tests/Unit/`
+* `.Build/bin/phpunit --colors=always -c .Build/vendor/typo3/testing-framework/Resources/Core/Build/UnitTests.xml Tests/Unit/`
 
 ## Contributing
 
