@@ -5,8 +5,13 @@
 			<f:if condition="{pager.previous}">
 				<f:then>
 					<f:link.action
-						arguments="{page:pager.previous}"
-						addQueryString="TRUE"
+						action="index"
+						controller="Search"
+						arguments="{
+								page: pager.previous,
+								extended: arguments.extended,
+								q: arguments.q
+						}"
 						section="{settings.jumpToID}"
 						class="icon-left-dir internal"
 						title="{f:translate(key:'Go to previous page of results. (Page %s)', arguments:'{1:pager.previous}')}"
@@ -23,9 +28,14 @@
 					<f:if condition="{current:page.current, gap:page.gap} == {current:FALSE , gap:FALSE}">
 						<f:then>
 							<f:link.action
+								action="index"
+								controller="Search"
+								arguments="{
+										page: page.number,
+										extended: arguments.extended,
+										q: arguments.q
+								}"
 								title="{f:translate(key:'Go to page %s of the search results.', arguments:'{1:page.number}')}"
-								arguments="{page:page.number}"
-								addQueryString="TRUE"
 								section="{settings.jumpToID}"
 								class="internal"
 							>
@@ -43,8 +53,13 @@
 			<f:if condition="{pager.next}">
 				<f:then>
 					<f:link.action
-						arguments="{page:pager.next}"
-						addQueryString="TRUE"
+						action="index"
+						controller="Search"
+						arguments="{
+								page: pager.next,
+								extended: arguments.extended,
+								q: arguments.q
+						}"
 						section="{settings.jumpToID}"
 						class="icon-right-dir internal"
 						title="{f:translate(key:'Go to next page of results. (Page %s)', arguments:'{1:pager.next}')}"
