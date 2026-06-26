@@ -55,7 +55,7 @@
     "typo3/testing-framework": "^9.5",
     "friendsofphp/php-cs-fixer": "^3.0",
     "phpunit/phpunit": "^13.1",
-    "ssch/typo3-rector": "^1.0",
+    "ssch/typo3-rector": "^3.0",
     "phpspec/prophecy": "^1.15"
   },
   "config": {
