@@ -39,15 +39,13 @@ abstract class AbstractRenderer
     protected array $usedPrefixes = [];
 
     /**
-     * @param $type
-     *
      * @return object
      */
     public static function instantiateSubclassForType($type)
     {
-        if ($type === 'rdf') {
+        if ('rdf' === $type) {
             $instance = GeneralUtility::makeInstance(RDFRenderer::class);
-        } elseif ($type === 'json-ld') {
+        } elseif ('json-ld' === $type) {
             $instance = GeneralUtility::makeInstance(JSONLDRenderer::class);
         } else {
             $instance = GeneralUtility::makeInstance(TurtleRenderer::class);
@@ -56,9 +54,6 @@ abstract class AbstractRenderer
         return $instance;
     }
 
-    /**
-     * @param $prefixes
-     */
     public function setPrefixes($prefixes): void
     {
         $this->prefixes = $prefixes;

@@ -61,16 +61,16 @@ class CSVLineViewHelper extends AbstractViewHelper
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
+        RenderingContextInterface $renderingContext,
     ) {
         $data = $arguments['data'];
-        if ($data === null) {
+        if (null === $data) {
             $data = $renderChildrenClosure();
         }
 
         // Write CSV to pseudo-file as PHP cannot write it directly to a string.
         $fp = fopen('php://temp', 'r+');
-        fputcsv($fp, $data, $arguments['fieldDelimiter'], $arguments['fieldEnclosure']);
+        fputcsv($fp, $data, $arguments['fieldDelimiter'], $arguments['fieldEnclosure'], escape: '\\');
         rewind($fp);
         $result = fgets($fp);
         fclose($fp);

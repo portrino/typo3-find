@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Subugoe\Find\ViewHelpers\Find;
 
 /*******************************************************************************
@@ -60,12 +62,12 @@ class PageNumberForResultNumberViewHelper extends AbstractViewHelper
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
+        RenderingContextInterface $renderingContext,
     ) {
-        if ($arguments['resultsPerPage'] === 0) {
+        if (0 === $arguments['resultsPerPage']) {
             $arguments['resultsPerPage'] = self::DEFAULT_RESULTS_PER_PAGE;
         }
 
-        return (int)ceil($arguments['resultNumber'] / $arguments['resultsPerPage']);
+        return (int) ceil($arguments['resultNumber'] / $arguments['resultsPerPage']);
     }
 }

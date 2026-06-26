@@ -73,6 +73,7 @@ class ItemViewHelperTest extends ViewHelperBaseTestcase
 
     /**
      * @test
+     *
      * @dataProvider linkedDataProvider
      */
     public function itemsAreAddedToContainer($subject, $predicate, $object, $objectType, $language, $name, $expected): void

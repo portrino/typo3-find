@@ -75,7 +75,7 @@ class FacetLinkArgumentsViewHelper extends AbstractViewHelper
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
+        RenderingContextInterface $renderingContext,
     ) {
         $result = [];
 
@@ -83,12 +83,12 @@ class FacetLinkArgumentsViewHelper extends AbstractViewHelper
         $facetTerm = $arguments['facetTerm'];
         $activeFacets = $arguments['activeFacets'];
         $mode = $arguments['mode'];
-        if ($mode === 'remove' && $activeFacets) {
+        if ('remove' === $mode && $activeFacets) {
             if (array_key_exists($facetID, $activeFacets)) {
-                $itemToRemove = 'tx_find_find[facet][' . $facetID . ']';
+                $itemToRemove = 'tx_find_find[facet]['.$facetID.']';
 
                 if (array_key_exists($facetTerm, $activeFacets[$facetID])) {
-                    $itemToRemove .= '[' . $facetTerm . ']';
+                    $itemToRemove .= '['.$facetTerm.']';
                 }
 
                 $result[] = $itemToRemove;
@@ -96,7 +96,7 @@ class FacetLinkArgumentsViewHelper extends AbstractViewHelper
 
             // Go back to page 1.
             $result[] = 'tx_find_find[page]';
-        } elseif ($mode === 'add') {
+        } elseif ('add' === $mode) {
             $result['facet'] = [
                 $facetID => [$facetTerm => 1],
             ];

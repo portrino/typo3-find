@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Subugoe\Find\Service;
 
 /* * *************************************************************
@@ -46,11 +48,6 @@ interface ServiceProviderInterface
 
     public function isExtendedSearch();
 
-    /**
-     * @param $query
-     *
-     * @return mixed
-     */
     public function search($query);
 
     /**
@@ -58,12 +55,6 @@ interface ServiceProviderInterface
      */
     public function setAction($actionName);
 
-    /**
-     * @param $key
-     * @param $value
-     *
-     * @return mixed
-     */
     public function setConfigurationValue($key, $value);
 
     /**
@@ -75,15 +66,8 @@ interface ServiceProviderInterface
 
     /**
      * @param array $requestArguments
-     *
-     * @return mixed
      */
     public function setRequestArguments($requestArguments);
 
-    /**
-     * @param $settings
-     *
-     * @return mixed
-     */
     public function suggestQuery($settings);
 }

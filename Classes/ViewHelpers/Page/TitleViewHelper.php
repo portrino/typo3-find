@@ -51,14 +51,14 @@ class TitleViewHelper extends AbstractViewHelper
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
+        RenderingContextInterface $renderingContext,
     ): string {
-        $title = (string)($arguments['title'] ?? '');
-        if ($title === '') {
-            $title = trim((string)$renderChildrenClosure());
+        $title = (string) ($arguments['title'] ?? '');
+        if ('' === $title) {
+            $title = trim((string) $renderChildrenClosure());
         }
 
-        if ($title !== '') {
+        if ('' !== $title) {
             $titleProvider = GeneralUtility::makeInstance(CustomPageTitleProvider::class);
             $titleProvider->setTitle($title);
         }

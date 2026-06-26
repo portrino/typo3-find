@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Subugoe\Find\ViewHelpers\Logic;
 
 /*******************************************************************************
@@ -52,13 +54,13 @@ class AndViewHelper extends AbstractViewHelper
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
+        RenderingContextInterface $renderingContext,
     ) {
         $result = true;
         foreach ($arguments['conditions'] as $condition) {
-            $result &= ($condition == true);
+            $result &= (true == $condition);
         }
 
-        return (bool)$result;
+        return (bool) $result;
     }
 }

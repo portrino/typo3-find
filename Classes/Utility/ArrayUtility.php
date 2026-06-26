@@ -47,7 +47,7 @@ class ArrayUtility
     public static function cleanArgumentsArray($array)
     {
         foreach ($array as $key => &$value) {
-            if (strpos($key, '__') === 0 || $value === '') {
+            if (0 === strpos($key, '__') || '' === $value) {
                 unset($array[$key]);
             } elseif (is_array($value)) {
                 self::cleanArgumentsArray($value);

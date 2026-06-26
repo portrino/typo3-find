@@ -71,13 +71,13 @@ class StripViewHelper extends AbstractViewHelper
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
+        RenderingContextInterface $renderingContext,
     ) {
         $string = $arguments['string'];
-        if ($string === null) {
+        if (null === $string) {
             $string = $renderChildrenClosure();
         }
 
-        return $arguments['strip'] === null ? trim($string) : trim($string, $arguments['strip']);
+        return null === $arguments['strip'] ? trim($string) : trim($string, $arguments['strip']);
     }
 }

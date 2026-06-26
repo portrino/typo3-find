@@ -36,8 +36,6 @@ class RealUrl
     /**
      * Create automatic RealUrl Configuratoin.
      *
-     * @param $params
-     *
      * @return array
      */
     public function addRealUrlConfiguration($params, &$pObj)

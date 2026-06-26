@@ -74,7 +74,7 @@ class SelectOptionsForFacetViewHelper extends AbstractViewHelper
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
+        RenderingContextInterface $renderingContext,
     ) {
         $result = [];
 
@@ -86,7 +86,7 @@ class SelectOptionsForFacetViewHelper extends AbstractViewHelper
         if (!empty($arguments['values'])) {
             foreach ($arguments['values'] as $item => $count) {
                 // Localise item name.
-                $localisationKey = $arguments['localisationPrefix'] . $item;
+                $localisationKey = $arguments['localisationPrefix'].$item;
 
                 $localisedItem = LocalizationUtility::translate($localisationKey, 'find');
                 if (!$localisedItem) {
@@ -94,7 +94,7 @@ class SelectOptionsForFacetViewHelper extends AbstractViewHelper
                 }
 
                 // Append count to item name?
-                $result[$item] = $localisedItem . ($arguments['showCount'] ? ' (' . $count . ')' : '');
+                $result[$item] = $localisedItem.($arguments['showCount'] ? ' ('.$count.')' : '');
             }
         }
 

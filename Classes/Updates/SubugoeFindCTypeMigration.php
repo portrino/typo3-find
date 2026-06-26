@@ -21,7 +21,7 @@ final class SubugoeFindCTypeMigration extends AbstractListTypeToCTypeUpdate
     }
 
     /**
-     * This must return an array containing the "list_type" to "CType" mapping
+     * This must return an array containing the "list_type" to "CType" mapping.
      *
      *  Example:
      *

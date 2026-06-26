@@ -71,7 +71,7 @@ class SearchController extends ActionController
             FrontendUtility::addQueryInformationAsJavaScript(
                 $underlyingQueryInfo['q'],
                 $this->settings,
-                (int)$underlyingQueryInfo['position'],
+                (int) $underlyingQueryInfo['position'],
                 $arguments
             );
         }
@@ -83,6 +83,7 @@ class SearchController extends ActionController
             'arguments' => $arguments,
             'config' => $this->searchProvider->getConfiguration(),
         ]);
+
         return $this->htmlResponse();
     }
 
@@ -102,6 +103,7 @@ class SearchController extends ActionController
             'config' => $this->searchProvider->getConfiguration(),
             'type' => $arguments['type'],
         ]);
+
         return $this->htmlResponse();
     }
 
@@ -113,18 +115,23 @@ class SearchController extends ActionController
         if (array_key_exists('id', $this->requestArguments)) {
             return new ForwardResponse('detail');
         }
+
         if (array_key_exists('rsn', $this->requestArguments)) {
             return new ForwardResponse('redirect');
         }
+
         if (array_key_exists('bc', $this->requestArguments)) {
             return new ForwardResponse('redirect');
         }
+
         if (array_key_exists('ppn', $this->requestArguments)) {
             return new ForwardResponse('redirect');
         }
+
         if (array_key_exists('oclc', $this->requestArguments)) {
             return new ForwardResponse('redirect');
         }
+
         $this->searchProvider->setCounter();
         FrontendUtility::addQueryInformationAsJavaScript(
             $this->searchProvider->getRequestArguments()['q'] ?? [],
@@ -146,6 +153,7 @@ class SearchController extends ActionController
                         $decodedTerm = urldecode($term);
                         $decodedTerms[$decodedTerm] = $value;
                     }
+
                     $arguments['facet'][$facetId] = $decodedTerms;
                 }
             }
@@ -160,11 +168,9 @@ class SearchController extends ActionController
         $this->view->assignMultiple($viewValues);
 
         // if there are no search parameters provided, redirect to the URL given in setting 'nosearchRedirect'
-        if (isset($defaultQuery['noSearch']) && $defaultQuery['noSearch']) {
-            if (isset($this->settings['nosearchRedirect']) && $this->settings['nosearchRedirect'] !== '') {
-                $response = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\Psr\Http\Message\ResponseFactoryInterface::class)->createResponse(\TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_303)->withAddedHeader('location', $this->settings['nosearchRedirect']);
-                throw new \TYPO3\CMS\Core\Http\PropagateResponseException($response, 8491898626);
-            }
+        if (isset($defaultQuery['noSearch']) && $defaultQuery['noSearch'] && (isset($this->settings['nosearchRedirect']) && '' !== $this->settings['nosearchRedirect'])) {
+            $response = GeneralUtility::makeInstance(\Psr\Http\Message\ResponseFactoryInterface::class)->createResponse(\TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_303)->withAddedHeader('location', $this->settings['nosearchRedirect']);
+            throw new \TYPO3\CMS\Core\Http\PropagateResponseException($response, 8491898626);
         }
 
         return $this->htmlResponse();
@@ -192,9 +198,9 @@ class SearchController extends ActionController
             $queryArgumentsDefault = $this->requestArguments['oclc'];
         }
 
-        $selectResults =$this->searchProvider->search($queryArguments);
+        $selectResults = $this->searchProvider->search($queryArguments);
 
-        if (count($selectResults) === 1) {
+        if (1 === count($selectResults)) {
             $resultSet = $selectResults->getDocuments();
 
             $arguments = [
@@ -216,12 +222,11 @@ class SearchController extends ActionController
             ];
         }
 
-        $uri = $this->uriBuilder->reset()->setTargetPageUid((int)($this->request->getAttribute('frontend.page.information')->getId()))->setCreateAbsoluteUri(true)->setArguments($arguments)->build();
+        $uri = $this->uriBuilder->reset()->setTargetPageUid((int) $this->request->getAttribute('frontend.page.information')->getId())->setCreateAbsoluteUri(true)->setArguments($arguments)->build();
 
-        $response = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\Psr\Http\Message\ResponseFactoryInterface::class)->createResponse(\TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_303)->withAddedHeader('location', $uri);
+        $response = GeneralUtility::makeInstance(\Psr\Http\Message\ResponseFactoryInterface::class)->createResponse(\TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_303)->withAddedHeader('location', $uri);
         throw new \TYPO3\CMS\Core\Http\PropagateResponseException($response, 6097036578);
-
-        die();
+        exit;
     }
 
     /**
@@ -248,6 +253,7 @@ class SearchController extends ActionController
     {
         $results = $this->searchProvider->suggestQuery($this->searchProvider->getRequestArguments());
         $this->view->assign('suggestions', $results);
+
         return $this->htmlResponse();
     }
 
@@ -258,6 +264,7 @@ class SearchController extends ActionController
     {
         $results = $this->searchProvider->getTerms($this->searchProvider->getRequestArguments());
         $this->view->assign('terms', $results);
+
         return $this->htmlResponse();
     }
 
@@ -280,7 +287,7 @@ class SearchController extends ActionController
         $this->searchProvider->setConfigurationValue('extendedSearch', $this->searchProvider->isExtendedSearch());
         $this->searchProvider->setConfigurationValue(
             'uid',
-            $contentObject instanceof ContentObjectRenderer ? (int)($contentObject->data['uid'] ?? 0) : 0
+            $contentObject instanceof ContentObjectRenderer ? (int) ($contentObject->data['uid'] ?? 0) : 0
         );
         $this->searchProvider->setConfigurationValue('prefixID', 'tx_find_find');
 
@@ -288,8 +295,9 @@ class SearchController extends ActionController
         $pageInformation = $this->request->getAttribute('frontend.page.information');
         if ($pageInformation instanceof PageInformation) {
             $pageRecord = $pageInformation->getPageRecord();
-            $pageTitle = (string)($pageRecord['title'] ?? '');
+            $pageTitle = (string) ($pageRecord['title'] ?? '');
         }
+
         $this->searchProvider->setConfigurationValue('pageTitle', $pageTitle);
 
         $this->searchProvider->setConfigurationValue(

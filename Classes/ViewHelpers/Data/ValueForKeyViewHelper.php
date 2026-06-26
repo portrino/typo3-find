@@ -50,14 +50,15 @@ class ValueForKeyViewHelper extends AbstractViewHelper
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
+        RenderingContextInterface $renderingContext,
     ) {
         $array = $arguments['array'];
         if (!$array) {
             return null;
         }
+
         if (is_object($array)) {
-            $array = (array)$array;
+            $array = (array) $array;
         }
 
         $result = null;

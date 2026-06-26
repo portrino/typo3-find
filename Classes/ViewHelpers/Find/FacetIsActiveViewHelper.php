@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Subugoe\Find\ViewHelpers\Find;
 
 /* * *************************************************************
@@ -65,12 +67,12 @@ class FacetIsActiveViewHelper extends AbstractViewHelper
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
+        RenderingContextInterface $renderingContext,
     ) {
         foreach ($arguments['activeFacets'] as $facets) {
             foreach ($facets as $facetInfo) {
                 if ($facetInfo['id'] === $arguments['facetID']
-                    && ($facetInfo['term'] === $arguments['facetTerm'] || $arguments['facetTerm'] === null)
+                    && ($facetInfo['term'] === $arguments['facetTerm'] || null === $arguments['facetTerm'])
                 ) {
                     return true;
                 }

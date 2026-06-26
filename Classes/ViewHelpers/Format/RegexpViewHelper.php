@@ -67,15 +67,15 @@ class RegexpViewHelper extends AbstractViewHelper
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
+        RenderingContextInterface $renderingContext,
     ) {
         $input = $arguments['string'];
-        if ($input === null) {
+        if (null === $input) {
             $input = $renderChildrenClosure();
         }
 
         $result = null;
-        if ($arguments['replace'] === null) {
+        if (null === $arguments['replace']) {
             $result = preg_match($arguments['match'], $input);
         } elseif (!$arguments['useMBEreg']) {
             $result = preg_replace($arguments['match'], $arguments['replace'], $input);

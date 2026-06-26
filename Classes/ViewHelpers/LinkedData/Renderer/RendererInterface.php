@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Subugoe\Find\ViewHelpers\LinkedData\Renderer;
 
 /* * *************************************************************
@@ -32,10 +34,5 @@ namespace Subugoe\Find\ViewHelpers\LinkedData\Renderer;
  */
 interface RendererInterface
 {
-    /**
-     * @param $items
-     *
-     * @return mixed
-     */
     public function renderItems($items);
 }

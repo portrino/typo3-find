@@ -61,7 +61,7 @@ class ContainerViewHelper extends AbstractViewHelper
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
+        RenderingContextInterface $renderingContext,
     ) {
         $renderingContext->getVariableProvider()->add($arguments['name'], []);
 

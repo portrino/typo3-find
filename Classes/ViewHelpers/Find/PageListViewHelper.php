@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Subugoe\Find\ViewHelpers\Find;
 
 /*******************************************************************************
@@ -53,14 +55,14 @@ class PageListViewHelper extends AbstractViewHelper
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
+        RenderingContextInterface $renderingContext,
     ) {
-        $currentPage = ($arguments['currentPage'] ? (int)$arguments['currentPage'] : 1);
-        $numberOfPages = (int)ceil($arguments['resultCount'] / $arguments['perPage']);
-        $adjacentPages = (int)$arguments['adjacentPages'];
+        $currentPage = ($arguments['currentPage'] ? (int) $arguments['currentPage'] : 1);
+        $numberOfPages = (int) ceil($arguments['resultCount'] / $arguments['perPage']);
+        $adjacentPages = (int) $arguments['adjacentPages'];
         $adjacentFirst = max($currentPage - $adjacentPages, 1);
         $adjacentLast = min($currentPage + $adjacentPages, $numberOfPages);
-        $minimumGapSize = (int)$arguments['minimumGapSize'];
+        $minimumGapSize = (int) $arguments['minimumGapSize'];
 
         $pageIndex = 1;
         while ($pageIndex <= $numberOfPages) {
@@ -69,7 +71,7 @@ class PageListViewHelper extends AbstractViewHelper
             if ($pageIndex === $currentPage) {
                 $pageInfo['status'] = 'current';
                 $pageInfo['current'] = true;
-            } elseif (($pageIndex === 1 | $pageIndex === $numberOfPages) !== 0) {
+            } elseif ((1 === $pageIndex | $pageIndex === $numberOfPages) !== 0) {
                 $pageInfo['status'] = 'edge';
             } elseif (abs($pageIndex - $currentPage) <= $adjacentPages) {
                 $pageInfo['status'] = 'adjacent';
@@ -81,7 +83,7 @@ class PageListViewHelper extends AbstractViewHelper
                 $pageInfo['gap'] = true;
             }
 
-            if ($pageInfo['status'] === 'gap') {
+            if ('gap' === $pageInfo['status']) {
                 $pageInfo['text'] = '…';
                 if ($pageIndex < $currentPage) {
                     $pageIndex = $currentPage - $adjacentPages;
@@ -89,7 +91,7 @@ class PageListViewHelper extends AbstractViewHelper
                     $pageIndex = $numberOfPages;
                 }
             } else {
-                $pageInfo['text'] = (string)$pageIndex;
+                $pageInfo['text'] = (string) $pageIndex;
                 ++$pageIndex;
             }
 
@@ -99,7 +101,7 @@ class PageListViewHelper extends AbstractViewHelper
         return [
             'pages' => $pages,
             'current' => $currentPage,
-            'previous' => ($currentPage === 1) ? null : $currentPage - 1,
+            'previous' => (1 === $currentPage) ? null : $currentPage - 1,
             'next' => ($currentPage === $numberOfPages) ? null : $currentPage + 1,
         ];
     }

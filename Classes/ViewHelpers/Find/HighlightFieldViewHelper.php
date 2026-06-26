@@ -105,15 +105,16 @@ class HighlightFieldViewHelper extends AbstractViewHelper
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
+        RenderingContextInterface $renderingContext,
     ) {
         if ($arguments['document']) {
             $fields = $arguments['document']->getFields();
             $fieldContent = $fields[$arguments['field']];
-            if ($arguments['index'] !== null) {
+            if (null !== $arguments['index']) {
                 if (is_array($fieldContent) && count($fieldContent) > $arguments['index']) {
                     $fieldContent = $fieldContent[$arguments['index']];
                 }
+
                 // TODO: error message
             }
 
@@ -188,7 +189,7 @@ class HighlightFieldViewHelper extends AbstractViewHelper
 
         foreach ($highlightInfo as $highlightItem) {
             $highlightItemStripped = str_replace(['\ueeee', '\ueeef'], ['', ''], $highlightItem);
-            if (strpos($fieldString, $highlightItemStripped) !== null) {
+            if (null !== strpos($fieldString, $highlightItemStripped)) {
                 // HTML escape the text here if not explicitly configured to not do so.
                 // Use f:format.raw in the template to avoid double escaping the HTML tags.
                 if (!$arguments['raw']) {
@@ -206,7 +207,7 @@ class HighlightFieldViewHelper extends AbstractViewHelper
         }
 
         // If no highlighted string is present, use the original one.
-        if ($result === null) {
+        if (null === $result) {
             $result = $arguments['raw'] ? $fieldString : htmlspecialchars($fieldString);
         }
 

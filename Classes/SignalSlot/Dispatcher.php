@@ -18,7 +18,7 @@ final class Dispatcher
         string $signalName,
         string $slotClassName,
         string $slotMethodName,
-        bool $passSignalInformation = false
+        bool $passSignalInformation = false,
     ): void {
         $key = $this->buildKey($signalClassName, $signalName);
 
@@ -53,6 +53,6 @@ final class Dispatcher
 
     private function buildKey(string $signalClassName, string $signalName): string
     {
-        return $signalClassName . '::' . $signalName;
+        return $signalClassName.'::'.$signalName;
     }
 }

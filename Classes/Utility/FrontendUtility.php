@@ -54,7 +54,7 @@ class FrontendUtility
                 $underlyingQuery['facet'] = $arguments['facet'];
             }
 
-            if ($position !== null) {
+            if (null !== $position) {
                 $underlyingQuery['position'] = $position;
             }
 
@@ -73,13 +73,11 @@ class FrontendUtility
                 }
             }
 
-            GeneralUtility::makeInstance(AssetCollector::class)->addInlineJavaScript('find_underlyingQuery', 'const underlyingQuery = ' . json_encode($underlyingQuery) . ';');
+            GeneralUtility::makeInstance(AssetCollector::class)->addInlineJavaScript('find_underlyingQuery', 'const underlyingQuery = '.json_encode($underlyingQuery).';');
         }
     }
 
     /**
-     * @param $underlyingQueryInfo
-     *
      * @return array
      */
     public static function getIndexes($underlyingQueryInfo)

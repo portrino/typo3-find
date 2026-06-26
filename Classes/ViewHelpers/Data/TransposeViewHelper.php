@@ -53,13 +53,13 @@ class TransposeViewHelper extends AbstractViewHelper
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
+        RenderingContextInterface $renderingContext,
     ) {
         $arrays = [];
         $iterationArray = [];
         // Strip non-numeric keys in the value arrays.
         foreach ($arguments['arrays'] as $key => $array) {
-            $iterationArray = ($array !== null) ? $array : [];
+            $iterationArray = (null !== $array) ? $array : [];
             $arrays[$key] = array_values($iterationArray);
         }
 
@@ -81,13 +81,13 @@ class TransposeViewHelper extends AbstractViewHelper
         } else {
             $info = [];
             foreach ($arguments['arrays'] as $key => $array) {
-                $info[] = $key . ': ' . count($array);
+                $info[] = $key.': '.count($array);
             }
 
-            $output = 'The arrays passed in the »arrays« argument do not have identical numbers of values: (' . implode(
+            $output = 'The arrays passed in the »arrays« argument do not have identical numbers of values: ('.implode(
                 ', ',
                 $info
-            ) . ')';
+            ).')';
         }
 
         return $output;
@@ -106,7 +106,7 @@ class TransposeViewHelper extends AbstractViewHelper
 
         $length = null;
         foreach ($arrays as $array) {
-            if ($length === null) {
+            if (null === $length) {
                 $length = count($array);
             } elseif ($length !== count($array)) {
                 $result = false;

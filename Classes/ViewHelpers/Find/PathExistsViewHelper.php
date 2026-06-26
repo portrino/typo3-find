@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Subugoe\Find\ViewHelpers\Find;
 
 /*******************************************************************************
@@ -51,8 +53,8 @@ class PathExistsViewHelper extends AbstractViewHelper
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
+        RenderingContextInterface $renderingContext,
     ) {
-        return file_exists(Environment::getPublicPath() . '/' . $arguments['path']);
+        return file_exists(Environment::getPublicPath().'/'.$arguments['path']);
     }
 }

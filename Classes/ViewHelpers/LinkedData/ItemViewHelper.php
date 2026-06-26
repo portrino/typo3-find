@@ -59,7 +59,7 @@ class ItemViewHelper extends AbstractViewHelper
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
+        RenderingContextInterface $renderingContext,
     ): void {
         $container = $renderingContext->getVariableProvider()->get($arguments['name']);
         if (!$container[$arguments['subject']]) {
@@ -70,7 +70,7 @@ class ItemViewHelper extends AbstractViewHelper
             $container[$arguments['subject']][$arguments['predicate']] = [];
         }
 
-        if ($arguments['object'] !== null) {
+        if (null !== $arguments['object']) {
             if (is_array($arguments['object'])) {
                 foreach ($arguments['object'] as $value) {
                     $container[$arguments['subject']][$arguments['predicate']][$value] = null;

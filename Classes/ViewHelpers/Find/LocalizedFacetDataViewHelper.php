@@ -70,29 +70,29 @@ class LocalizedFacetDataViewHelper extends AbstractViewHelper
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
+        RenderingContextInterface $renderingContext,
     ) {
         $facetNames = [];
         $facetEntryNames = [];
 
-        $baseKey = 'LLL:' . $arguments['settings']['languageRootPath'] . 'locallang-facets.xml:facet';
+        $baseKey = 'LLL:'.$arguments['settings']['languageRootPath'].'locallang-facets.xml:facet';
         foreach ($arguments['data'] as $facetID => $facetData) {
-            $facetKey = $baseKey . '.' . $facetID;
+            $facetKey = $baseKey.'.'.$facetID;
             $localizedFacetName = LocalizationUtility::translate($facetKey, '', []);
-            if ($localizedFacetName !== null) {
+            if (null !== $localizedFacetName) {
                 $facetNames[$facetID] = $localizedFacetName;
             }
 
             $localizationsForFacet = [];
             foreach ($facetData->getValues() as $facetEntryID => $count) {
-                $facetEntryKey = $facetKey . '.' . $facetEntryID;
+                $facetEntryKey = $facetKey.'.'.$facetEntryID;
                 $localizedFacetEntryName = LocalizationUtility::translate($facetEntryKey, '', []);
-                if ($localizedFacetEntryName !== null) {
+                if (null !== $localizedFacetEntryName) {
                     $localizationsForFacet[$facetEntryID] = $localizedFacetEntryName;
                 }
             }
 
-            if ($localizationsForFacet !== []) {
+            if ([] !== $localizationsForFacet) {
                 $facetEntryNames[$facetID] = $localizationsForFacet;
             }
         }
