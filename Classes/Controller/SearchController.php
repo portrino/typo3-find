@@ -28,27 +28,28 @@ namespace Subugoe\Find\Controller;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
+
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Subugoe\Find\Service\ServiceProviderInterface;
 use Subugoe\Find\Utility\ArrayUtility;
 use Subugoe\Find\Utility\FrontendUtility;
 use TYPO3\CMS\Core\Log\LogManagerInterface;
+use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\ArrayUtility as CoreArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Http\ForwardResponse;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException;
-use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
+use TYPO3\CMS\Frontend\Page\PageInformation;
 
 class SearchController extends ActionController
 {
     protected array $requestArguments = [];
 
-    protected ?object $searchProvider = null;
+    protected ?ServiceProviderInterface $searchProvider = null;
 
     private LoggerInterface $logger;
 
@@ -59,7 +60,6 @@ class SearchController extends ActionController
 
     /**
      * @throws NoSuchArgumentException
-     * @throws StopActionException
      */
     public function detailAction(string $id): ResponseInterface
     {
@@ -216,7 +216,7 @@ class SearchController extends ActionController
             ];
         }
 
-        $uri = $this->uriBuilder->reset()->setTargetPageUid((int)($GLOBALS['TSFE']->id))->setCreateAbsoluteUri(true)->setArguments($arguments)->build();
+        $uri = $this->uriBuilder->reset()->setTargetPageUid((int)($this->request->getAttribute('frontend.page.information')->getId()))->setCreateAbsoluteUri(true)->setArguments($arguments)->build();
 
         $response = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\Psr\Http\Message\ResponseFactoryInterface::class)->createResponse(\TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_303)->withAddedHeader('location', $uri);
         throw new \TYPO3\CMS\Core\Http\PropagateResponseException($response, 6097036578);
@@ -267,11 +267,14 @@ class SearchController extends ActionController
     protected function addStandardAssignments(): void
     {
         $contentObject = $this->request->getAttribute('currentContentObject');
-        $frontendController = $this->request->getAttribute('frontend.controller') ?? $GLOBALS['TSFE'] ?? null;
         $siteLanguage = $this->request->getAttribute('language');
 
-        if (!$siteLanguage instanceof SiteLanguage && $frontendController instanceof TypoScriptFrontendController) {
-            $siteLanguage = $frontendController->getLanguage();
+        if (!$siteLanguage instanceof SiteLanguage) {
+            $site = $this->request->getAttribute('site');
+
+            if ($site instanceof Site) {
+                $siteLanguage = $site->getDefaultLanguage();
+            }
         }
 
         $this->searchProvider->setConfigurationValue('extendedSearch', $this->searchProvider->isExtendedSearch());
@@ -280,10 +283,15 @@ class SearchController extends ActionController
             $contentObject instanceof ContentObjectRenderer ? (int)($contentObject->data['uid'] ?? 0) : 0
         );
         $this->searchProvider->setConfigurationValue('prefixID', 'tx_find_find');
-        $this->searchProvider->setConfigurationValue(
-            'pageTitle',
-            $frontendController instanceof TypoScriptFrontendController ? (string)($frontendController->page['title'] ?? '') : ''
-        );
+
+        $pageTitle = '';
+        $pageInformation = $this->request->getAttribute('frontend.page.information');
+        if ($pageInformation instanceof PageInformation) {
+            $pageRecord = $pageInformation->getPageRecord();
+            $pageTitle = (string)($pageRecord['title'] ?? '');
+        }
+        $this->searchProvider->setConfigurationValue('pageTitle', $pageTitle);
+
         $this->searchProvider->setConfigurationValue(
             'language',
             $siteLanguage instanceof SiteLanguage ? $siteLanguage->getTypo3Language() : ''
@@ -297,7 +305,6 @@ class SearchController extends ActionController
     {
         $connectionConfiguration = $this->settings['connections'][$activeConnection];
 
-        /* @var ServiceProviderInterface $searchProvider */
         $this->searchProvider = GeneralUtility::makeInstance($connectionConfiguration['provider']);
         $this->searchProvider->initialize($activeConnection, $this->settings);
         $this->searchProvider->connect();

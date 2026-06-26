@@ -18,6 +18,7 @@ plugin.tx_find {
         omitHeader = true
 
         nosearchRedirect = 
+        allowNoSearch = 0
 
         idQuery = id:%1$s
 
@@ -255,12 +256,21 @@ module.tx_find.settings < plugin.tx_find.settings
 tx_find_page = PAGE
 tx_find_page {
     typeNum = 1369315139
-    10 < tt_content.list.20.find_find
+    10 < tt_content.find_find.20
     config {
         disableAllHeaderCode = 1
         additionalHeaders.10 {
             header = Content-Type:application/json
             replace = 1
+        }
+    }
+}
+
+config {
+    pageTitleProviders {
+        custom {
+            provider = Subugoe\Find\PageTitle\CustomPageTitleProvider
+            before = seo
         }
     }
 }
