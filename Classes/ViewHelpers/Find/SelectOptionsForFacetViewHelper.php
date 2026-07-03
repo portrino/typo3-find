@@ -68,14 +68,11 @@ class SelectOptionsForFacetViewHelper extends AbstractViewHelper
         $this->registerArgument('localisationPrefix', 'string', 'prefix for the localisation key', false, '');
     }
 
-    /**
-     * @return array
-     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
-    ) {
+    ): array {
         $result = [];
 
         // Start the select with a blank element?
@@ -83,13 +80,13 @@ class SelectOptionsForFacetViewHelper extends AbstractViewHelper
             $result[''] = '';
         }
 
-        if (!empty($arguments['values'])) {
+        if (is_array($arguments['values']) && $arguments['values'] !== []) {
             foreach ($arguments['values'] as $item => $count) {
                 // Localise item name.
                 $localisationKey = $arguments['localisationPrefix'] . $item;
 
                 $localisedItem = LocalizationUtility::translate($localisationKey, 'find');
-                if (!$localisedItem) {
+                if ($localisedItem === null || $localisedItem === '') {
                     $localisedItem = $item;
                 }
 
@@ -104,7 +101,7 @@ class SelectOptionsForFacetViewHelper extends AbstractViewHelper
         }
 
         // Strip sort prefixes.
-        if ($arguments['sortPrefixSeparator']) {
+        if ($arguments['sortPrefixSeparator'] !== null && $arguments['sortPrefixSeparator'] !== '') {
             $strippedResult = [];
             foreach ($result as $key => $value) {
                 $valueParts = explode($arguments['sortPrefixSeparator'], $value, 2);

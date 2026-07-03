@@ -32,10 +32,7 @@ namespace Subugoe\Find\ViewHelpers\LinkedData\Renderer;
  */
 class JSONLDRenderer extends AbstractRenderer implements RendererInterface
 {
-    /**
-     * @return string
-     */
-    public function renderItems($items)
+    public function renderItems(array $items): string
     {
         $graph = [];
 
@@ -62,7 +59,7 @@ class JSONLDRenderer extends AbstractRenderer implements RendererInterface
                     }
 
                     $predicateURI = $this->prefixedName($predicateURI);
-                    if ($subject[$predicateURI]) {
+                    if (array_key_exists($predicateURI, $subject)) {
                         if (is_array($subject[$predicateURI])) {
                             $subject[$predicateURI][] = $object;
                         } else {
@@ -91,7 +88,7 @@ class JSONLDRenderer extends AbstractRenderer implements RendererInterface
         ]);
     }
 
-    protected function prefixedName($name)
+    protected function prefixedName(string $name): string
     {
         foreach ($this->prefixes as $acronym => $URI) {
             if (strpos($name, $URI) === 0) {

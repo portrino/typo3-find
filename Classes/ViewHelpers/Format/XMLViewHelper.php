@@ -52,14 +52,11 @@ class XMLViewHelper extends AbstractViewHelper
         $this->registerArgument('htmloutput', 'Boolean', 'Whether to output as HTML', false, false);
     }
 
-    /**
-     * @return string
-     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
-    ) {
+    ): string|false {
         $input = $renderChildrenClosure();
         $XML = new \DOMDocument();
         $XML->preserveWhiteSpace = false;

@@ -64,14 +64,11 @@ class LocalizedFacetDataViewHelper extends AbstractViewHelper
         $this->registerArgument('settings', 'Array', 'find settings', true);
     }
 
-    /**
-     * @return array
-     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
-    ) {
+    ): array {
         $facetNames = [];
         $facetEntryNames = [];
 

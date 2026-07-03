@@ -99,14 +99,11 @@ class HighlightFieldViewHelper extends AbstractViewHelper
         $this->registerArgument('raw', 'boolean', 'whether to not HTML escape the output', false, false);
     }
 
-    /**
-     * @return string
-     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
-    ) {
+    ): array|string {
         if ($arguments['document']) {
             $fields = $arguments['document']->getFields();
             $fieldContent = $fields[$arguments['field']];
@@ -127,13 +124,8 @@ class HighlightFieldViewHelper extends AbstractViewHelper
     /**
      * Returns string or array of strings with highlighted areas enclosed
      * by \ueeee and \ueeef.
-     *
-     * @param array|string $fieldContent content of the field to highlight
-     * @param array        $arguments
-     *
-     * @return array|string
      */
-    protected static function highlightField($fieldContent, $arguments)
+    protected static function highlightField(array|string $fieldContent, array $arguments): array|string
     {
         $highlightInfo = self::getHighlightInfo($arguments);
 
@@ -152,10 +144,8 @@ class HighlightFieldViewHelper extends AbstractViewHelper
     /**
      * Returns highlight information for the document and field configured in
      * our arguments.
-     *
-     * @return array
      */
-    protected static function getHighlightInfo($arguments)
+    protected static function getHighlightInfo(array $arguments): array
     {
         $highlightInfo = [];
         $documentID = $arguments['document'][$arguments['idKey']];
@@ -176,24 +166,18 @@ class HighlightFieldViewHelper extends AbstractViewHelper
 
     /**
      * Returns $fieldString with highlighted areas enclosed by \ueeee and \ueeef.
-     *
-     * @param string $fieldString   the string to highlight
-     * @param array  $highlightInfo information provided by the index’ highlighter
-     * @param array  $arguments
-     *
-     * @return string
      */
-    protected static function highlightSingleField($fieldString, $highlightInfo, $arguments)
+    protected static function highlightSingleField(string $fieldString, array $highlightInfo, array $arguments): string
     {
         $result = null;
 
         foreach ($highlightInfo as $highlightItem) {
             $highlightItemStripped = str_replace(['\ueeee', '\ueeef'], ['', ''], $highlightItem);
-            if (strpos($fieldString, $highlightItemStripped) !== null) {
+            if (strpos($fieldString, $highlightItemStripped) !== false) {
                 // HTML escape the text here if not explicitly configured to not do so.
                 // Use f:format.raw in the template to avoid double escaping the HTML tags.
                 if (!$arguments['raw']) {
-                    $highlightItem = htmlspecialchars($highlightItem);
+                    $highlightItem = htmlspecialchars($highlightItem, ENT_QUOTES);
                 }
 
                 $highlightItemMarkedUp = str_replace(
@@ -208,7 +192,7 @@ class HighlightFieldViewHelper extends AbstractViewHelper
 
         // If no highlighted string is present, use the original one.
         if ($result === null) {
-            $result = $arguments['raw'] ? $fieldString : htmlspecialchars($fieldString);
+            $result = $arguments['raw'] ? $fieldString : htmlspecialchars($fieldString, ENT_QUOTES);
         }
 
         return $result;

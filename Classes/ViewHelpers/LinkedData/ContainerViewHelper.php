@@ -55,14 +55,11 @@ class ContainerViewHelper extends AbstractViewHelper
         );
     }
 
-    /**
-     * @return string
-     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
-    ) {
+    ): string {
         $renderingContext->getVariableProvider()->add($arguments['name'], []);
 
         $renderChildrenClosure();

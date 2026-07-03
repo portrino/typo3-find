@@ -23,8 +23,10 @@ namespace Subugoe\Find\ViewHelpers\Solr;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Solarium\Client;
+use Solarium\Core\Client\Adapter\Curl;
 use Solarium\QueryType\Select\Query\Query;
 use Solarium\QueryType\Select\Result\Result;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
@@ -36,10 +38,7 @@ class CountFromSolrViewHelper extends AbstractViewHelper
 {
     public array $configuration;
 
-    /**
-     * @var Client
-     */
-    protected $solr;
+    protected Client $solr;
 
     public function initialize(): void
     {
@@ -55,7 +54,9 @@ class CountFromSolrViewHelper extends AbstractViewHelper
             ],
         ];
 
-        $this->solr = new Client($configuration);
+        $adapter = new Curl();
+        $eventDispatcher = new EventDispatcher();
+        $this->solr = new Client($adapter, $eventDispatcher, $configuration);
     }
 
     /**
@@ -77,11 +78,11 @@ class CountFromSolrViewHelper extends AbstractViewHelper
 
         $newQuery = $this->arguments['query'];
 
-        if ($findParameter['q']['default']) {
+        if (($findParameter['q']['default'] ?? '') !== '') {
             $newQuery = $newQuery . ' AND ' . $findParameter['q']['default'];
         }
 
-        if ($activeFacets) {
+        if (is_array($activeFacets) && $activeFacets !== []) {
             foreach ($activeFacets as $facetInfo) {
                 foreach ($facetInfo as $facet) {
                     $newQuery = $newQuery . ' AND ' . $facet['query'];
@@ -89,7 +90,7 @@ class CountFromSolrViewHelper extends AbstractViewHelper
             }
         }
 
-        if ($queryConcat) {
+        if ($queryConcat !== null && $queryConcat !== '') {
             $newQuery .= ' AND ' . $queryConcat;
         }
 
@@ -114,12 +115,13 @@ class CountFromSolrViewHelper extends AbstractViewHelper
      *
      * @param Query $query
      */
-    private function createQueryComponents(&$query): void
+    private function createQueryComponents(Query $query): void
     {
         // Shards
-        if ($this->templateVariableContainer->get('settings')['shards'] && count($this->templateVariableContainer->get('settings')['shards'])) {
+        $shards = $this->templateVariableContainer->get('settings')['shards'];
+        if (is_array($shards) && count($shards) > 0) {
             $distributedSearch = $query->getDistributedSearch();
-            foreach ($this->templateVariableContainer->get('settings')['shards'] as $name => $shard) {
+            foreach ($shards as $name => $shard) {
                 $distributedSearch->addShard($name, $shard);
             }
         }
@@ -130,10 +132,11 @@ class CountFromSolrViewHelper extends AbstractViewHelper
      *
      * @param Query $query
      */
-    private function addTypoScriptFilters($query): void
+    private function addTypoScriptFilters(Query $query): void
     {
-        if (!empty($this->templateVariableContainer->get('settings')['additionalFilters'])) {
-            foreach ($this->templateVariableContainer->get('settings')['additionalFilters'] as $key => $filterQuery) {
+        $additionalFilters = $this->templateVariableContainer->get('settings')['additionalFilters'];
+        if (is_array($additionalFilters) && $additionalFilters !== []) {
+            foreach ($additionalFilters as $key => $filterQuery) {
                 $query->createFilterQuery('additionalFilter-' . $key)
                     ->setQuery($filterQuery);
             }
@@ -142,10 +145,8 @@ class CountFromSolrViewHelper extends AbstractViewHelper
 
     /**
      * Creates a query for a document.
-     *
-     * @return Query
      */
-    private function createQuery($query)
+    private function createQuery(string $query): Query
     {
         $queryObject = $this->solr->createSelect();
         $this->addTypoScriptFilters($queryObject);

@@ -69,14 +69,12 @@ class FacetLinkArgumentsViewHelper extends AbstractViewHelper
      * Create the return array required to add/remove the URL parameters by
      * passing it to f.link.action’s »arguments«
      * or »argumentsToBeExcludedFromQueryString«.
-     *
-     * @return array
      */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
-    ) {
+    ): array {
         $result = [];
 
         $facetID = $arguments['facetID'];

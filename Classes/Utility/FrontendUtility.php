@@ -42,9 +42,9 @@ class FrontendUtility
      * @param int|null $position  of the record in the result list
      * @param array    $arguments overrides $this->requestArguments if set
      */
-    public static function addQueryInformationAsJavaScript($query, array $settings, $position = null, $arguments = []): void
+    public static function addQueryInformationAsJavaScript(array|string $query, array $settings, ?int $position = null, array $arguments = []): void
     {
-        if (!empty($settings['paging']['detailPagePaging'])) {
+        if ((bool)($settings['paging']['detailPagePaging'] ?? false)) {
             if (array_key_exists('underlyingQuery', $arguments)) {
                 $arguments = $arguments['underlyingQuery'];
             }
@@ -58,17 +58,17 @@ class FrontendUtility
                 $underlyingQuery['position'] = $position;
             }
 
-            if (!empty($arguments['count'])) {
+            if (array_key_exists('count', $arguments) && $arguments['count'] !== '') {
                 $underlyingQuery['count'] = $arguments['count'];
             }
 
-            if (!empty($arguments['sort'])) {
+            if (array_key_exists('sort', $arguments) && $arguments['sort'] !== '') {
                 $underlyingQuery['sort'] = $arguments['sort'];
             }
 
-            if (!empty($arguments['group'])) {
+            if (array_key_exists('group', $arguments) && $arguments['group'] !== '') {
                 $underlyingQuery['group'] = $arguments['group'];
-                if (!empty($arguments['grouplimit'])) {
+                if (array_key_exists('grouplimit', $arguments) && $arguments['grouplimit'] !== '') {
                     $underlyingQuery['grouplimit'] = $arguments['grouplimit'];
                 }
             }
@@ -80,7 +80,7 @@ class FrontendUtility
     /**
      * @return array
      */
-    public static function getIndexes($underlyingQueryInfo)
+    public static function getIndexes(array $underlyingQueryInfo): array
     {
         return ['positionIndex' => $underlyingQueryInfo['position'] - 1, 'previousIndex' => max([$underlyingQueryInfo['position'] - 2, 0]), 'nextIndex' => $underlyingQueryInfo['position'], 'resultIndexOffset' => (0 === $underlyingQueryInfo['position'] - 1) ? 0 : 1];
     }

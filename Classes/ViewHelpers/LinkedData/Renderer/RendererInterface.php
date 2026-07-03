@@ -34,5 +34,7 @@ namespace Subugoe\Find\ViewHelpers\LinkedData\Renderer;
  */
 interface RendererInterface
 {
-    public function renderItems($items);
+    public function setPrefixes(array $prefixes): void;
+
+    public function renderItems(array $items): string;
 }

@@ -61,18 +61,15 @@ class NewArrayViewHelper extends AbstractViewHelper
         $this->registerArgument('omitEmptyFields', 'boolean', 'omits empty fields', false, false);
     }
 
-    /**
-     * @return array
-     */
-    public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
+    public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext): mixed
     {
         $result = $arguments['array'];
 
-        if ($arguments['keys']) {
+        if (is_array($arguments['keys']) && $arguments['keys'] !== []) {
             if (count($arguments['keys']) === count($arguments['values'])) {
                 foreach ($arguments['keys'] as $index => $key) {
                     $value = $arguments['values'][$index];
-                    if (!$arguments['omitEmptyFields'] || $value) {
+                    if (!$arguments['omitEmptyFields'] || ($value !== null && $value !== '')) {
                         $result[$key] = $value;
                     }
                 }

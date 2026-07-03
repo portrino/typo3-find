@@ -33,13 +33,11 @@ namespace Subugoe\Find\ViewHelpers\LinkedData\Renderer;
  */
 class RDFRenderer extends AbstractRenderer implements RendererInterface
 {
-    /**
-     * @return string
-     */
-    public function renderItems($items)
+    public function renderItems(array $items): string
     {
         $doc = new \DOMDocument();
         $this->prefixes['rdf'] = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
+        /** @var \DOMElement $rdf */
         $rdf = $doc->createElement($this->prefixedName('rdf:RDF'));
         $doc->appendChild($rdf);
 
@@ -88,9 +86,11 @@ class RDFRenderer extends AbstractRenderer implements RendererInterface
         }
 
         // Add the prefixes that are used as xmlns.
+        /** @var \DOMElement $rootElement */
+        $rootElement = $doc->documentElement;
         foreach (array_keys($this->usedPrefixes) as $prefix) {
-            if ($this->prefixes[$prefix]) {
-                $doc->firstChild->setAttribute('xmlns:' . $prefix, $this->prefixes[$prefix]);
+            if (($this->prefixes[$prefix] ?? '') !== '') {
+                $rootElement->setAttribute('xmlns:' . $prefix, $this->prefixes[$prefix]);
             }
         }
 
@@ -99,12 +99,7 @@ class RDFRenderer extends AbstractRenderer implements RendererInterface
         return $doc->saveXML();
     }
 
-    /**
-     * @param bool $expand
-     *
-     * @return string
-     */
-    protected function prefixedName($name, $expand = false)
+    protected function prefixedName(string $name, bool $expand = false): string
     {
         $nameParts = explode(':', $name, 2);
         if ($this->prefixes[$nameParts[0]]) {

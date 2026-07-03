@@ -61,14 +61,11 @@ class RegexpViewHelper extends AbstractViewHelper
         );
     }
 
-    /**
-     * @return string
-     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
-    ) {
+    ): int|string|null {
         $input = $arguments['string'];
         if ($input === null) {
             $input = $renderChildrenClosure();

@@ -47,14 +47,11 @@ class SolrEscapeViewHelper extends AbstractViewHelper
         $this->registerArgument('phrase', 'boolean', 'whether to use phrase escaping', false, false);
     }
 
-    /**
-     * @return string
-     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
-    ) {
+    ): string {
         $string = $arguments['string'];
         if ($string === null) {
             $string = $renderChildrenClosure();

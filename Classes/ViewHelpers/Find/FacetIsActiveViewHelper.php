@@ -57,18 +57,11 @@ class FacetIsActiveViewHelper extends AbstractViewHelper
         $this->registerArgument('type', 'string', 'Query type [string, range]', false, 'string');
     }
 
-    /**
-     * @return bool
-     */
-
-    /**
-     * @return string|int|bool|array
-     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
-    ) {
+    ): bool {
         foreach ($arguments['activeFacets'] as $facets) {
             foreach ($facets as $facetInfo) {
                 if ($facetInfo['id'] === $arguments['facetID']

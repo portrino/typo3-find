@@ -47,14 +47,11 @@ class TransposeViewHelper extends AbstractViewHelper
         $this->registerArgument('name', 'string', 'Variable name to assign the new array to', true);
     }
 
-    /**
-     * @return string Rendered string
-     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
-    ) {
+    ): string {
         $arrays = [];
         $iterationArray = [];
         // Strip non-numeric keys in the value arrays.
@@ -95,12 +92,8 @@ class TransposeViewHelper extends AbstractViewHelper
 
     /**
      * Returns TRUE if all elements of $arrays have the same count(), FALSE otherwise.
-     *
-     * @param array $arrays array of arrays
-     *
-     * @return bool
      */
-    protected static function identicalLengths($arrays)
+    protected static function identicalLengths(array $arrays): bool
     {
         $result = true;
 

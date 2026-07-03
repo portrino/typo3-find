@@ -38,10 +38,7 @@ abstract class AbstractRenderer
 
     protected array $usedPrefixes = [];
 
-    /**
-     * @return object
-     */
-    public static function instantiateSubclassForType($type)
+    public static function instantiateSubclassForType(string $type): RendererInterface
     {
         if ($type === 'rdf') {
             $instance = GeneralUtility::makeInstance(RDFRenderer::class);
@@ -54,7 +51,7 @@ abstract class AbstractRenderer
         return $instance;
     }
 
-    public function setPrefixes($prefixes): void
+    public function setPrefixes(array $prefixes): void
     {
         $this->prefixes = $prefixes;
     }

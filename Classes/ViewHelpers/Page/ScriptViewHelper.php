@@ -35,10 +35,7 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class ScriptViewHelper extends AbstractViewHelper
 {
-    /**
-     * @return PageRenderer
-     */
-    protected static function getPageRenderer()
+    protected static function getPageRenderer(): PageRenderer
     {
         return GeneralUtility::makeInstance(PageRenderer::class);
     }
@@ -49,14 +46,11 @@ class ScriptViewHelper extends AbstractViewHelper
         $this->registerArgument('name', 'string', 'Name to use', true);
     }
 
-    /**
-     * @return string
-     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
-    ) {
+    ): string {
         $name = $arguments['name'];
         $pageRenderer = self::getPageRenderer();
 

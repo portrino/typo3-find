@@ -35,10 +35,8 @@ class RealUrl
 {
     /**
      * Create automatic RealUrl Configuratoin.
-     *
-     * @return array
      */
-    public function addRealUrlConfiguration($params, &$pObj)
+    public function addRealUrlConfiguration(array $params, mixed &$pObj): array
     {
         return array_merge_recursive(
             $params['config'],

@@ -32,10 +32,7 @@ namespace Subugoe\Find\ViewHelpers\LinkedData\Renderer;
  */
 class TurtleRenderer extends AbstractRenderer implements RendererInterface
 {
-    /**
-     * @return string
-     */
-    public function renderItems($items)
+    public function renderItems(array $items): string
     {
         $result = '';
 
@@ -102,12 +99,7 @@ class TurtleRenderer extends AbstractRenderer implements RendererInterface
         return PHP_EOL . implode('', $prefixes) . PHP_EOL . $result;
     }
 
-    /**
-     * @param bool $usePrefixes
-     *
-     * @return mixed|string
-     */
-    protected function turtleString($item, $usePrefixes = true)
+    protected function turtleString(string $item, bool $usePrefixes = true): string
     {
         $result = '<' . $item . '>';
 

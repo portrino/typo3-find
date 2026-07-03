@@ -55,14 +55,11 @@ class CSVLineViewHelper extends AbstractViewHelper
         $this->registerArgument('fieldEnclosure', 'string', 'The string to enclose the field content in', false, '"');
     }
 
-    /**
-     * @return string
-     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
-    ) {
+    ): string|false {
         $data = $arguments['data'];
         if ($data === null) {
             $data = $renderChildrenClosure();
