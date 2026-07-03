@@ -48,19 +48,16 @@ class AndViewHelper extends AbstractViewHelper
         $this->registerArgument('conditions', 'array', 'the array of conditions to AND', true);
     }
 
-    /**
-     * @return bool
-     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
-    ) {
+    ): bool {
         $result = true;
         foreach ($arguments['conditions'] as $condition) {
-            $result &= (true == $condition);
+            $result = $result && (bool)$condition;
         }
 
-        return (bool) $result;
+        return $result;
     }
 }

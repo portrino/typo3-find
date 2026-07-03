@@ -72,7 +72,7 @@ class FacetIsActiveViewHelper extends AbstractViewHelper
         foreach ($arguments['activeFacets'] as $facets) {
             foreach ($facets as $facetInfo) {
                 if ($facetInfo['id'] === $arguments['facetID']
-                    && ($facetInfo['term'] === $arguments['facetTerm'] || null === $arguments['facetTerm'])
+                    && ($facetInfo['term'] === $arguments['facetTerm'] || $arguments['facetTerm'] === null)
                 ) {
                     return true;
                 }

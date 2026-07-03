@@ -47,14 +47,11 @@ class PathExistsViewHelper extends AbstractViewHelper
         $this->registerArgument('path', 'string', 'the path to check the existence of', true);
     }
 
-    /**
-     * @return string
-     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
-    ) {
-        return file_exists(Environment::getPublicPath().'/'.$arguments['path']);
+    ): bool {
+        return file_exists(Environment::getPublicPath() . '/' . $arguments['path']);
     }
 }

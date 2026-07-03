@@ -54,24 +54,15 @@ class JsonViewHelper extends AbstractViewHelper
         $this->registerArgument('data', 'mixed', 'The data to output as JSON', false, null);
     }
 
-    /**
-     * @return string
-     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
-    ) {
+    ): string|false {
         @trigger_error('Please use f:format.json instead', E_USER_DEPRECATED);
 
-        // Transform arguments for being compatible to the core ViewHelper arguments
-        $data = [];
-        $data['value'] = $arguments['data'];
-        $data['forceObject'] = false;
+        $value = $arguments['data'] ?? $renderChildrenClosure();
 
-        // Call the Core ViewHelper
-        $jsonViewHelper = new \TYPO3\CMS\Fluid\ViewHelpers\Format\JsonViewHelper();
-
-        return $jsonViewHelper::renderStatic($data, $renderChildrenClosure, $renderingContext);
+        return json_encode($value, JSON_HEX_TAG);
     }
 }

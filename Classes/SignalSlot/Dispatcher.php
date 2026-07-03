@@ -53,6 +53,6 @@ final class Dispatcher
 
     private function buildKey(string $signalClassName, string $signalName): string
     {
-        return $signalClassName.'::'.$signalName;
+        return $signalClassName . '::' . $signalName;
     }
 }

@@ -53,11 +53,11 @@ class IsArrayViewHelper extends AbstractViewHelper
         $result = false;
 
         $subject = $arguments['subject'];
-        if (null === $subject) {
+        if ($subject === null) {
             $subject = $renderChildrenClosure();
         }
 
-        if (null !== $subject) {
+        if ($subject !== null) {
             $result = is_array($subject);
         }
 

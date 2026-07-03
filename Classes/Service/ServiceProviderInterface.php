@@ -34,40 +34,42 @@ namespace Subugoe\Find\Service;
  */
 interface ServiceProviderInterface
 {
-    public function initialize(string $connectionName, array $settings);
+    public function initialize(string $connectionName, array $settings): void;
 
-    public function connect();
+    public function connect(): void;
 
-    public function getConfiguration();
+    public function getConfiguration(): array;
 
-    public function getDefaultQuery();
+    public function getDefaultQuery(): array;
 
-    public function getDocumentById(string $id);
+    public function getDocumentById(string $id): array;
 
-    public function getRequestArguments();
+    public function getRequestArguments(): array;
 
-    public function isExtendedSearch();
+    public function isExtendedSearch(): bool;
 
-    public function search($query);
+    public function search(array $query): mixed;
 
     /**
      * @param string $actionName
      */
-    public function setAction($actionName);
+    public function setAction(string $actionName): void;
 
-    public function setConfigurationValue($key, $value);
+    public function setConfigurationValue(string $key, mixed $value): void;
 
     /**
      * @param string $key
      */
-    public function setControllerExtensionKey($key);
+    public function setControllerExtensionKey(string $key): void;
 
-    public function setCounter();
+    public function setCounter(): void;
 
     /**
      * @param array $requestArguments
      */
-    public function setRequestArguments($requestArguments);
+    public function setRequestArguments(array $requestArguments): void;
 
-    public function suggestQuery($settings);
+    public function suggestQuery(array $settings): array;
+
+    public function getTerms(array $arguments): mixed;
 }

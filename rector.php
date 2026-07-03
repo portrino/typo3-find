@@ -8,17 +8,17 @@ use Ssch\TYPO3Rector\Set\Typo3SetList;
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
-        __DIR__.'/Classes',
-        __DIR__.'/Tests',
-        __DIR__.'/Configuration',
-        __DIR__.'/Resources',
-        __DIR__.'/*.php',
+        __DIR__ . '/Classes',
+        __DIR__ . '/Tests',
+        __DIR__ . '/Configuration',
+        __DIR__ . '/Resources',
+        __DIR__ . '/*.php',
     ]);
 
     $rectorConfig->skip([
-        __DIR__.'/.Build/vendor',
-        __DIR__.'/var',
-        __DIR__.'/*.cache',
+        __DIR__ . '/.Build/vendor',
+        __DIR__ . '/var',
+        __DIR__ . '/*.cache',
     ]);
 
     // Define what rule sets will be applied

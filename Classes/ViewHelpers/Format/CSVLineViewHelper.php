@@ -64,7 +64,7 @@ class CSVLineViewHelper extends AbstractViewHelper
         RenderingContextInterface $renderingContext,
     ) {
         $data = $arguments['data'];
-        if (null === $data) {
+        if ($data === null) {
             $data = $renderChildrenClosure();
         }
 

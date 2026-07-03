@@ -61,7 +61,7 @@ class SplitViewHelper extends AbstractViewHelper
         RenderingContextInterface $renderingContext,
     ) {
         $string = $arguments['string'];
-        if (null === $string) {
+        if ($string === null) {
             $string = $renderChildrenClosure();
         }
 

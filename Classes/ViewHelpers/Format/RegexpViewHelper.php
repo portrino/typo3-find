@@ -70,12 +70,12 @@ class RegexpViewHelper extends AbstractViewHelper
         RenderingContextInterface $renderingContext,
     ) {
         $input = $arguments['string'];
-        if (null === $input) {
+        if ($input === null) {
             $input = $renderChildrenClosure();
         }
 
         $result = null;
-        if (null === $arguments['replace']) {
+        if ($arguments['replace'] === null) {
             $result = preg_match($arguments['match'], $input);
         } elseif (!$arguments['useMBEreg']) {
             $result = preg_replace($arguments['match'], $arguments['replace'], $input);

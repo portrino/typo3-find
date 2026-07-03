@@ -83,12 +83,12 @@ class FacetLinkArgumentsViewHelper extends AbstractViewHelper
         $facetTerm = $arguments['facetTerm'];
         $activeFacets = $arguments['activeFacets'];
         $mode = $arguments['mode'];
-        if ('remove' === $mode && $activeFacets) {
+        if ($mode === 'remove' && $activeFacets) {
             if (array_key_exists($facetID, $activeFacets)) {
-                $itemToRemove = 'tx_find_find[facet]['.$facetID.']';
+                $itemToRemove = 'tx_find_find[facet][' . $facetID . ']';
 
                 if (array_key_exists($facetTerm, $activeFacets[$facetID])) {
-                    $itemToRemove .= '['.$facetTerm.']';
+                    $itemToRemove .= '[' . $facetTerm . ']';
                 }
 
                 $result[] = $itemToRemove;
@@ -96,7 +96,7 @@ class FacetLinkArgumentsViewHelper extends AbstractViewHelper
 
             // Go back to page 1.
             $result[] = 'tx_find_find[page]';
-        } elseif ('add' === $mode) {
+        } elseif ($mode === 'add') {
             $result['facet'] = [
                 $facetID => [$facetTerm => 1],
             ];

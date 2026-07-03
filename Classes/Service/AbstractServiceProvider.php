@@ -2,18 +2,15 @@
 
 namespace Subugoe\Find\Service;
 
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Log\LogManager;
-use TYPO3\CMS\Core\Log\LogManagerInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 abstract class AbstractServiceProvider implements ServiceProviderInterface
 {
     protected string $connectionName;
 
-    /**
-     * @var LogManagerInterface
-     */
-    protected $logger;
+    protected LoggerInterface $logger;
 
     protected array $requestArguments = [];
 
@@ -29,7 +26,7 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
     /**
      * @return array
      */
-    public function getRequestArguments()
+    public function getRequestArguments(): array
     {
         return $this->requestArguments;
     }
@@ -37,7 +34,7 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
     /**
      * @param array $requestArguments
      */
-    public function setRequestArguments($requestArguments): void
+    public function setRequestArguments(array $requestArguments): void
     {
         $this->requestArguments = $requestArguments;
     }

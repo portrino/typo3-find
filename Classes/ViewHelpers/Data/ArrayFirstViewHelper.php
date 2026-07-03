@@ -55,11 +55,11 @@ class ArrayFirstViewHelper extends AbstractViewHelper
         $result = null;
 
         $array = $arguments['array'];
-        if (null === $array) {
+        if ($array === null) {
             $array = $renderChildrenClosure();
         }
 
-        if (is_array($array) && [] !== $array) {
+        if (is_array($array) && $array !== []) {
             $arrayKeys = array_keys($array);
             $firstKey = $arrayKeys[0];
             $result = $array[$firstKey];

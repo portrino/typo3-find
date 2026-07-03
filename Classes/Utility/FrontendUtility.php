@@ -54,7 +54,7 @@ class FrontendUtility
                 $underlyingQuery['facet'] = $arguments['facet'];
             }
 
-            if (null !== $position) {
+            if ($position !== null) {
                 $underlyingQuery['position'] = $position;
             }
 
@@ -73,7 +73,7 @@ class FrontendUtility
                 }
             }
 
-            GeneralUtility::makeInstance(AssetCollector::class)->addInlineJavaScript('find_underlyingQuery', 'const underlyingQuery = '.json_encode($underlyingQuery).';');
+            GeneralUtility::makeInstance(AssetCollector::class)->addInlineJavaScript('find_underlyingQuery', 'const underlyingQuery = ' . json_encode($underlyingQuery) . ';');
         }
     }
 

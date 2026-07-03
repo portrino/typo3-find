@@ -62,15 +62,15 @@ class ItemViewHelper extends AbstractViewHelper
         RenderingContextInterface $renderingContext,
     ): void {
         $container = $renderingContext->getVariableProvider()->get($arguments['name']);
-        if (!$container[$arguments['subject']]) {
+        if (!array_key_exists($arguments['subject'], $container)) {
             $container[$arguments['subject']] = [];
         }
 
-        if (!$container[$arguments['subject']][$arguments['predicate']]) {
+        if (!array_key_exists($arguments['predicate'], $container[$arguments['subject']])) {
             $container[$arguments['subject']][$arguments['predicate']] = [];
         }
 
-        if (null !== $arguments['object']) {
+        if ($arguments['object'] !== null) {
             if (is_array($arguments['object'])) {
                 foreach ($arguments['object'] as $value) {
                     $container[$arguments['subject']][$arguments['predicate']][$value] = null;

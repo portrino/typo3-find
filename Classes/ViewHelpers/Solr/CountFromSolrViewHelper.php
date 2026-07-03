@@ -47,7 +47,7 @@ class CountFromSolrViewHelper extends AbstractViewHelper
             'endpoint' => [
                 'localhost' => [
                     'host' => $this->templateVariableContainer->get('settings')['connection']['host'],
-                    'port' => (int) $this->templateVariableContainer->get('settings')['connection']['port'],
+                    'port' => (int)$this->templateVariableContainer->get('settings')['connection']['port'],
                     'path' => $this->templateVariableContainer->get('settings')['connection']['path'],
                     'timeout' => $this->templateVariableContainer->get('settings')['connection']['timeout'],
                     'scheme' => $this->templateVariableContainer->get('settings')['connection']['scheme'],
@@ -78,19 +78,19 @@ class CountFromSolrViewHelper extends AbstractViewHelper
         $newQuery = $this->arguments['query'];
 
         if ($findParameter['q']['default']) {
-            $newQuery = $newQuery.' AND '.$findParameter['q']['default'];
+            $newQuery = $newQuery . ' AND ' . $findParameter['q']['default'];
         }
 
         if ($activeFacets) {
             foreach ($activeFacets as $facetInfo) {
                 foreach ($facetInfo as $facet) {
-                    $newQuery = $newQuery.' AND '.$facet['query'];
+                    $newQuery = $newQuery . ' AND ' . $facet['query'];
                 }
             }
         }
 
         if ($queryConcat) {
-            $newQuery .= ' AND '.$queryConcat;
+            $newQuery .= ' AND ' . $queryConcat;
         }
 
         $query = $this->createQuery($newQuery);
@@ -134,7 +134,7 @@ class CountFromSolrViewHelper extends AbstractViewHelper
     {
         if (!empty($this->templateVariableContainer->get('settings')['additionalFilters'])) {
             foreach ($this->templateVariableContainer->get('settings')['additionalFilters'] as $key => $filterQuery) {
-                $query->createFilterQuery('additionalFilter-'.$key)
+                $query->createFilterQuery('additionalFilter-' . $key)
                     ->setQuery($filterQuery);
             }
         }

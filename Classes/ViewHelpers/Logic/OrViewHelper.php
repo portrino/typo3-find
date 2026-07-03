@@ -47,19 +47,16 @@ class OrViewHelper extends AbstractViewHelper
         $this->registerArgument('conditions', 'array', 'the array of conditions to OR', true);
     }
 
-    /**
-     * @return bool
-     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
-    ) {
+    ): bool {
         $result = false;
         foreach ($arguments['conditions'] as $condition) {
-            $result |= (true == $condition);
+            $result = $result || (bool)$condition;
         }
 
-        return (bool) $result;
+        return $result;
     }
 }

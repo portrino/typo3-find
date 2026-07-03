@@ -53,12 +53,12 @@ class TitleViewHelper extends AbstractViewHelper
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
     ): string {
-        $title = (string) ($arguments['title'] ?? '');
-        if ('' === $title) {
-            $title = trim((string) $renderChildrenClosure());
+        $title = (string)($arguments['title'] ?? '');
+        if ($title === '') {
+            $title = trim((string)$renderChildrenClosure());
         }
 
-        if ('' !== $title) {
+        if ($title !== '') {
             $titleProvider = GeneralUtility::makeInstance(CustomPageTitleProvider::class);
             $titleProvider->setTitle($title);
         }

@@ -30,11 +30,9 @@ namespace Subugoe\Find\Controller;
  * ************************************************************* */
 
 use Psr\Http\Message\ResponseInterface;
-use Psr\Log\LoggerInterface;
 use Subugoe\Find\Service\ServiceProviderInterface;
 use Subugoe\Find\Utility\ArrayUtility;
 use Subugoe\Find\Utility\FrontendUtility;
-use TYPO3\CMS\Core\Log\LogManagerInterface;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\ArrayUtility as CoreArrayUtility;
@@ -51,13 +49,6 @@ class SearchController extends ActionController
 
     protected ?ServiceProviderInterface $searchProvider = null;
 
-    private LoggerInterface $logger;
-
-    public function __construct(LogManagerInterface $logManager)
-    {
-        $this->logger = $logManager->getLogger('find');
-    }
-
     /**
      * @throws NoSuchArgumentException
      */
@@ -71,7 +62,7 @@ class SearchController extends ActionController
             FrontendUtility::addQueryInformationAsJavaScript(
                 $underlyingQueryInfo['q'],
                 $this->settings,
-                (int) $underlyingQueryInfo['position'],
+                (int)$underlyingQueryInfo['position'],
                 $arguments
             );
         }
@@ -168,7 +159,7 @@ class SearchController extends ActionController
         $this->view->assignMultiple($viewValues);
 
         // if there are no search parameters provided, redirect to the URL given in setting 'nosearchRedirect'
-        if (isset($defaultQuery['noSearch']) && $defaultQuery['noSearch'] && (isset($this->settings['nosearchRedirect']) && '' !== $this->settings['nosearchRedirect'])) {
+        if (isset($defaultQuery['noSearch']) && $defaultQuery['noSearch'] && (isset($this->settings['nosearchRedirect']) && $this->settings['nosearchRedirect'] !== '')) {
             $response = GeneralUtility::makeInstance(\Psr\Http\Message\ResponseFactoryInterface::class)->createResponse(\TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_303)->withAddedHeader('location', $this->settings['nosearchRedirect']);
             throw new \TYPO3\CMS\Core\Http\PropagateResponseException($response, 8491898626);
         }
@@ -200,7 +191,7 @@ class SearchController extends ActionController
 
         $selectResults = $this->searchProvider->search($queryArguments);
 
-        if (1 === count($selectResults)) {
+        if (count($selectResults) === 1) {
             $resultSet = $selectResults->getDocuments();
 
             $arguments = [
@@ -222,11 +213,10 @@ class SearchController extends ActionController
             ];
         }
 
-        $uri = $this->uriBuilder->reset()->setTargetPageUid((int) $this->request->getAttribute('frontend.page.information')->getId())->setCreateAbsoluteUri(true)->setArguments($arguments)->build();
+        $uri = $this->uriBuilder->reset()->setTargetPageUid($this->request->getAttribute('frontend.page.information')->getId())->setCreateAbsoluteUri(true)->setArguments($arguments)->build();
 
         $response = GeneralUtility::makeInstance(\Psr\Http\Message\ResponseFactoryInterface::class)->createResponse(\TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_303)->withAddedHeader('location', $uri);
         throw new \TYPO3\CMS\Core\Http\PropagateResponseException($response, 6097036578);
-        exit;
     }
 
     /**
@@ -287,7 +277,7 @@ class SearchController extends ActionController
         $this->searchProvider->setConfigurationValue('extendedSearch', $this->searchProvider->isExtendedSearch());
         $this->searchProvider->setConfigurationValue(
             'uid',
-            $contentObject instanceof ContentObjectRenderer ? (int) ($contentObject->data['uid'] ?? 0) : 0
+            $contentObject instanceof ContentObjectRenderer ? (int)($contentObject->data['uid'] ?? 0) : 0
         );
         $this->searchProvider->setConfigurationValue('prefixID', 'tx_find_find');
 
@@ -295,7 +285,7 @@ class SearchController extends ActionController
         $pageInformation = $this->request->getAttribute('frontend.page.information');
         if ($pageInformation instanceof PageInformation) {
             $pageRecord = $pageInformation->getPageRecord();
-            $pageTitle = (string) ($pageRecord['title'] ?? '');
+            $pageTitle = (string)($pageRecord['title'] ?? '');
         }
 
         $this->searchProvider->setConfigurationValue('pageTitle', $pageTitle);
@@ -309,7 +299,7 @@ class SearchController extends ActionController
     /**
      * @param string $activeConnection
      */
-    protected function initializeConnection($activeConnection)
+    protected function initializeConnection(string $activeConnection): void
     {
         $connectionConfiguration = $this->settings['connections'][$activeConnection];
 

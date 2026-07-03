@@ -61,7 +61,7 @@ class JoinViewHelper extends AbstractViewHelper
         RenderingContextInterface $renderingContext,
     ) {
         $array = $arguments['array'];
-        if (null === $array) {
+        if ($array === null) {
             $array = $renderChildrenClosure();
         }
 

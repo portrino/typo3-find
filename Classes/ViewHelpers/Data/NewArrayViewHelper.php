@@ -77,7 +77,7 @@ class NewArrayViewHelper extends AbstractViewHelper
                     }
                 }
             } else {
-                $result = 'newArray View Helper: Number of keys and values must be the same.'.PHP_EOL.print_r(
+                $result = 'newArray View Helper: Number of keys and values must be the same.' . PHP_EOL . print_r(
                     $arguments,
                     true
                 );
@@ -89,14 +89,14 @@ class NewArrayViewHelper extends AbstractViewHelper
         }
 
         $variableName = $arguments['name'];
-        if (null !== $variableName) {
+        if ($variableName !== null) {
             if ($renderingContext->getVariableProvider()->exists($variableName)) {
                 $renderingContext->getVariableProvider()->remove($variableName);
             }
 
             $renderingContext->getVariableProvider()->add($variableName, $result);
             $result = $renderChildrenClosure();
-            if (true !== $arguments['global']) {
+            if ($arguments['global'] !== true) {
                 $renderingContext->getVariableProvider()->remove($variableName);
             }
         }
