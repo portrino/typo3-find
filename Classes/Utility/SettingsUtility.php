@@ -39,6 +39,10 @@ class SettingsUtility
      *
      * Settings array keys need to be non-numeric if they are supposed to be overriden.
      */
+    /**
+     * @param array<string, mixed> $settings
+     * @return array<string, mixed>
+     */
     public static function getMergedSettings(string $settingName, array $settings, string $actionName = 'index'): array
     {
         $config = [];

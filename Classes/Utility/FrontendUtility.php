@@ -38,9 +38,10 @@ class FrontendUtility
     /**
      * Stores information about the active query in the »underlyingQuery« JavaScript variable.
      *
-     * @param array    $query
-     * @param int|null $position  of the record in the result list
-     * @param array    $arguments overrides $this->requestArguments if set
+     * @param array<string, mixed>|string $query
+     * @param array<string, mixed> $settings
+     * @param int|null $position of the record in the result list
+     * @param array<string, mixed> $arguments overrides $this->requestArguments if set
      */
     public static function addQueryInformationAsJavaScript(array|string $query, array $settings, ?int $position = null, array $arguments = []): void
     {
@@ -78,7 +79,8 @@ class FrontendUtility
     }
 
     /**
-     * @return array
+     * @param array<string, int> $underlyingQueryInfo
+     * @return array{positionIndex:int, previousIndex:int, nextIndex:int, resultIndexOffset:int}
      */
     public static function getIndexes(array $underlyingQueryInfo): array
     {

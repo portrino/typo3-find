@@ -34,6 +34,8 @@ class LoggerUtility
 {
     /**
      * Returns an array that can be handled by devLog with the information from an exception.
+     *
+     * @return array{message:string, code:int, file:string, line:int, trace:string, previous?:array<string, mixed>}
      */
     public static function exceptionToArray(\Throwable $exception, bool $includePrevious = false): array
     {

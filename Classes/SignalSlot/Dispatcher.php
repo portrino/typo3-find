@@ -37,7 +37,9 @@ final class Dispatcher
         $key = $this->buildKey($signalClassName, $signalName);
 
         foreach (self::$connections[$key] ?? [] as $connection) {
-            $slotInstance = GeneralUtility::makeInstance($connection['slotClassName']);
+            /** @var class-string<object> $slotClassName */
+            $slotClassName = $connection['slotClassName'];
+            $slotInstance = GeneralUtility::makeInstance($slotClassName);
             $arguments = $signalArguments;
 
             if ($connection['passSignalInformation']) {
@@ -47,7 +49,8 @@ final class Dispatcher
                 ];
             }
 
-            call_user_func_array([$slotInstance, $connection['slotMethodName']], $arguments);
+            $methodName = $connection['slotMethodName'];
+            $slotInstance->{$methodName}(...$arguments);
         }
     }
 

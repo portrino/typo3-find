@@ -6,6 +6,10 @@ namespace Subugoe\Find\Utility;
 
 class UpgradeUtility
 {
+    /**
+     * @param array<string, mixed> $connectionSettings
+     * @return array<string, mixed>
+     */
     public static function handleSolariumUpgrade(array $connectionSettings): array
     {
         trigger_error('Please read the upgrading instructions at https://github.com/subugoe/typo3-find/blob/main/UPGRADING.md', E_USER_DEPRECATED);

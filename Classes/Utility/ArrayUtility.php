@@ -40,6 +40,10 @@ class ArrayUtility
      * Specifically aimed at the __hmac and __referrer keys introduced by Fluid
      * forms as well as the text submitted by empty search form fields.
      */
+    /**
+     * @param array<string, mixed> $array
+     * @return array<string, mixed>
+     */
     public static function cleanArgumentsArray(array $array): array
     {
         foreach ($array as $key => &$value) {

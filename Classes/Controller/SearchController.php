@@ -29,6 +29,7 @@ namespace Subugoe\Find\Controller;
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
 
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Subugoe\Find\Service\ServiceProviderInterface;
 use Subugoe\Find\Utility\ArrayUtility;
@@ -45,6 +46,7 @@ use TYPO3\CMS\Frontend\Page\PageInformation;
 
 class SearchController extends ActionController
 {
+    /** @var array<string, mixed> */
     protected array $requestArguments = [];
 
     protected ?ServiceProviderInterface $searchProvider = null;
@@ -160,7 +162,7 @@ class SearchController extends ActionController
 
         // if there are no search parameters provided, redirect to the URL given in setting 'nosearchRedirect'
         if (isset($defaultQuery['noSearch']) && $defaultQuery['noSearch'] && (isset($this->settings['nosearchRedirect']) && $this->settings['nosearchRedirect'] !== '')) {
-            $response = GeneralUtility::makeInstance(\Psr\Http\Message\ResponseFactoryInterface::class)->createResponse(\TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_303)->withAddedHeader('location', $this->settings['nosearchRedirect']);
+            $response = GeneralUtility::makeInstance(ResponseFactoryInterface::class)->createResponse((int)\TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_303)->withAddedHeader('location', $this->settings['nosearchRedirect']);
             throw new \TYPO3\CMS\Core\Http\PropagateResponseException($response, 8491898626);
         }
 
@@ -215,7 +217,7 @@ class SearchController extends ActionController
 
         $uri = $this->uriBuilder->reset()->setTargetPageUid($this->request->getAttribute('frontend.page.information')->getId())->setCreateAbsoluteUri(true)->setArguments($arguments)->build();
 
-        $response = GeneralUtility::makeInstance(\Psr\Http\Message\ResponseFactoryInterface::class)->createResponse(\TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_303)->withAddedHeader('location', $uri);
+        $response = GeneralUtility::makeInstance(ResponseFactoryInterface::class)->createResponse((int)\TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_303)->withAddedHeader('location', $uri);
         throw new \TYPO3\CMS\Core\Http\PropagateResponseException($response, 6097036578);
     }
 
@@ -303,7 +305,9 @@ class SearchController extends ActionController
     {
         $connectionConfiguration = $this->settings['connections'][$activeConnection];
 
-        $this->searchProvider = GeneralUtility::makeInstance($connectionConfiguration['provider']);
+        /** @var class-string<ServiceProviderInterface> $providerClass */
+        $providerClass = $connectionConfiguration['provider'];
+        $this->searchProvider = GeneralUtility::makeInstance($providerClass);
         $this->searchProvider->initialize($activeConnection, $this->settings);
         $this->searchProvider->connect();
     }

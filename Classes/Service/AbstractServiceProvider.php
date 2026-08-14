@@ -12,10 +12,13 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
 
     protected LoggerInterface $logger;
 
+    /** @var array<string, mixed> */
     protected array $requestArguments = [];
 
+    /** @var array<string, mixed> */
     protected array $settings = [];
 
+    /** @param array<string, mixed> $settings */
     public function initialize(string $connectionName, array $settings): void
     {
         $this->connectionName = $connectionName;
@@ -26,14 +29,13 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
     /**
      * @return array
      */
+    /** @return array<string, mixed> */
     public function getRequestArguments(): array
     {
         return $this->requestArguments;
     }
 
-    /**
-     * @param array $requestArguments
-     */
+    /** @param array<string, mixed> $requestArguments */
     public function setRequestArguments(array $requestArguments): void
     {
         $this->requestArguments = $requestArguments;
