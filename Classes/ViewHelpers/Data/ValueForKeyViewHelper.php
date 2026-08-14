@@ -44,13 +44,16 @@ class ValueForKeyViewHelper extends AbstractViewHelper
         $this->registerArgument('key', 'string', 'The key to extract the value for', true);
     }
 
+    /**
+     * @param array{array: array<array-key, mixed>|object|null, key: array-key} $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
     ): mixed {
         $array = $arguments['array'];
-        if (!$array) {
+        if ($array === null || $array === []) {
             return null;
         }
 
@@ -60,7 +63,7 @@ class ValueForKeyViewHelper extends AbstractViewHelper
 
         $result = null;
 
-        if ((is_int($arguments['key']) || is_string($arguments['key'])) && array_key_exists($arguments['key'], $array)) {
+        if (array_key_exists($arguments['key'], $array)) {
             $result = $array[$arguments['key']];
         }
 

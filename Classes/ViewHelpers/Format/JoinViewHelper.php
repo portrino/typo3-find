@@ -52,12 +52,15 @@ class JoinViewHelper extends AbstractViewHelper
         );
     }
 
+    /**
+     * @param array{array?: array<int, scalar>|null, separator: string} $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
     ): string {
-        $array = $arguments['array'];
+        $array = $arguments['array'] ?? null;
         if ($array === null) {
             $array = $renderChildrenClosure();
         }

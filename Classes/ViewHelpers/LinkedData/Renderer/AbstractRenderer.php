@@ -34,8 +34,10 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 abstract class AbstractRenderer
 {
+    /** @var array<string, string> */
     protected array $prefixes = [];
 
+    /** @var array<string, bool> */
     protected array $usedPrefixes = [];
 
     public static function instantiateSubclassForType(string $type): RendererInterface
@@ -51,6 +53,9 @@ abstract class AbstractRenderer
         return $instance;
     }
 
+    /**
+     * @param array<string, string> $prefixes
+     */
     public function setPrefixes(array $prefixes): void
     {
         $this->prefixes = $prefixes;

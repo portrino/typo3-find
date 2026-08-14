@@ -48,6 +48,9 @@ class NotViewHelper extends AbstractViewHelper
         $this->registerArgument('condition', 'string|int|float|array', 'the condition to NOT', true);
     }
 
+    /**
+     * @param array{condition: mixed} $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,

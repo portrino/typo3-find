@@ -61,23 +61,36 @@ class RegexpViewHelper extends AbstractViewHelper
         );
     }
 
+    /**
+     * @param array{
+     *     string?: string|null,
+     *     match: string,
+     *     replace?: string|null,
+     *     useMBEreg: bool
+     * } $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
-    ): int|string|null {
-        $input = $arguments['string'];
+    ): int|string|false|null {
+        $input = $arguments['string'] ?? null;
         if ($input === null) {
             $input = $renderChildrenClosure();
         }
 
+        if (!is_string($input)) {
+            return null;
+        }
+
         $result = null;
-        if ($arguments['replace'] === null) {
+        $replace = $arguments['replace'] ?? null;
+        if ($replace === null) {
             $result = preg_match($arguments['match'], $input);
         } elseif (!$arguments['useMBEreg']) {
-            $result = preg_replace($arguments['match'], $arguments['replace'], $input);
+            $result = preg_replace($arguments['match'], $replace, $input);
         } else {
-            $result = mb_ereg_replace($arguments['match'], $arguments['replace'], $input);
+            $result = mb_ereg_replace($arguments['match'], $replace, $input);
         }
 
         return $result;

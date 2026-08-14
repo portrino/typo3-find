@@ -56,6 +56,9 @@ class PageNumberForResultNumberViewHelper extends AbstractViewHelper
         $this->registerArgument('resultsPerPage', 'int', 'number of results per page', false, self::DEFAULT_RESULTS_PER_PAGE);
     }
 
+    /**
+     * @param array{resultNumber: int, resultsPerPage: int} $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,

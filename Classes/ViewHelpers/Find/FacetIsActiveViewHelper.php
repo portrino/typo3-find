@@ -57,15 +57,24 @@ class FacetIsActiveViewHelper extends AbstractViewHelper
         $this->registerArgument('type', 'string', 'Query type [string, range]', false, 'string');
     }
 
+    /**
+     * @param array{
+     *     facetID: string,
+     *     facetTerm?: string|null,
+     *     activeFacets: array<int|string, array<int, array{id: string, term: string|null}>>,
+     *     type?: string
+     * } $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
     ): bool {
+        $facetTerm = $arguments['facetTerm'] ?? null;
         foreach ($arguments['activeFacets'] as $facets) {
             foreach ($facets as $facetInfo) {
                 if ($facetInfo['id'] === $arguments['facetID']
-                    && ($facetInfo['term'] === $arguments['facetTerm'] || $arguments['facetTerm'] === null)
+                    && ($facetInfo['term'] === $facetTerm || $facetTerm === null)
                 ) {
                     return true;
                 }

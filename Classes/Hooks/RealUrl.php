@@ -35,6 +35,9 @@ class RealUrl
 {
     /**
      * Create automatic RealUrl Configuratoin.
+     *
+     * @param array{config: array<string, mixed>} $params
+     * @return array<string, mixed>
      */
     public function addRealUrlConfiguration(array $params, mixed &$pObj): array
     {

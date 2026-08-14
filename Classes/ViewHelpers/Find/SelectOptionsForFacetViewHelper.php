@@ -68,19 +68,31 @@ class SelectOptionsForFacetViewHelper extends AbstractViewHelper
         $this->registerArgument('localisationPrefix', 'string', 'prefix for the localisation key', false, '');
     }
 
+    /**
+     * @param array{
+     *     values: array<string, int|string>,
+     *     showCount: bool,
+     *     leadingBlank: bool,
+     *     sortByName: bool,
+     *     sortPrefixSeparator?: string|null,
+     *     localisationPrefix: string
+     * } $arguments
+     * @return array<string, string>
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
     ): array {
         $result = [];
+        $sortPrefixSeparator = $arguments['sortPrefixSeparator'] ?? null;
 
         // Start the select with a blank element?
         if ($arguments['leadingBlank']) {
             $result[''] = '';
         }
 
-        if (is_array($arguments['values']) && $arguments['values'] !== []) {
+        if ($arguments['values'] !== []) {
             foreach ($arguments['values'] as $item => $count) {
                 // Localise item name.
                 $localisationKey = $arguments['localisationPrefix'] . $item;
@@ -101,10 +113,10 @@ class SelectOptionsForFacetViewHelper extends AbstractViewHelper
         }
 
         // Strip sort prefixes.
-        if ($arguments['sortPrefixSeparator'] !== null && $arguments['sortPrefixSeparator'] !== '') {
+        if ($sortPrefixSeparator !== null && $sortPrefixSeparator !== '') {
             $strippedResult = [];
             foreach ($result as $key => $value) {
-                $valueParts = explode($arguments['sortPrefixSeparator'], $value, 2);
+                $valueParts = explode($sortPrefixSeparator, $value, 2);
                 $strippedResult[$key] = $valueParts[count($valueParts) - 1];
             }
 

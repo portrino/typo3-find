@@ -48,6 +48,9 @@ class AndViewHelper extends AbstractViewHelper
         $this->registerArgument('conditions', 'array', 'the array of conditions to AND', true);
     }
 
+    /**
+     * @param array{conditions: array<int, mixed>} $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,

@@ -49,17 +49,26 @@ class PageListViewHelper extends AbstractViewHelper
         $this->registerArgument('minimumGapSize', 'int', 'gaps of fewer items than this are filles', false, 2);
     }
 
+    /**
+     * @param array{currentPage?: int, resultCount: int, perPage: int, adjacentPages: int, minimumGapSize: int} $arguments
+     * @return array{
+     *     pages: list<array{number: int, current: bool, gap: bool, status: string, text: string}>,
+     *     current: int,
+     *     previous: int|null,
+     *     next: int|null
+     * }
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
     ): array {
-        $currentPage = ($arguments['currentPage'] ? (int)$arguments['currentPage'] : 1);
+        $currentPage = max(1, $arguments['currentPage'] ?? 1);
         $numberOfPages = (int)ceil($arguments['resultCount'] / $arguments['perPage']);
-        $adjacentPages = (int)$arguments['adjacentPages'];
+        $adjacentPages = $arguments['adjacentPages'];
         $adjacentFirst = max($currentPage - $adjacentPages, 1);
         $adjacentLast = min($currentPage + $adjacentPages, $numberOfPages);
-        $minimumGapSize = (int)$arguments['minimumGapSize'];
+        $minimumGapSize = $arguments['minimumGapSize'];
         $pages = [];
 
         $pageIndex = 1;

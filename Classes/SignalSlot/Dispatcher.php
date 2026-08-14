@@ -50,7 +50,14 @@ final class Dispatcher
             }
 
             $methodName = $connection['slotMethodName'];
-            $slotInstance->{$methodName}(...$arguments);
+            if (!is_callable([$slotInstance, $methodName])) {
+                throw new \RuntimeException(
+                    sprintf('Configured slot method "%s::%s" is not callable.', $slotClassName, $methodName),
+                    1755168631
+                );
+            }
+
+            call_user_func_array([$slotInstance, $methodName], $arguments);
         }
     }
 

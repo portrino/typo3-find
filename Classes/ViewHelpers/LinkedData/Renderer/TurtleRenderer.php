@@ -32,6 +32,9 @@ namespace Subugoe\Find\ViewHelpers\LinkedData\Renderer;
  */
 class TurtleRenderer extends AbstractRenderer implements RendererInterface
 {
+    /**
+     * @param array<string, array<string, array<string, array{language?: string|null, type?: string|null}|null>>> $items
+     */
     public function renderItems(array $items): string
     {
         $result = '';
@@ -65,13 +68,15 @@ class TurtleRenderer extends AbstractRenderer implements RendererInterface
                         }
 
                         // TODO: Error Handling for could not escape.
+                        $language = $properties['language'] ?? null;
+                        $type = $properties['type'] ?? null;
 
-                        if ($properties['language']) {
-                            $objectString .= '@' . $properties['language'];
+                        if ($language !== null && $language !== '') {
+                            $objectString .= '@' . $language;
                         }
 
-                        if ($properties['type']) {
-                            $objectString .= '^^' . $this->turtleString($properties['type']);
+                        if ($type !== null && $type !== '') {
+                            $objectString .= '^^' . $this->turtleString($type);
                         }
                     }
 

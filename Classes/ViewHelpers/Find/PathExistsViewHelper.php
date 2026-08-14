@@ -47,6 +47,9 @@ class PathExistsViewHelper extends AbstractViewHelper
         $this->registerArgument('path', 'string', 'the path to check the existence of', true);
     }
 
+    /**
+     * @param array{path: string} $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,

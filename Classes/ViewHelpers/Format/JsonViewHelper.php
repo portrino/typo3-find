@@ -54,6 +54,9 @@ class JsonViewHelper extends AbstractViewHelper
         $this->registerArgument('data', 'mixed', 'The data to output as JSON', false, null);
     }
 
+    /**
+     * @param array{data?: mixed} $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,

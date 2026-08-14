@@ -45,15 +45,18 @@ class FieldContentViewHelper extends AbstractViewHelper
         $this->registerArgument('string', 'string', 'String to be examined for display', false, null);
     }
 
+    /**
+     * @param array{string?: array{term?: string}|string|null} $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
     ): ?string {
-        $string = $arguments['string'];
+        $string = $arguments['string'] ?? null;
 
-        if (is_array($string) && array_key_exists('term', $string)) {
-            $string = $string['term'];
+        if (is_array($string)) {
+            $string = $string['term'] ?? null;
         }
 
         if ($string === null || $string === '') {

@@ -69,6 +69,16 @@ class FacetLinkArgumentsViewHelper extends AbstractViewHelper
      * Create the return array required to add/remove the URL parameters by
      * passing it to f.link.action’s »arguments«
      * or »argumentsToBeExcludedFromQueryString«.
+     *
+     * @param array{
+     *     facetID: string,
+     *     facetTerm?: string|null,
+     *     activeFacets: array<string, array<string, int|string>>,
+     *     mode: string,
+     *     not?: bool,
+     *     modifier?: string
+     * } $arguments
+     * @return array<int|string, mixed>
      */
     public static function renderStatic(
         array $arguments,
@@ -78,10 +88,10 @@ class FacetLinkArgumentsViewHelper extends AbstractViewHelper
         $result = [];
 
         $facetID = $arguments['facetID'];
-        $facetTerm = $arguments['facetTerm'];
+        $facetTerm = $arguments['facetTerm'] ?? null;
         $activeFacets = $arguments['activeFacets'];
         $mode = $arguments['mode'];
-        if ($mode === 'remove' && $activeFacets) {
+        if ($mode === 'remove' && $activeFacets !== []) {
             if (array_key_exists($facetID, $activeFacets)) {
                 $itemToRemove = 'tx_find_find[facet][' . $facetID . ']';
 
@@ -98,8 +108,9 @@ class FacetLinkArgumentsViewHelper extends AbstractViewHelper
             $result['facet'] = [
                 $facetID => [$facetTerm => 1],
             ];
-            if ($arguments['modifier']) {
-                $result['facet'][$facetID][$facetTerm] = $arguments['modifier'];
+            $modifier = $arguments['modifier'] ?? '';
+            if ($modifier !== '') {
+                $result['facet'][$facetID][$facetTerm] = $modifier;
             }
         }
 

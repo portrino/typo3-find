@@ -52,6 +52,9 @@ class XMLViewHelper extends AbstractViewHelper
         $this->registerArgument('htmloutput', 'Boolean', 'Whether to output as HTML', false, false);
     }
 
+    /**
+     * @param array{htmloutput: bool} $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,

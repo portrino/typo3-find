@@ -59,8 +59,8 @@ class SearchController extends ActionController
         $arguments = $this->searchProvider->getRequestArguments();
         $detail = $this->searchProvider->getDocumentById($id);
 
-        if ($arguments['underlyingQuery']) {
-            $underlyingQueryInfo = $arguments['underlyingQuery'];
+        $underlyingQueryInfo = $arguments['underlyingQuery'] ?? null;
+        if (is_array($underlyingQueryInfo) && array_key_exists('q', $underlyingQueryInfo) && isset($underlyingQueryInfo['position'])) {
             FrontendUtility::addQueryInformationAsJavaScript(
                 $underlyingQueryInfo['q'],
                 $this->settings,
@@ -161,8 +161,10 @@ class SearchController extends ActionController
         $this->view->assignMultiple($viewValues);
 
         // if there are no search parameters provided, redirect to the URL given in setting 'nosearchRedirect'
-        if (isset($defaultQuery['noSearch']) && $defaultQuery['noSearch'] && (isset($this->settings['nosearchRedirect']) && $this->settings['nosearchRedirect'] !== '')) {
-            $response = GeneralUtility::makeInstance(ResponseFactoryInterface::class)->createResponse((int)\TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_303)->withAddedHeader('location', $this->settings['nosearchRedirect']);
+        $noSearch = (bool)($defaultQuery['noSearch'] ?? false);
+        $nosearchRedirect = $this->settings['nosearchRedirect'] ?? null;
+        if ($noSearch && is_string($nosearchRedirect) && $nosearchRedirect !== '') {
+            $response = GeneralUtility::makeInstance(ResponseFactoryInterface::class)->createResponse((int)\TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_303)->withAddedHeader('location', $nosearchRedirect);
             throw new \TYPO3\CMS\Core\Http\PropagateResponseException($response, 8491898626);
         }
 

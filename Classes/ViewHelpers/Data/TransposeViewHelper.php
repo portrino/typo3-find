@@ -47,6 +47,9 @@ class TransposeViewHelper extends AbstractViewHelper
         $this->registerArgument('name', 'string', 'Variable name to assign the new array to', true);
     }
 
+    /**
+     * @param array{arrays: array<string, array<array-key, mixed>|null>, name: string} $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
@@ -56,11 +59,11 @@ class TransposeViewHelper extends AbstractViewHelper
         $iterationArray = [];
         // Strip non-numeric keys in the value arrays.
         foreach ($arguments['arrays'] as $key => $array) {
-            $iterationArray = ($array !== null) ? $array : [];
-            $arrays[$key] = array_values($iterationArray);
+            $iterationArray = $array !== null ? array_values($array) : [];
+            $arrays[$key] = $iterationArray;
         }
 
-        if ($iterationArray && static::identicalLengths($arrays)) {
+        if ($iterationArray !== [] && static::identicalLengths($arrays)) {
             $rows = [];
             foreach (array_keys($iterationArray) as $rowIndex) {
                 $row = [];
@@ -92,6 +95,8 @@ class TransposeViewHelper extends AbstractViewHelper
 
     /**
      * Returns TRUE if all elements of $arrays have the same count(), FALSE otherwise.
+     *
+     * @param array<string, array<int, mixed>> $arrays
      */
     protected static function identicalLengths(array $arrays): bool
     {

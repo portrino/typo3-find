@@ -65,16 +65,24 @@ class StripViewHelper extends AbstractViewHelper
         );
     }
 
+    /**
+     * @param array{string?: string|null, strip?: string|null} $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
     ): string {
-        $string = $arguments['string'];
+        $string = $arguments['string'] ?? null;
         if ($string === null) {
             $string = $renderChildrenClosure();
         }
+        if (!is_string($string)) {
+            $string = (string)$string;
+        }
 
-        return $arguments['strip'] === null ? trim($string) : trim($string, $arguments['strip']);
+        $strip = $arguments['strip'] ?? null;
+
+        return $strip === null ? trim($string) : trim($string, $strip);
     }
 }

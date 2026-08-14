@@ -46,11 +46,17 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
  * Service provider for solr.
+ *
+ * @phpstan-type RequestArguments array<string, mixed>
+ * @phpstan-type FacetConfig array<string, mixed>
+ * @phpstan-type FacetInfo array{id: string, config: FacetConfig, term: string, status: string, query: string|null}
+ * @phpstan-type ActiveFacets array<string, array<string, FacetInfo>>
  */
 class SolrServiceProvider extends AbstractServiceProvider
 {
     protected ?string $action = null;
 
+    /** @var array<string, mixed> */
     protected array $configuration = [];
 
     protected Client $connection;
@@ -59,6 +65,7 @@ class SolrServiceProvider extends AbstractServiceProvider
 
     protected Query $query;
 
+    /** @var array<string, mixed> */
     protected array $timing = [];
 
     protected ?Dispatcher $signalSlotDispatcher = null;
@@ -184,7 +191,7 @@ class SolrServiceProvider extends AbstractServiceProvider
     }
 
     /**
-     * @param array $requestArguments
+     * @param RequestArguments $requestArguments
      */
     public function setRequestArguments(array $requestArguments): void
     {
@@ -203,11 +210,14 @@ class SolrServiceProvider extends AbstractServiceProvider
         $arguments = $this->getRequestArguments();
 
         $assignments = [];
-        if ($this->settings['paging']['detailPagePaging'] && array_key_exists('underlyingQuery', $arguments)) {
+        if ((bool)($this->settings['paging']['detailPagePaging'] ?? false)
+            && array_key_exists('underlyingQuery', $arguments)
+            && is_array($arguments['underlyingQuery'])
+        ) {
             // If underlying query has been sent, fetch more data to enable paging arrows.
             $underlyingQueryInfo = $arguments['underlyingQuery'];
 
-            $index = FrontendUtility::getIndexes($underlyingQueryInfo);
+            $index = FrontendUtility::getIndexes(['position' => (int)($underlyingQueryInfo['position'] ?? 0)]);
 
             foreach ($arguments['underlyingQuery'] as $key => $value) {
                 $arguments[$key] = $value;
@@ -251,23 +261,28 @@ class SolrServiceProvider extends AbstractServiceProvider
         return $assignments;
     }
 
-    private function addDocumentPageMetaData(object $document): void
+    private function addDocumentPageMetaData(mixed $document): void
     {
+        if (!is_object($document) || !method_exists($document, 'getFields')) {
+            return;
+        }
+
         $dpm = $this->settings['detailPageMeta'];
         $descriptionField = $dpm['descriptionFieldName'] ?? '';
         $imageField = $dpm['imageFieldName'] ?? '';
+        $documentFields = $document->getFields();
 
         $imageUrl = null;
         $description = null;
         // get image URL from configured field
-        if (in_array($imageField, $document->getFields(), true)) {
-            $difv = $document[$imageField];
+        if (array_key_exists($imageField, $documentFields)) {
+            $difv = $documentFields[$imageField];
             $imageUrl = is_array($difv) ? $difv[0] : $difv;
         }
 
         // get description from configured field
-        if (in_array($descriptionField, $document->getFields(), true)) {
-            $ddfv = $document[$descriptionField];
+        if (array_key_exists($descriptionField, $documentFields)) {
+            $ddfv = $documentFields[$descriptionField];
             $description = is_array($ddfv) ? $ddfv[0] : $ddfv;
         }
 
@@ -309,9 +324,11 @@ class SolrServiceProvider extends AbstractServiceProvider
             $result = ((bool)$this->requestArguments['extended']);
         } elseif (array_key_exists('q', $this->requestArguments)) {
             foreach ($this->settings['queryFields'] as $fieldInfo) {
-                if (isset($fieldInfo['extended']) && $fieldInfo['extended']
+                if ((bool)($fieldInfo['extended'] ?? false)
                     && array_key_exists($fieldInfo['id'], $this->requestArguments['q'])
-                    && $this->requestArguments['q'][$fieldInfo['id']]
+                    && $this->requestArguments['q'][$fieldInfo['id']] !== ''
+                    && $this->requestArguments['q'][$fieldInfo['id']] !== null
+                    && $this->requestArguments['q'][$fieldInfo['id']] !== []
                 ) {
                     // Check if the request argument is an array itself (appies to field type "Range")
                     if (is_array($this->requestArguments['q'][$fieldInfo['id']])) {
@@ -348,7 +365,7 @@ class SolrServiceProvider extends AbstractServiceProvider
     }
 
     /**
-     * @param array $configuration
+     * @param array<string, mixed> $configuration
      */
     public function setConfiguration(array $configuration): void
     {
@@ -377,7 +394,7 @@ class SolrServiceProvider extends AbstractServiceProvider
         if (array_key_exists('q', $settings)) {
             $query = $this->getConnection()->createSuggester();
             $query->setQuery($settings['q']);
-            if ($settings['dictionary']) {
+            if (isset($settings['dictionary']) && $settings['dictionary'] !== '') {
                 $query->setDictionary($settings['dictionary']);
             }
 
@@ -398,7 +415,7 @@ class SolrServiceProvider extends AbstractServiceProvider
     }
 
     /**
-     * @param array $arguments
+     * @param RequestArguments $arguments
      */
     public function getTerms(array $arguments): mixed
     {
@@ -439,7 +456,8 @@ class SolrServiceProvider extends AbstractServiceProvider
     /**
      * Adds filter queries for active facets to $query.
      *
-     * @param array $arguments request arguments
+     * @param RequestArguments $arguments request arguments
+     * @return ActiveFacets
      */
     protected function addFacetFilters(array $arguments): array
     {
@@ -580,16 +598,16 @@ class SolrServiceProvider extends AbstractServiceProvider
                             }
                         }
 
-                        if ((int)$facet['excludeOwnFilter'] === 1) {
+                        if ((int)($facet['excludeOwnFilter'] ?? 0) === 1) {
                             $queryForFacet->addExclude($this->tagForFacet($facetID));
                         }
                     } else {
                         /** @var FacetField $queryForFacet */
                         $queryForFacet = $facetSet->createFacetField($facetID);
                         $queryForFacet->setField($facet['field'] ?? $facetID)
-                                      ->setMinCount($facet['fetchMinimum'])
-                                      ->setLimit($facet['fetchMaximum'])
-                                      ->setSort($facet['sortOrder']);
+                                      ->setMinCount($facet['fetchMinimum'] ?? 0)
+                                      ->setLimit($facet['fetchMaximum'] ?? 0)
+                                      ->setSort($facet['sortOrder'] ?? '');
                     }
 
                     if (isset($facet['excludeOwnFilter']) && $facet['excludeOwnFilter'] === 1) {
@@ -628,7 +646,7 @@ class SolrServiceProvider extends AbstractServiceProvider
      * the highlight to better deal with field contents that contain markup
      * themselves.
      *
-     * @param array $arguments request arguments
+     * @param RequestArguments $arguments request arguments
      */
     protected function addHighlighting(array $arguments): void
     {
@@ -737,7 +755,7 @@ class SolrServiceProvider extends AbstractServiceProvider
      * For the key »default« it contains the default number of results.
      * For the key »selected« it contains the the selected number of results.
      *
-     * @param array $arguments request arguments
+     * @param RequestArguments $arguments request arguments
      */
     protected function addResultCountOptionsToTemplate(array $arguments): void
     {
@@ -770,7 +788,7 @@ class SolrServiceProvider extends AbstractServiceProvider
      * For the key »default« it contains the default sort order string.
      * For the key »selected« it contains the selected sort order string.
      *
-     * @param array $arguments request arguments
+     * @param RequestArguments $arguments request arguments
      */
     protected function addSortOrdersToTemplate(array $arguments): void
     {
@@ -810,7 +828,7 @@ class SolrServiceProvider extends AbstractServiceProvider
             if (array_key_exists('sort', $arguments) && $arguments['sort'] !== '' && array_key_exists($arguments['sort'], $sortOptions['menu'])) {
                 $sortOptions['selected'] = $arguments['sort'];
             } else {
-                $sortOptions['selected'] = $sortOptions['default'];
+                $sortOptions['selected'] = $sortOptions['default'] ?? null;
             }
         }
 
@@ -916,7 +934,7 @@ class SolrServiceProvider extends AbstractServiceProvider
     /**
      * Creates a query configured with all parameters set in the request’s arguments.
      *
-     * @param array $arguments request arguments
+     * @param RequestArguments $arguments request arguments
      */
     protected function createQueryForArguments(array $arguments): void
     {
@@ -968,9 +986,9 @@ class SolrServiceProvider extends AbstractServiceProvider
     /**
      * Returns array with information about active facets.
      *
-     * @param array $arguments request arguments
+     * @param RequestArguments $arguments request arguments
      *
-     * @return array of arrays with information about active facets
+     * @return ActiveFacets
      */
     protected function getActiveFacets(array $arguments): array
     {
@@ -1009,7 +1027,7 @@ class SolrServiceProvider extends AbstractServiceProvider
      * * TypoScript setting »paging.perPage«
      * limited by the setting »paging.maximumPerPage«.
      *
-     * @param array|null $arguments overrides $this->requestArguments if set
+     * @param RequestArguments|null $arguments overrides $this->requestArguments if set
      */
     protected function getCount(?array $arguments = null): int
     {
@@ -1033,6 +1051,8 @@ class SolrServiceProvider extends AbstractServiceProvider
 
     /**
      * Returns the facet configuration for the given $id.
+     *
+     * @return FacetConfig|null
      */
     protected function getFacetConfig(string $id): ?array
     {
@@ -1052,6 +1072,7 @@ class SolrServiceProvider extends AbstractServiceProvider
      * Returns query for the given facet $ID and $term based on the facet’s
      * configuration.
      *
+     * @param FacetConfig $facetConfig
      * @return string query string
      */
     protected function getFacetQuery(array $facetConfig, string $queryTerm, string $queryModifier): ?string
@@ -1094,7 +1115,7 @@ class SolrServiceProvider extends AbstractServiceProvider
 
                 $queryTerm = urldecode($queryTerm);
 
-                if ($facetConfig['escapeQuotes'] ?? false) {
+                if ((bool)($facetConfig['escapeQuotes'] ?? false)) {
                     $queryTerm = str_replace('"', '\\"', $queryTerm);
                 }
 
@@ -1130,7 +1151,7 @@ class SolrServiceProvider extends AbstractServiceProvider
     /**
      * Returns the index of the first row to return.
      *
-     * @param array|null $arguments overrides $this->requestArguments if set
+     * @param RequestArguments|null $arguments overrides $this->requestArguments if set
      */
     protected function getOffset(?array $arguments = null): int
     {
@@ -1151,6 +1172,12 @@ class SolrServiceProvider extends AbstractServiceProvider
         return $offset;
     }
 
+    /**
+     * @param array<string, mixed> $assignments
+     * @param array{positionIndex: int, previousIndex: int, nextIndex: int, resultIndexOffset: int} $index
+     * @param RequestArguments $arguments
+     * @return array<string, mixed>
+     */
     protected function getRecordsWithUnderlyingQuery(array $assignments, array $index, string $id, array $arguments): array
     {
         $connection = $this->getConnection();
@@ -1169,7 +1196,7 @@ class SolrServiceProvider extends AbstractServiceProvider
                 $groups = $selectResults->getGrouping();
                 $group = $groups->getGroup($field);
                 $numFound = $group->getMatches();
-                $valueGroups = $group->getValueGroups();
+                $valueGroups = method_exists($group, 'getValueGroups') ? $group->getValueGroups() : [];
                 $numValueGroups = count($valueGroups);
                 $document = null;
                 $docIdx = (int)$arguments['position'];
@@ -1220,7 +1247,8 @@ class SolrServiceProvider extends AbstractServiceProvider
                 $resultSet = $selectResults->getDocuments();
                 // the actual result is at position 0 (for the first document) or 1 (otherwise).
                 $document = $resultSet[$index['resultIndexOffset']];
-                if ($document['id'] === $id) {
+                $documentFields = $document->getFields();
+                if (($documentFields['id'] ?? null) === $id) {
                     $assignments['document'] = $document;
                     if ($index['resultIndexOffset'] !== 0) {
                         $assignments['document-previous'] = $resultSet[0];
@@ -1261,6 +1289,10 @@ class SolrServiceProvider extends AbstractServiceProvider
         return $assignments;
     }
 
+    /**
+     * @param array<string, mixed> $assignments
+     * @return array<string, mixed>
+     */
     protected function getTheRecordSpecified(string $id, array $assignments): array
     {
         $connection = $this->getConnection();
@@ -1307,6 +1339,9 @@ class SolrServiceProvider extends AbstractServiceProvider
      * Takes the array of search query parameters and builds an array of Solr
      * search strings from it, using the »queryFields« configuration from TypoScript.
      * These search strings need to be ANDed together for the complete query.
+     *
+     * @param array<string, mixed> $queryParameters
+     * @return array<string, string>
      */
     protected function queryComponentsForQueryParameters(array $queryParameters): array
     {
@@ -1348,6 +1383,10 @@ class SolrServiceProvider extends AbstractServiceProvider
                     }
 
                     foreach ($defaults as $defaultKey => $default) {
+                        if (!is_array($queryTerms)) {
+                            $queryTerms = [];
+                        }
+
                         if (!array_key_exists($defaultKey, $queryTerms)) {
                             $queryTerms[$defaultKey] = $default;
                         }
@@ -1355,11 +1394,11 @@ class SolrServiceProvider extends AbstractServiceProvider
                 }
 
                 // Escape all arguments unless told not to do so.
-                if (isset($fieldInfo['noescape']) && !$fieldInfo['noescape']) {
+                if ((int)($fieldInfo['noescape'] ?? 0) === 0) {
                     $escapedQueryTerms = [];
                     if (is_array($queryTerms) && $queryTerms !== [] && count($queryTerms) > 1) {
                         foreach ($queryTerms as $key => $term) {
-                            if ($fieldInfo['phrase']) {
+                            if ((bool)($fieldInfo['phrase'] ?? false)) {
                                 $escapedQueryTerms[$key] = $this->query->getHelper()->escapePhrase($term);
                             } else {
                                 $escapedQueryTerms[$key] = $this->query->getHelper()->escapeTerm($term);
@@ -1394,11 +1433,11 @@ class SolrServiceProvider extends AbstractServiceProvider
                     $magicFieldPrefix = '_query_:';
                 }
 
-                if (isset($this->settings['features']['eDisMax']) && $this->settings['features']['eDisMax']) {
+                if ((bool)($this->settings['features']['eDisMax'] ?? false)) {
                     $magicFieldPrefix .= '{!edismax}';
                 }
 
-                if (isset($fieldInfo['noSubQuery']) && $fieldInfo['noSubQuery']) {
+                if ((bool)($fieldInfo['noSubQuery'] ?? false)) {
                     $magicFieldPrefix = '';
                 }
 
@@ -1482,6 +1521,8 @@ class SolrServiceProvider extends AbstractServiceProvider
      *
      * @param string $facetID        ID of the facet to set
      * @param array  $facetSelection array of selected items for the facet
+     * @param ActiveFacets $activeFacets
+     * @param array<string, string> $facetSelection
      */
     protected function setActiveFacetSelectionForID(array &$activeFacets, string $facetID, array $facetSelection): void
     {
@@ -1515,7 +1556,7 @@ class SolrServiceProvider extends AbstractServiceProvider
     /**
      * Sets up the fields to be fetched by the query.
      *
-     * @param array $arguments request arguments
+     * @param RequestArguments $arguments request arguments
      */
     protected function setFields(array $arguments): void
     {
@@ -1550,7 +1591,7 @@ class SolrServiceProvider extends AbstractServiceProvider
     /**
      * Sets up the range of documents to be fetches by $query.
      *
-     * @param array $arguments request arguments
+     * @param RequestArguments $arguments request arguments
      */
     protected function setRange(array $arguments): void
     {
@@ -1561,7 +1602,7 @@ class SolrServiceProvider extends AbstractServiceProvider
     /**
      * Sets up $query’s sort order from URL arguments or the TypoScript default.
      *
-     * @param array $arguments request arguments
+     * @param RequestArguments $arguments request arguments
      */
     protected function setSortOrder(array $arguments): void
     {
@@ -1584,7 +1625,7 @@ class SolrServiceProvider extends AbstractServiceProvider
     /**
      * Sets up $query’s grouping parameters from URL arguments or the TypoScript default.
      *
-     * @param array $arguments request arguments
+     * @param RequestArguments $arguments request arguments
      */
     private function addGrouping(array $arguments): void
     {
@@ -1620,6 +1661,9 @@ class SolrServiceProvider extends AbstractServiceProvider
         }
     }
 
+    /**
+     * @param RequestArguments $arguments
+     */
     private function addGroupLimitOptionsToTemplate(array $arguments): void
     {
         $grouplimitOptions = ['menu' => []];

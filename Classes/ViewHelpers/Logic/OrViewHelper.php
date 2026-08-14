@@ -47,6 +47,9 @@ class OrViewHelper extends AbstractViewHelper
         $this->registerArgument('conditions', 'array', 'the array of conditions to OR', true);
     }
 
+    /**
+     * @param array{conditions: array<int, mixed>} $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,

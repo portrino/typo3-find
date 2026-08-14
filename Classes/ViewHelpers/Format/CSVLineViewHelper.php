@@ -55,18 +55,29 @@ class CSVLineViewHelper extends AbstractViewHelper
         $this->registerArgument('fieldEnclosure', 'string', 'The string to enclose the field content in', false, '"');
     }
 
+    /**
+     * @param array{
+     *     data?: array<int, scalar|null>|null,
+     *     fieldDelimiter: string,
+     *     fieldEnclosure: string
+     * } $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
     ): string|false {
-        $data = $arguments['data'];
+        $data = $arguments['data'] ?? null;
         if ($data === null) {
             $data = $renderChildrenClosure();
         }
 
         // Write CSV to pseudo-file as PHP cannot write it directly to a string.
         $fp = fopen('php://temp', 'r+');
+        if ($fp === false) {
+            throw new \RuntimeException('Unable to open temporary stream for CSV output.', 1755168632);
+        }
+
         fputcsv($fp, $data, $arguments['fieldDelimiter'], $arguments['fieldEnclosure'], escape: '\\');
         rewind($fp);
         $result = fgets($fp);

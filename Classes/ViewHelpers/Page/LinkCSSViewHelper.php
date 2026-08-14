@@ -45,13 +45,16 @@ class LinkCSSViewHelper extends AbstractViewHelper
         $this->registerArgument('file', 'string', 'File to add a CSS header for');
     }
 
+    /**
+     * @param array{file?: string|null} $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
     ): void {
-        $fileNameFromArguments = $arguments['file'];
-        if ($fileNameFromArguments) {
+        $fileNameFromArguments = $arguments['file'] ?? null;
+        if ($fileNameFromArguments !== null && $fileNameFromArguments !== '') {
             $CSSFileName = GeneralUtility::makeInstance(FilePathSanitizer::class)->sanitize($fileNameFromArguments);
             $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
             $pageRenderer->addCssFile($CSSFileName);

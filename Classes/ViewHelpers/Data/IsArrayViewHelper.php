@@ -45,11 +45,14 @@ class IsArrayViewHelper extends AbstractViewHelper
         $this->registerArgument('subject', 'array|string|int', 'The variable to inspect', false, null);
     }
 
+    /**
+     * @param array{subject?: array<array-key, mixed>|string|int|null} $arguments
+     */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext): bool
     {
         $result = false;
 
-        $subject = $arguments['subject'];
+        $subject = $arguments['subject'] ?? null;
         if ($subject === null) {
             $subject = $renderChildrenClosure();
         }

@@ -52,24 +52,29 @@ class SplitViewHelper extends AbstractViewHelper
         $this->registerArgument('separator', 'string', 'The string separating the components', false, self::DEFAULT_SEPARATOR);
     }
 
+    /**
+     * @param array{string?: string|null, separator?: string|null} $arguments
+     * @return array<int, string>|string
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
     ): array|string {
-        $string = $arguments['string'];
+        $string = $arguments['string'] ?? null;
         if ($string === null) {
             $string = $renderChildrenClosure();
         }
 
-        if ($arguments['separator'] === '' || $arguments['separator'] === null) {
-            $arguments['separator'] = self::DEFAULT_SEPARATOR;
+        $separator = $arguments['separator'] ?? self::DEFAULT_SEPARATOR;
+        if ($separator === '') {
+            $separator = self::DEFAULT_SEPARATOR;
         }
 
         if (!is_string($string)) {
             return $string;
         }
 
-        return explode($arguments['separator'], $string);
+        return explode($separator, $string);
     }
 }

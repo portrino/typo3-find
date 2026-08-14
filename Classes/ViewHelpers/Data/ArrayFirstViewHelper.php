@@ -47,11 +47,14 @@ class ArrayFirstViewHelper extends AbstractViewHelper
         $this->registerArgument('array', 'array|string', 'the array to return the first value of', false, null);
     }
 
+    /**
+     * @param array{array?: array<array-key, mixed>|string|null} $arguments
+     */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext): mixed
     {
         $result = null;
 
-        $array = $arguments['array'];
+        $array = $arguments['array'] ?? null;
         if ($array === null) {
             $array = $renderChildrenClosure();
         }

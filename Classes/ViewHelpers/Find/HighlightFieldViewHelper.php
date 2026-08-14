@@ -99,31 +99,56 @@ class HighlightFieldViewHelper extends AbstractViewHelper
         $this->registerArgument('raw', 'boolean', 'whether to not HTML escape the output', false, false);
     }
 
+    /**
+     * @param array{
+     *     results: Result,
+     *     document: Document,
+     *     field: string,
+     *     alternateField?: string|null,
+     *     index?: int|null,
+     *     idKey: string,
+     *     highlightTagOpen: string,
+     *     highlightTagClose: string,
+     *     raw: bool
+     * } $arguments
+     * @return array<int, string>|string
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
     ): array|string {
-        if ($arguments['document']) {
-            $fields = $arguments['document']->getFields();
-            $fieldContent = $fields[$arguments['field']];
-            if ($arguments['index'] !== null) {
-                if (is_array($fieldContent) && count($fieldContent) > $arguments['index']) {
-                    $fieldContent = $fieldContent[$arguments['index']];
-                }
-
-                // TODO: error message
+        $fields = $arguments['document']->getFields();
+        $fieldContent = $fields[$arguments['field']];
+        $selectedIndex = $arguments['index'] ?? null;
+        if ($selectedIndex !== null) {
+            if (is_array($fieldContent) && count($fieldContent) > $selectedIndex) {
+                $fieldContent = $fieldContent[$selectedIndex];
             }
 
-            return self::highlightField($fieldContent, $arguments);
+            // TODO: error message
         }
 
-        return '';
+        return self::highlightField($fieldContent, $arguments);
     }
 
     /**
      * Returns string or array of strings with highlighted areas enclosed
      * by \ueeee and \ueeef.
+     *
+     * @param array{
+     *     results: Result,
+     *     document: Document,
+     *     field: string,
+     *     alternateField?: string|null,
+     *     index?: int|null,
+     *     idKey: string,
+     *     highlightTagOpen: string,
+     *     highlightTagClose: string,
+     *     raw: bool
+     * } $arguments
+     * @param array<int, string>|string $fieldContent
+     * @return array<int, string>|string
      */
     protected static function highlightField(array|string $fieldContent, array $arguments): array|string
     {
@@ -144,19 +169,33 @@ class HighlightFieldViewHelper extends AbstractViewHelper
     /**
      * Returns highlight information for the document and field configured in
      * our arguments.
+     *
+     * @param array{
+     *     results: Result,
+     *     document: Document,
+     *     field: string,
+     *     alternateField?: string|null,
+     *     index?: int|null,
+     *     idKey: string,
+     *     highlightTagOpen: string,
+     *     highlightTagClose: string,
+     *     raw: bool
+     * } $arguments
+     * @return array<int, string>
      */
     protected static function getHighlightInfo(array $arguments): array
     {
         $highlightInfo = [];
-        $documentID = $arguments['document'][$arguments['idKey']];
-        if ($documentID) {
+        $documentID = $arguments['document'][$arguments['idKey']] ?? null;
+        if ($documentID !== null && $documentID !== '') {
             $highlighting = $arguments['results']->getHighlighting();
 
-            if ($highlighting) {
-                if ($arguments['alternateField']) {
-                    $highlightInfo += $highlighting->getResult($documentID)->getField($arguments['alternateField']);
+            if ($highlighting !== null) {
+                $alternateField = $arguments['alternateField'] ?? null;
+                if ($alternateField !== null && $alternateField !== '') {
+                    $highlightInfo += $highlighting->getResult((string)$documentID)->getField($alternateField);
                 } else {
-                    $highlightInfo += $highlighting->getResult($documentID)->getField($arguments['field']);
+                    $highlightInfo += $highlighting->getResult((string)$documentID)->getField($arguments['field']);
                 }
             }
         }
@@ -166,6 +205,19 @@ class HighlightFieldViewHelper extends AbstractViewHelper
 
     /**
      * Returns $fieldString with highlighted areas enclosed by \ueeee and \ueeef.
+     *
+     * @param array<int, string> $highlightInfo
+     * @param array{
+     *     results: Result,
+     *     document: Document,
+     *     field: string,
+     *     alternateField?: string|null,
+     *     index?: int|null,
+     *     idKey: string,
+     *     highlightTagOpen: string,
+     *     highlightTagClose: string,
+     *     raw: bool
+     * } $arguments
      */
     protected static function highlightSingleField(string $fieldString, array $highlightInfo, array $arguments): string
     {

@@ -55,6 +55,9 @@ class ContainerViewHelper extends AbstractViewHelper
         );
     }
 
+    /**
+     * @param array{format: string, prefixes: array<string, string>, name: string} $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,

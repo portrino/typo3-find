@@ -32,6 +32,9 @@ namespace Subugoe\Find\ViewHelpers\LinkedData\Renderer;
  */
 class JSONLDRenderer extends AbstractRenderer implements RendererInterface
 {
+    /**
+     * @param array<string, array<string, array<string, array{language?: string|null, type?: string|null}|null>>> $items
+     */
     public function renderItems(array $items): string
     {
         $graph = [];
@@ -48,13 +51,15 @@ class JSONLDRenderer extends AbstractRenderer implements RendererInterface
                         $object = $this->prefixedName($objectString);
                     } else {
                         $object = ['@value' => $objectString];
+                        $language = $properties['language'] ?? null;
+                        $type = $properties['type'] ?? null;
 
-                        if ($properties['language']) {
-                            $object['@language'] = $properties['language'];
+                        if ($language !== null && $language !== '') {
+                            $object['@language'] = $language;
                         }
 
-                        if ($properties['type']) {
-                            $object['@type'] = $properties['type'];
+                        if ($type !== null && $type !== '') {
+                            $object['@type'] = $type;
                         }
                     }
 
@@ -77,15 +82,21 @@ class JSONLDRenderer extends AbstractRenderer implements RendererInterface
         // Add the prefixes as the @context.
         $context = [];
         foreach (array_keys($this->usedPrefixes) as $prefix) {
-            if ($this->prefixes[$prefix]) {
-                $context[$prefix] = $this->prefixes[$prefix];
+            $prefixValue = $this->prefixes[$prefix] ?? '';
+            if ($prefixValue !== '') {
+                $context[$prefix] = $prefixValue;
             }
         }
 
-        return json_encode([
+        $result = json_encode([
             '@context' => $context,
             '@graph' => $graph,
         ]);
+        if ($result === false) {
+            throw new \RuntimeException('Unable to encode JSON-LD output.', 1755168633);
+        }
+
+        return $result;
     }
 
     protected function prefixedName(string $name): string

@@ -61,13 +61,24 @@ class NewArrayViewHelper extends AbstractViewHelper
         $this->registerArgument('omitEmptyFields', 'boolean', 'omits empty fields', false, false);
     }
 
+    /**
+     * @param array{
+     *     name?: string|null,
+     *     array: array<array-key, mixed>,
+     *     keys?: array<int, array-key>|null,
+     *     values: array<int, mixed>,
+     *     global: bool,
+     *     omitEmptyFields: bool
+     * } $arguments
+     */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext): mixed
     {
         $result = $arguments['array'];
 
-        if (is_array($arguments['keys']) && $arguments['keys'] !== []) {
-            if (count($arguments['keys']) === count($arguments['values'])) {
-                foreach ($arguments['keys'] as $index => $key) {
+        $keys = $arguments['keys'] ?? null;
+        if (is_array($keys) && $keys !== []) {
+            if (count($keys) === count($arguments['values'])) {
+                foreach ($keys as $index => $key) {
                     $value = $arguments['values'][$index];
                     if (!$arguments['omitEmptyFields'] || ($value !== null && $value !== '')) {
                         $result[$key] = $value;
@@ -85,7 +96,7 @@ class NewArrayViewHelper extends AbstractViewHelper
             }
         }
 
-        $variableName = $arguments['name'];
+        $variableName = $arguments['name'] ?? null;
         if ($variableName !== null) {
             if ($renderingContext->getVariableProvider()->exists($variableName)) {
                 $renderingContext->getVariableProvider()->remove($variableName);

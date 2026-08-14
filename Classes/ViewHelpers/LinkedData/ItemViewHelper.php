@@ -56,11 +56,24 @@ class ItemViewHelper extends AbstractViewHelper
         );
     }
 
+    /**
+     * @param array{
+     *     subject: string,
+     *     predicate: string,
+     *     object?: string|array<int, string>|null,
+     *     objectType?: string|null,
+     *     language?: string|null,
+     *     name: string
+     * } $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext,
     ): void {
+        $object = $arguments['object'] ?? null;
+        $objectType = $arguments['objectType'] ?? null;
+        $language = $arguments['language'] ?? null;
         $container = $renderingContext->getVariableProvider()->get($arguments['name']);
         if (!array_key_exists($arguments['subject'], $container)) {
             $container[$arguments['subject']] = [];
@@ -70,18 +83,18 @@ class ItemViewHelper extends AbstractViewHelper
             $container[$arguments['subject']][$arguments['predicate']] = [];
         }
 
-        if ($arguments['object'] !== null) {
-            if (is_array($arguments['object'])) {
-                foreach ($arguments['object'] as $value) {
+        if ($object !== null) {
+            if (is_array($object)) {
+                foreach ($object as $value) {
                     $container[$arguments['subject']][$arguments['predicate']][$value] = null;
                 }
             } else {
-                $container[$arguments['subject']][$arguments['predicate']][$arguments['object']] = null;
+                $container[$arguments['subject']][$arguments['predicate']][$object] = null;
             }
         } else {
             $container[$arguments['subject']][$arguments['predicate']][$renderChildrenClosure()] = [
-                'type' => $arguments['objectType'],
-                'language' => $arguments['language'],
+                'type' => $objectType,
+                'language' => $language,
             ];
         }
 

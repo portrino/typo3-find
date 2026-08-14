@@ -46,6 +46,9 @@ class ScriptViewHelper extends AbstractViewHelper
         $this->registerArgument('name', 'string', 'Name to use', true);
     }
 
+    /**
+     * @param array{file?: string|null, name: string} $arguments
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
@@ -54,8 +57,8 @@ class ScriptViewHelper extends AbstractViewHelper
         $name = $arguments['name'];
         $pageRenderer = self::getPageRenderer();
 
-        $fileNameFromArguments = $arguments['file'];
-        if ($fileNameFromArguments) {
+        $fileNameFromArguments = $arguments['file'] ?? null;
+        if ($fileNameFromArguments !== null && $fileNameFromArguments !== '') {
             $scriptPath = GeneralUtility::makeInstance(FilePathSanitizer::class)->sanitize($fileNameFromArguments);
             $pageRenderer->addJsFooterLibrary($name, $scriptPath);
         } else {

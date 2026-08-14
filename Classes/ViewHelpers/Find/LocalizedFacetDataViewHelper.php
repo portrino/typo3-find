@@ -64,6 +64,10 @@ class LocalizedFacetDataViewHelper extends AbstractViewHelper
         $this->registerArgument('settings', 'Array', 'find settings', true);
     }
 
+    /**
+     * @param array{data: iterable<string, object>, settings: array{languageRootPath: string}} $arguments
+     * @return array{facets: array<string, string>, entries: array<string, array<int|string, string>>}
+     */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
@@ -74,6 +78,10 @@ class LocalizedFacetDataViewHelper extends AbstractViewHelper
 
         $baseKey = 'LLL:' . $arguments['settings']['languageRootPath'] . 'locallang-facets.xml:facet';
         foreach ($arguments['data'] as $facetID => $facetData) {
+            if (!method_exists($facetData, 'getValues')) {
+                continue;
+            }
+
             $facetKey = $baseKey . '.' . $facetID;
             $localizedFacetName = LocalizationUtility::translate($facetKey, '', []);
             if ($localizedFacetName !== null) {
